@@ -5,6 +5,8 @@
 #include <random>
 #include <string>
 #include <chrono>
+
+//#include <boost/math/distributions/beta.hpp>
 //#include "koolplot.h"
 //#include "PlotData.h"
 //#include "Plotstream.h"
@@ -39,6 +41,7 @@ public:
 	int x, y; //position
 	int group;
 	int action;
+	int age;
 	bool homeless;
 	bool unemployed;
 	int x_home;
@@ -410,6 +413,8 @@ int main()
 	std::uniform_int_distribution <int> distribution_employees(20, 61);
 	std::uniform_real_distribution <float> distribution_homeless(0, 1);
 	std::uniform_real_distribution <float> distribution_employeed(0, 1);
+	std::_Beta_distribution <float> distribution_age(2, 5);
+	
 	
 	
 
@@ -485,6 +490,7 @@ int main()
 
 	}*/
 
+	
 	for (i = 0; i < N - I; i++)
 
 	{
@@ -496,6 +502,7 @@ int main()
 		person.y = 1;
 		person.group = 0;
 		person.action = 0;
+		person.age = (int)(distribution_age(generator) * 100);
 		float w = distribution_homeless(generator); //homeless / unemployed
 		if (w <= (1 - homeless_rate))
 
@@ -511,6 +518,11 @@ int main()
 		{
 
 			person.unemployed = 1;
+		}
+		else if (person.age < 15 || person.age > 66)
+		{
+			person.unemployed = 1;
+
 		}
 		else
 		{
@@ -548,6 +560,7 @@ int main()
 		person.y = 1;
 		person.group = 2;
 		person.action = 0;
+		person.age = 30;
 		person.homeless = 0;
 		person.unemployed = 0;
 		person.x_home = -1;
@@ -560,10 +573,8 @@ int main()
 
 	}
 						
-							
+	shuffle(PPL.begin(), PPL.end(), std::default_random_engine(seed));
 
-								//random.shuffle(HOU)
-								//random.shuffle(PPL)
 	i = 0;
 	j = 0;
 	p = 0;
@@ -674,7 +685,9 @@ int main()
 		//printf("\n position_x_work = %d\n", person1.x_work);
 		//printf("\n position_y_work = %d\n", person1.y_work);
 		//printf("\n homeless = %d\n", person1.homeless);
-		//printf("\n unemployeed = %d\n", person1.unemployed);
+		printf("\n unemployeed = %d\n", person1.unemployed);
+		printf("\n person_age = %d\n", person1.age);
+
 
 	
 	}
