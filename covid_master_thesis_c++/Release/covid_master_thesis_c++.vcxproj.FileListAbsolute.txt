@@ -1,1 +1,2 @@
 C:\Users\SterPol\Desktop\covid_thesis_c++\covid_master_thesis_c++\Release\covid_master_thesis_c++.exe
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Release\covid_master_thesis_c++.exe
