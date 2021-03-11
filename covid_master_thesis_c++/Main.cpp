@@ -831,7 +831,6 @@ int main()
 				Rarray.push_back(R);
 
 				contactsPerDay = 0;
-				int testestset = 1;
 
 				if (T == 150)
 				{
