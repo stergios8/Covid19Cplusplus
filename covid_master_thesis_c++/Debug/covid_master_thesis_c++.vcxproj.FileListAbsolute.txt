@@ -1,0 +1,2 @@
+C:\Users\SterPol\Desktop\covid_thesis_c++\covid_master_thesis_c++\Debug\covid_master_thesis_c++.exe
+C:\Users\SterPol\Desktop\covid_thesis_c++\covid_master_thesis_c++\Debug\covid_master_thesis_c++.pdb
