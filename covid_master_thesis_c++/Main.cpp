@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <chrono>
 //#include "koolplot.h"
 //#include "PlotData.h"
 //#include "Plotstream.h"
@@ -85,9 +86,11 @@ public:
 		//If person at home, stay at px or move with probability inside home
 		if ((x >= house.x - house.dx) && (x <= house.x + house.dx) && (y >= house.y - house.dy) && (y <= house.y + house.dy))
 		{
-			std::default_random_engine generator;
+			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::default_random_engine generator(seed);
 			std::uniform_real_distribution <float> distribution(0, 1);
 			float eps = distribution(generator);  // uniform distribution
+			//printf("\neps = %f\n",eps);
 			if (eps > 0.6 && eps < 0.7)
 			{
 				x = x + dx;
@@ -174,10 +177,11 @@ public:
 		//If person at work, stay at px or move with probability inside work
 		if ((x >= work.x - work.dx) && (x <= work.x + work.dx) && (y >= work.y - work.dy) && (y <= work.y + work.dy))
 		{
-			std::default_random_engine generator;
-			std::uniform_real_distribution <float> distribution(0, 1);
-			float eps = distribution(generator);  // uniform distribution	
-
+			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::default_random_engine generator(seed);
+			std::uniform_real_distribution <float> distributionfg(0, 1);
+			float eps = distributionfg(generator);  // uniform distribution	
+			//printf("\neps = %f\n", eps);
 
 			if (eps > 0.6 and eps < 0.7)
 			{
@@ -230,8 +234,9 @@ public:
 	}
 	void actionWalkFree()
 
-	{
-		std::default_random_engine generator;
+	{    
+		unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+		std::default_random_engine generator(seed);
 		std::uniform_real_distribution <float> distribution(0, 1);
 		float eps = distribution(generator);  // uniform distribution
 
@@ -386,7 +391,8 @@ int main()
 
 	//Random generators
 
-	std::default_random_engine generator;
+	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
 	std::uniform_int_distribution <int> distribution_x(0, Length + 1);
 	std::uniform_int_distribution <int> distribution_y(0, Width + 1);
 	std::uniform_int_distribution <int> distribution_dx_house(1, 3);
@@ -606,8 +612,9 @@ int main()
 	/*for (House house : HOU)
 
 	{
-		//printf("\n position_house_x = %d\n", house.x);
-		printf("\n house residents = %d\n", house.no_residents);
+		printf("\n position_house_x = %d\n", house.x);
+		printf("\n position_house_y = %d\n", house.y);
+		//printf("\n house residents = %d\n", house.no_residents);
 
 	}*/
 	
@@ -616,7 +623,7 @@ int main()
 	{
 		//printf("\n position_work_x = %d\n", workplace.x);
 		//printf("\n employees = %d\n", workplace.no_workers);
-		//printf("\n work_x_pos = %d\n", workplace.x);
+		printf("\n work_x_pos = %d\n", workplace.x);
 		printf("\n work_y_pos = %d\n", workplace.y);
 	}
 	*/
@@ -624,10 +631,13 @@ int main()
 	{
 
 		//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
-		printf("\n position_x = %d\n", person1.x_work);
+		printf("\n position_x_home = %d\n", person1.x_home);
+		printf("\n position_y_home = %d\n", person1.y_home);
+		printf("\n position_x_work = %d\n", person1.x_work);
+		printf("\n position_y_work = %d\n", person1.y_work);
 	
-	}*/
-	
+	}
+	*/
 
 	
 
@@ -658,8 +668,8 @@ int main()
 							PPL[i].actionGoHome();
 							if (i == 50)
 							{
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].y_home);
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].y);
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].x_home);
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].x);
 
 							}
 							PPL[i].actionStayHome();
@@ -702,7 +712,7 @@ int main()
 						{
 							
 							PPL[i].actionGoWork();
-							if (i == 80)
+							if (i == 30)
 							{
 								//printf("\nwork position of person 1: %d\n", PPL[i].x_work);
 								//printf("\ncurrent position of person 1: %d\n", PPL[i].x);
