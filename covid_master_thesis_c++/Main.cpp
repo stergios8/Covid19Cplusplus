@@ -51,7 +51,7 @@ public:
 	void actionGoHome()
 
 	{
-		if ((x - house.x > 300) || (x - house.x < -300) || (y - house.y > 300) || (y - house.y < -300))
+		if ((x - house.x > 200) || (x - house.x < -200) || (y - house.y > 200) || (y - house.y < -200))
 		{
 			x = house.x;
 			y = house.y;
@@ -83,7 +83,7 @@ public:
 
 	{
 		//If person at home, stay at px or move with probability inside home
-		if ((x >= house.x - house.dx) || (x <= house.x + house.dx) || (y >= house.y - house.dy) || (y <= house.y + house.dy))
+		if ((x >= house.x - house.dx) && (x <= house.x + house.dx) && (y >= house.y - house.dy) && (y <= house.y + house.dy))
 		{
 			std::default_random_engine generator;
 			std::uniform_real_distribution <float> distribution(0, 1);
@@ -139,14 +139,14 @@ public:
 	void actionGoWork()
 
 	{
-		if ((x - work.x > 300) || (x - work.x < -300) || (y - work.y > 300) || (y - work.y < -300))
+		if ((x - work.x > 200) || (x - work.x < -200) || (y - work.y > 200) || (y - work.y < -200))
 		{
 			x = work.x;
 			y = work.y;
 		}
 
 		//IF person not in work, at this function call, move person by 1 px towards work
-		if ((x < work.x - work.dx) or (x > work.x + work.dx) or (y < work.y - work.dy) or (y > work.y + work.dy))
+		if ((x < work.x - work.dx) || (x > work.x + work.dx) || (y < work.y - work.dy) || (y > work.y + work.dy))
 		{
 			if (x < x_work)
 			{
@@ -172,7 +172,7 @@ public:
 
 	{
 		//If person at work, stay at px or move with probability inside work
-		if ((x >= work.x - work.dx) or (x <= work.x + work.dx) or (y >= work.y - work.dy) or (y <= work.y + work.dy))
+		if ((x >= work.x - work.dx) && (x <= work.x + work.dx) && (y >= work.y - work.dy) && (y <= work.y + work.dy))
 		{
 			std::default_random_engine generator;
 			std::uniform_real_distribution <float> distribution(0, 1);
@@ -262,7 +262,7 @@ public:
 
 bool contact(Human& person1, Human& person2)
 {
-	if ((person1.group != 3 && person2.group != 3) && ((person1.group == 2 /*&& person2.group == 1*/) || (/*person1.group == 1 &&*/ person2.group == 2)))//question
+	if ((person1.group != 3 && person2.group != 3) && ((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)))//question
 	{
 		if ((person1.x == person2.x) && (person1.y == person2.y))
 		{
@@ -280,14 +280,14 @@ bool contact(Human& person1, Human& person2)
 
 					if (person1.group == 2)
 					{
-						person2.group = 1;
+						person2.group = 2;
 					}
 					
 					if (person2.group == 2)
 					{
-						person1.group = 1;
+						person1.group = 2;
 					}
-							
+					printf("\nAdequate Contact\n");
 					return true;
 				}
 				
@@ -362,7 +362,7 @@ int main()
 
 
 
-	float b = 0.001;//0.001;  // infectious rate, controls the rate of spread which represents the probability of transmitting disease between a susceptible and an infectious individual.
+	float b = 0.9;//0.001;  // infectious rate, controls the rate of spread which represents the probability of transmitting disease between a susceptible and an infectious individual.
 	float q = 0.01;  // b / g // contact ratio
 	float g = 0.05;  // b / q // recovery rate
 	float e = 0.1;  // incubation rate is the rate of latent individuals becoming infectious(average duration of incubation is 1 / s)
@@ -402,11 +402,6 @@ int main()
 	int f = 0;
 	for (f = 0; f < no_houses; f++)
 	{
-
-		bool done1 = false;
-		while (done1 == false)
-			{
-			
 			House house;
 			house.x = distribution_x(generator); 		
 			house.y = distribution_y(generator);
@@ -414,9 +409,7 @@ int main()
 			house.dy= distribution_dy_house(generator);
 			house.no_residents = 0;
 			HOU.push_back(house);
-			done1 = true;
-			}
-		
+	
 	}
 		
 
@@ -424,10 +417,7 @@ int main()
 	int k = 0;
 	for (k = 0; k < no_workplaces; k++)
 	{
-
-		bool done2 = false;
-		while (done2 == false)
-		{
+	
 			Workplace workplace;
 			workplace.x = distribution_x(generator);
 			workplace.y = distribution_y(generator);
@@ -435,9 +425,6 @@ int main()
 			workplace.dy = distribution_dy_workplace(generator);
 			workplace.no_workers = 0;
 			WRP.push_back(workplace);
-				done2 = true;
-		}
-
 	}
 
 //Spawn people
@@ -466,6 +453,8 @@ int main()
 
 		person.x = 1;
 		person.y = 1;
+		person.dx = 1;
+		person.dy = 1;
 		person.group = 0;
 		person.action = 0;
 		person.homeless = 1;
@@ -486,6 +475,8 @@ int main()
 		Human person;
 
 		person.x = 1;
+		person.dx = 1;
+		person.dy = 1;
 		person.y = 1;
 		person.group = 0;
 		person.action = 0;
@@ -508,6 +499,8 @@ int main()
 		Human person;
 
 		person.x = 1;
+		person.dx = 1;
+		person.dy = 1;
 		person.y = 1;
 		person.group = 2;
 		person.action = 0;
@@ -605,8 +598,8 @@ int main()
 		worksx.push_back(workplace.x);
 		worksy.push_back(workplace.y);
 
-		}*/
-
+		}
+		*/
 	//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
 	//plot(z, u);
 
@@ -622,7 +615,9 @@ int main()
 
 	{
 		//printf("\n position_work_x = %d\n", workplace.x);
-		printf("\n employees = %d\n", workplace.no_workers);
+		//printf("\n employees = %d\n", workplace.no_workers);
+		//printf("\n work_x_pos = %d\n", workplace.x);
+		printf("\n work_y_pos = %d\n", workplace.y);
 	}
 	*/
 	/*for (Human person1 : PPL)
@@ -658,8 +653,24 @@ int main()
 					{
 						if (PPL[i].homeless == 0)
 						{
+
+							
 							PPL[i].actionGoHome();
+							if (i == 50)
+							{
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].y_home);
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].y);
+
+							}
 							PPL[i].actionStayHome();
+							
+							if (i == 50)
+							{
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].y_home);
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].y);
+
+							}
+
 							for (j = 0; j < N; j++)
 							{
 								if ((i != j) && (contact(PPL[i], PPL[j]) == true)) //explain
@@ -689,8 +700,21 @@ int main()
 					{
 						if (PPL[i].unemployed == 0)
 						{
+							
 							PPL[i].actionGoWork();
+							if (i == 80)
+							{
+								//printf("\nwork position of person 1: %d\n", PPL[i].x_work);
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].x);
+//
+							}
 							PPL[i].actionStayAtWork();
+							if (i == 80)
+							{
+								//printf("\nwork position of person 1: %d\n", PPL[i].x_work);
+								//printf("\ncurrent position of person 1: %d\n", PPL[i].x);
+
+							}
 							for (j = 0; j < N; j++)
 							{
 								if ((i != j) && (contact(PPL[i], PPL[j]) == true)) //explain
@@ -719,6 +743,7 @@ int main()
 				{
 					for (i = 0; i < N; i++)
 					{
+						
 						PPL[i].actionWalkFree();
 
 						for (j = 0; j < N; j++)
@@ -748,6 +773,7 @@ int main()
 					{
 						if (PPL[i].unemployed == 0)
 						{
+							
 							PPL[i].actionGoWork();
 							PPL[i].actionStayAtWork();
 							for (j = 0; j < N; j++)
@@ -771,6 +797,7 @@ int main()
 				{
 					for (i = 0; i < N; i++)
 					{
+						
 						PPL[i].actionWalkFree();
 						for (j = 0; j < N; j++)
 						{
@@ -831,6 +858,21 @@ int main()
 				Rarray.push_back(R);
 
 				contactsPerDay = 0;
+				std::vector <int> people_group;
+				
+
+				for (Human person : PPL)
+				{
+
+
+					people_group.push_back(person.group);
+					if (person.group == 2)
+					{
+						
+						printf("\nInfected\n");
+					}
+
+					}
 
 				if (T == 150)
 				{
