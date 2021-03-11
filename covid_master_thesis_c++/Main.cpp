@@ -312,17 +312,26 @@ int main()
 
 //Variables 
 
+	float homeless_rate = 0.0005;
+	float initial_infected_rate = 0.01;
+	float unemployment_rate = 0.12;
+	float business_proportion = 0.01875;
+	float business_proportion_informal = 0.4;
+
 //Groups
 
-	int S = 399;  //Susceptible //maybe parameterize
+
+	int	N = 400;  // Population
+	int S = N - (N*initial_infected_rate);  //Susceptible //maybe parameterize
+	printf("\nSinit = %d\n",S);
 	int E = 0;   //Exposed
-	int I = 1;  //Infected
+	int I = N*initial_infected_rate;  //Infected
 	int	I_hosp = 0;  // Infected hospitalized
 	int	I_icu = 0;  // Infected ICU(ventilator)
 	int	R = 0;  // Recovered
 	int	D = 0;  // Deceased
 	int	Q = 0;  // Quarantined
-	int	N = S + E + I + R;  // Population
+	
 
 	std::vector<float> Sarray;
 	std::vector<float> Earray;
@@ -339,9 +348,7 @@ int main()
 	std::vector<Workplace> WRP;
 	
 	int family_size = 3;
-	float homeless_rate = 0.0005;
 	int no_houses = (N - N * homeless_rate) / family_size;
-	float unemployment_rate = 0.12;
 	int no_workplaces = 20;
 
 
@@ -401,6 +408,9 @@ int main()
 	std::uniform_int_distribution <int> distribution_dy_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_family(2, 5);
 	std::uniform_int_distribution <int> distribution_employees(20, 61);
+	std::uniform_real_distribution <float> distribution_homeless(0, 1);
+	std::uniform_real_distribution <float> distribution_employeed(0, 1);
+	
 	
 
 
@@ -453,7 +463,7 @@ int main()
 	int j = 0;
 	int p = 0;
 
-	for (j = 0; j < 1; j++)
+	/*for (j = 0; j < 1; j++)
 	{
 		Human person;
 
@@ -473,9 +483,9 @@ int main()
 		person.work = emptyWork;
 		PPL.push_back(person);
 
-	}
+	}*/
 
-	for (i = 0; i < N - 2; i++)
+	for (i = 0; i < N - I; i++)
 
 	{
 		Human person;
@@ -486,8 +496,36 @@ int main()
 		person.y = 1;
 		person.group = 0;
 		person.action = 0;
-		person.homeless = 0;
-		person.unemployed = 0;
+		float w = distribution_homeless(generator); //homeless / unemployed
+		if (w <= (1 - homeless_rate))
+
+		{
+			person.homeless = 0;
+		}
+		else
+		{
+			person.homeless = 1;
+
+		}
+		if (person.homeless == 1)
+		{
+
+			person.unemployed = 1;
+		}
+		else
+		{
+			float z = distribution_employeed(generator);
+			if (z <= (1 - unemployment_rate))
+
+			{
+				person.unemployed = 0;
+			}
+			else
+			{
+				person.unemployed = 1;
+
+			}
+		}
 		person.x_home = -1;
 		person.y_home = -1;
 		person.x_work = -1;
@@ -500,7 +538,7 @@ int main()
 	}
 
 
-	for (p = 0; p < 1; p++)
+	for (p = 0; p < I; p++)
 	{
 		Human person;
 
@@ -627,17 +665,20 @@ int main()
 		printf("\n work_y_pos = %d\n", workplace.y);
 	}
 	*/
-	/*for (Human person1 : PPL)
+	for (Human person1 : PPL)
 	{
 
 		//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
-		printf("\n position_x_home = %d\n", person1.x_home);
-		printf("\n position_y_home = %d\n", person1.y_home);
-		printf("\n position_x_work = %d\n", person1.x_work);
-		printf("\n position_y_work = %d\n", person1.y_work);
+		//printf("\n position_x_home = %d\n", person1.x_home);
+		//printf("\n position_y_home = %d\n", person1.y_home);
+		//printf("\n position_x_work = %d\n", person1.x_work);
+		//printf("\n position_y_work = %d\n", person1.y_work);
+		//printf("\n homeless = %d\n", person1.homeless);
+		//printf("\n unemployeed = %d\n", person1.unemployed);
+
 	
 	}
-	*/
+	
 
 	
 
@@ -755,6 +796,12 @@ int main()
 					{
 						
 						PPL[i].actionWalkFree();
+						if (i == 50)
+						{
+							//printf("\ncurrent position of person 1_x: %d\n", PPL[i].x);
+							//printf("\ncurrent position of person 1_y: %d\n", PPL[i].y);
+
+						}
 
 						for (j = 0; j < N; j++)
 						{
