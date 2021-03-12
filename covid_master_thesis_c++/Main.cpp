@@ -301,7 +301,7 @@ bool contact(Human& person1, Human& person2)
 					{
 						person1.group = 2;
 					}
-					printf("\nAdequate Contact\n");
+					//printf("\nAdequate Contact\n");
 					return true;
 				}
 				
@@ -319,10 +319,7 @@ int main()
 
 {
 
-	std::ofstream excel_file;
-
-	excel_file.open("covid_waveforms.csv", std::ios::app);
-
+	std::ofstream excel_file; // excel file for exporting data
 
 //Variables 
 
@@ -337,7 +334,7 @@ int main()
 
 	int	N = 400;  // Population
 	int S = N - (N*initial_infected_rate);  //Susceptible //maybe parameterize
-	printf("\nSinit = %d\n",S);
+	//printf("\nSinit = %d\n",S);
 	int E = 0;   //Exposed
 	int I = N*initial_infected_rate;  //Infected
 	int	I_hosp = 0;  // Infected hospitalized
@@ -652,6 +649,8 @@ int main()
 	std::vector <int> worksx;
 	std::vector <int> worksy;
 
+	excel_file.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
+
 	for (House house : HOU)
 	{
 		housesx.push_back(house.x);
@@ -659,6 +658,7 @@ int main()
 		excel_file << house.x <<","<<house.y<< std::endl;
 		}
 	
+	excel_file.close();
 	
 	//plt::plot(housesx, housesy, "r.");
 	//plt::show();
@@ -673,22 +673,22 @@ int main()
 	//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
 	//plot(z, u);
 
-	/*for (House house : HOU)
+	for (House house : HOU)
 
 	{
-		printf("\n position_house_x = %d\n", house.x);
-		printf("\n position_house_y = %d\n", house.y);
+		//printf("\n position_house_x = %d\n", house.x);
+		//printf("\n position_house_y = %d\n", house.y);
 		//printf("\n house residents = %d\n", house.no_residents);
 
-	}*/
+	}
 	
 	/*for (Workplace workplace : WRP)
 
 	{
 		//printf("\n position_work_x = %d\n", workplace.x);
 		//printf("\n employees = %d\n", workplace.no_workers);
-		printf("\n work_x_pos = %d\n", workplace.x);
-		printf("\n work_y_pos = %d\n", workplace.y);
+		//printf("\n work_x_pos = %d\n", workplace.x);
+		//printf("\n work_y_pos = %d\n", workplace.y);
 	}
 	*/
 	for (Human person1 : PPL)
@@ -700,8 +700,8 @@ int main()
 		//printf("\n position_x_work = %d\n", person1.x_work);
 		//printf("\n position_y_work = %d\n", person1.y_work);
 		//printf("\n homeless = %d\n", person1.homeless);
-		printf("\n unemployeed = %d\n", person1.unemployed);
-		printf("\n person_age = %d\n", person1.age);
+		//printf("\n unemployeed = %d\n", person1.unemployed);
+		//printf("\n person_age = %d\n", person1.age);
 
 
 	
@@ -950,7 +950,7 @@ int main()
 				std::vector <int> people_group;
 				
 
-				for (Human person : PPL)
+				/*for (Human person : PPL)
 				{
 
 
@@ -961,9 +961,9 @@ int main()
 						printf("\nInfected\n");
 					}
 
-					}
+					}*/
 
-				if (T == 150)
+				if (T == 5) //150
 				{
 
 					done = true;
