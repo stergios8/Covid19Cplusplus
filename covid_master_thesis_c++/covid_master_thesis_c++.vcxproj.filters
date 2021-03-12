@@ -19,4 +19,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\Anaconda3\libs\python38.lib" />
+  </ItemGroup>
 </Project>

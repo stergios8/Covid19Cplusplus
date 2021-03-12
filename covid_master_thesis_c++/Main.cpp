@@ -1,16 +1,20 @@
-
+#define WITHOUT_NUMPY
+#include "Python.h"
 #include <stdio.h>
 #include<stdlib.h>
 #include <iostream>
 #include <random>
 #include <string>
 #include <chrono>
+#include "matplotlibcpp.h"
 
 //#include <boost/math/distributions/beta.hpp>
 //#include "koolplot.h"
 //#include "PlotData.h"
 //#include "Plotstream.h"
 
+//official
+namespace plt = matplotlibcpp;
 
 class House
 {
@@ -641,14 +645,17 @@ int main()
 	std::vector <int> worksx;
 	std::vector <int> worksy;
 
-	/*for (House house : HOU)
+	for (House house : HOU)
 	{
 		housesx.push_back(house.x);
 		housesy.push_back(house.y);
 
 		}
 	
-	for (Workplace workplace : WRP)
+	plt::plot(housesx, housesy, "r.");
+	plt::show();
+
+	/*for (Workplace workplace : WRP)
 	{
 		worksx.push_back(workplace.x);
 		worksy.push_back(workplace.y);
