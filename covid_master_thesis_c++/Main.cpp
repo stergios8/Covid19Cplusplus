@@ -1,12 +1,14 @@
-#define WITHOUT_NUMPY
-#include "Python.h"
+//#define WITHOUT_NUMPY
+//#include "Python.h"
 #include <stdio.h>
 #include<stdlib.h>
 #include <iostream>
 #include <random>
 #include <string>
 #include <chrono>
-#include "matplotlibcpp.h"
+#include <iomanip>
+#include <fstream>
+//#include "matplotlibcpp.h"
 
 //#include <boost/math/distributions/beta.hpp>
 //#include "koolplot.h"
@@ -14,13 +16,13 @@
 //#include "Plotstream.h"
 
 //official
-namespace plt = matplotlibcpp;
+//namespace plt = matplotlibcpp;
 
 class House
 {
 
 public:
-
+	
 	int dx, dy; //position move
 	int x, y; //position
 	int no_residents;
@@ -316,6 +318,11 @@ bool contact(Human& person1, Human& person2)
 int main()
 
 {
+
+	std::ofstream excel_file;
+
+	excel_file.open("covid_waveforms.csv", std::ios::app);
+
 
 //Variables 
 
@@ -649,11 +656,12 @@ int main()
 	{
 		housesx.push_back(house.x);
 		housesy.push_back(house.y);
-
+		excel_file << house.x <<","<<house.y<< std::endl;
 		}
 	
-	plt::plot(housesx, housesy, "r.");
-	plt::show();
+	
+	//plt::plot(housesx, housesy, "r.");
+	//plt::show();
 
 	/*for (Workplace workplace : WRP)
 	{
@@ -935,6 +943,10 @@ int main()
 				Rarray.push_back(R);
 
 				contactsPerDay = 0;
+
+				
+				
+				//excel_file << Sarray[0] << std:: endl;
 				std::vector <int> people_group;
 				
 
@@ -958,7 +970,7 @@ int main()
 				}
 		
 	}
-
+	
 	printf("\nDone\n");
 
 	printf("\nPress a button to finish...\n");
