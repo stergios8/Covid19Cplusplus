@@ -319,7 +319,9 @@ int main()
 
 {
 
-	std::ofstream excel_file; // excel file for exporting data
+	std::ofstream excel_file_initialization; // excel file for exporting initial distribution of houses, workplaces etc.
+	std::ofstream exce_file_results; // excel file for exporting final results of SEIR model
+
 
 //Variables 
 
@@ -358,10 +360,11 @@ int main()
 	std::vector<House> HOU;
 	std::vector<Workplace> WRP;
 	
-	int family_size = 3;
-	int no_houses = (N - N * homeless_rate) / family_size;
-	int no_workplaces = 20;
-
+	int family_size_average = 3;
+	int no_houses = (int) (N / family_size_average);
+	int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_informal));
+	printf("\ntotal houses are = %d\n", no_houses);
+	printf("\ntottal workplaces are = %d\n", no_workplaces);
 
 
 //Environment
@@ -649,16 +652,14 @@ int main()
 	std::vector <int> worksx;
 	std::vector <int> worksy;
 
-	excel_file.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
+	
 
-	for (House house : HOU)
+	/*for (House house : HOU)
 	{
 		housesx.push_back(house.x);
 		housesy.push_back(house.y);
-		excel_file << house.x <<","<<house.y<< std::endl;
-		}
-	
-	excel_file.close();
+		
+		}*/
 	
 	//plt::plot(housesx, housesy, "r.");
 	//plt::show();
@@ -673,14 +674,14 @@ int main()
 	//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
 	//plot(z, u);
 
-	for (House house : HOU)
+	/*for (House house : HOU)
 
 	{
 		//printf("\n position_house_x = %d\n", house.x);
 		//printf("\n position_house_y = %d\n", house.y);
 		//printf("\n house residents = %d\n", house.no_residents);
 
-	}
+	}*/
 	
 	/*for (Workplace workplace : WRP)
 
@@ -691,7 +692,7 @@ int main()
 		//printf("\n work_y_pos = %d\n", workplace.y);
 	}
 	*/
-	for (Human person1 : PPL)
+	/*for (Human person1 : PPL)
 	{
 
 		//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
@@ -705,9 +706,37 @@ int main()
 
 
 	
-	}
+	}*/
 	
+	i = 0;
 
+	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
+	
+		for (i = 0; i < N; i++)
+
+		{
+			if (i < (no_houses - 1))
+
+			{
+				excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << "," << HOU[i].x << "," << HOU[i].y << std::endl;
+
+
+			}
+
+			if(i > (no_houses - 1) && i < (no_workplaces - 1))
+			{
+				excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << std::endl;
+			}
+
+			if (i > (no_workplaces - 1))
+			{
+				excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << std::endl;
+			}
+
+		}
+
+	
+	//excel_file << house.x << "," << house.y << std::endl;
 	
 
 	//experiment
@@ -963,7 +992,7 @@ int main()
 
 					}*/
 
-				if (T == 5) //150
+				if (T == 60) //150
 				{
 
 					done = true;
@@ -971,7 +1000,24 @@ int main()
 		
 	}
 	
-	printf("\nDone\n");
+
+	exce_file_results.open("SEIR_Results.csv");
+	i = 0;
+
+	printf("\nPreparing results excel file...\n");
+	for (i = 0; i < T; i++)
+
+	{
+		exce_file_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << timepassed[i] << std::endl;
+
+	}
+
+	exce_file_results.close();
+
+
+	printf("\nResults excel file done!\n");
+
+	printf("\nSimulation completed!\n");
 
 	printf("\nPress a button to finish...\n");
 
