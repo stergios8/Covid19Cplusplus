@@ -26,6 +26,9 @@ public:
 	int dx, dy; //position move
 	int x, y; //position
 	int no_residents;
+	int socoal_stratum;
+	float home_income;
+	float home_expenses;
 
 };
 
@@ -36,6 +39,9 @@ public:
 	int dx, dy; //position move
 	int x, y; //position
 	int no_workers;
+	int socoal_stratum;
+	float workplace_income;
+	float workplace_expenses;
 
 };
 class Human
@@ -54,6 +60,9 @@ public:
 	int y_home;
 	int x_work;
 	int y_work;
+	int personal_income;
+	float personal_expenses;
+	int socoal_stratum;
 	House house;
 	Workplace work;
 
@@ -330,7 +339,26 @@ int main()
 	float unemployment_rate = 0.12;
 	float business_proportion = 0.01875;
 	float business_proportion_informal = 0.4;
+	float total_Wealth = 1000000000;
+	float public_Wealth_rate = 0.01;
+	float business_Wealt_rate = 0.05;
+	float personal_Wealth_rate = 0.04;
+	float public_Wealth = total_Wealth * public_Wealth_rate;
+	float business_Wealth = total_Wealth * business_Wealt_rate;
+	float personal_Wealth = total_Wealth * personal_Wealth_rate;
+	float min_income = 900;
+	float min_expense = 600;
 
+	/* Social Stratum explanation
+	each workplace and house are given a social stratum
+	according to the house stratum, the respective stratum is assigned to the people that stay at the home --> the family members
+
+	1: Most Poor
+	2:Poor
+	3:Working class
+	4:Rich
+	5:Most Rich
+	*/
 //Groups
 
 
@@ -421,10 +449,12 @@ int main()
 	std::uniform_int_distribution <int> distribution_dx_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_dy_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_family(2, 5);
-	std::uniform_int_distribution <int> distribution_employees(20, 61);
+	std::uniform_int_distribution <int> distribution_employees(20, 60);
 	std::uniform_real_distribution <float> distribution_homeless(0, 1);
 	std::uniform_real_distribution <float> distribution_employeed(0, 1);
 	std::_Beta_distribution <float> distribution_age(2, 5);
+	std::uniform_int_distribution <int> distribution_social_stratum(1,5);
+	std::uniform_int_distribution <int> distribution_unemployeed_social_stratum(1, 2);
 	
 	
 	
@@ -439,6 +469,7 @@ int main()
 			house.y = distribution_y(generator);
 			house.dx = distribution_dx_house(generator);
 			house.dy= distribution_dy_house(generator);
+			house.socoal_stratum = distribution_social_stratum(generator);
 			house.no_residents = 0;
 			HOU.push_back(house);
 	
@@ -455,6 +486,7 @@ int main()
 			workplace.y = distribution_y(generator);
 			workplace.dx = distribution_dx_workplace(generator);
 			workplace.dy = distribution_dy_workplace(generator);
+			workplace.socoal_stratum = distribution_social_stratum(generator);
 			workplace.no_workers = 0;
 			WRP.push_back(workplace);
 	}
@@ -607,6 +639,7 @@ int main()
 					PPL[i].y_home = HOU[j].y;
 					PPL[i].x = HOU[j].x;
 					PPL[i].y = HOU[j].y;
+					PPL[i].socoal_stratum = HOU[j].socoal_stratum;
 					HOU[j].no_residents = HOU[j].no_residents + 1;
 						
 						temp = temp + 1;
@@ -631,16 +664,19 @@ int main()
 		{
 			if (PPL[i].unemployed == 0)
 			{
-				if (PPL[i].x_work == -1)
-				{
-					PPL[i].work = WRP[j];
-					PPL[i].x_work = WRP[j].x;
-					PPL[i].y_work = WRP[j].y;
-					WRP[j].no_workers = WRP[j].no_workers + 1;
-					temp = temp + 1;
-					if (temp == ff)
+				if (PPL[i].socoal_stratum == WRP[j].socoal_stratum)
+				{ 
+					if (PPL[i].x_work == -1)
 					{
-						break;
+						PPL[i].work = WRP[j];
+						PPL[i].x_work = WRP[j].x;
+						PPL[i].y_work = WRP[j].y;
+						WRP[j].no_workers = WRP[j].no_workers + 1;
+						temp = temp + 1;
+						if (temp == ff)
+						{
+							break;
+						}
 					}
                  }
              }
@@ -680,6 +716,7 @@ int main()
 		//printf("\n position_house_x = %d\n", house.x);
 		//printf("\n position_house_y = %d\n", house.y);
 		//printf("\n house residents = %d\n", house.no_residents);
+		//printf("\n House social stratum is = %d\n", house.socoal_stratum);
 
 	}*/
 	
@@ -690,9 +727,10 @@ int main()
 		//printf("\n employees = %d\n", workplace.no_workers);
 		//printf("\n work_x_pos = %d\n", workplace.x);
 		//printf("\n work_y_pos = %d\n", workplace.y);
+		//printf("\n Workplace social stratum is = %d\n", workplace.socoal_stratum);
 	}
 	*/
-	/*for (Human person1 : PPL)
+	for (Human person1 : PPL)
 	{
 
 		//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
@@ -703,10 +741,22 @@ int main()
 		//printf("\n homeless = %d\n", person1.homeless);
 		//printf("\n unemployeed = %d\n", person1.unemployed);
 		//printf("\n person_age = %d\n", person1.age);
+		//printf("\n Person social stratum is = %d\n", person1.socoal_stratum);
+		/*if (person1.unemployed == 0)
 
+		{
 
+			printf("\n Person's work social stratum is = %d\n", person1.work.socoal_stratum);
+		}
+		
+		else
+
+		{
+			printf("\nunemployed guy\n");
+
+		}*/
 	
-	}*/
+	}
 	
 	i = 0;
 
@@ -992,7 +1042,7 @@ int main()
 
 					}*/
 
-				if (T == 60) //150
+				if (T == 1) //150
 				{
 
 					done = true;
