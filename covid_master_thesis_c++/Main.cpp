@@ -1,5 +1,3 @@
-//#define WITHOUT_NUMPY
-//#include "Python.h"
 #include <stdio.h>
 #include<stdlib.h>
 #include <iostream>
@@ -8,25 +6,17 @@
 #include <chrono>
 #include <iomanip>
 #include <fstream>
-//#include "matplotlibcpp.h"
 
-//#include <boost/math/distributions/beta.hpp>
-//#include "koolplot.h"
-//#include "PlotData.h"
-//#include "Plotstream.h"
-
-//official
-//namespace plt = matplotlibcpp;
 
 class House
 {
 
 public:
-	
+
 	int dx, dy; //position move
 	int x, y; //position
 	int no_residents;
-	int socoal_stratum;
+	int social_stratum;
 	float home_income;
 	float home_expenses;
 	float home_wealth;
@@ -40,7 +30,7 @@ public:
 	int dx, dy; //position move
 	int x, y; //position
 	int no_workers;
-	int socoal_stratum;
+	int social_stratum;
 	float workplace_income;
 	float workplace_expenses;
 	float workplace_wealth;
@@ -65,9 +55,15 @@ public:
 	int personal_income;
 	float personal_expenses;
 	float personal_wealth;
-	int socoal_stratum;
+	int social_stratum;
 	House house;
 	Workplace work;
+
+	int Eday;
+	int Iday;
+	int Ihospday;
+	int IICUday;
+	int Rday;
 
 
 	void actionGoHome()
@@ -78,8 +74,8 @@ public:
 			x = house.x;
 			y = house.y;
 		}
-		
-	 //IF person not in home, at this function call, move person by 1 px towards home
+
+		//IF person not in home, at this function call, move person by 1 px towards home
 		if ((x < house.x - house.dx) || (x > house.x + house.dx) || (y < house.y - house.dy) || (y > house.y + house.dy))
 		{
 			if (x < x_home)
@@ -99,7 +95,7 @@ public:
 				y = y - dy;
 			}
 		}
-	
+
 	}
 	void actionStayHome()
 
@@ -111,7 +107,6 @@ public:
 			std::default_random_engine generator(seed);
 			std::uniform_real_distribution <float> distribution(0, 1);
 			float eps = distribution(generator);  // uniform distribution
-			//printf("\neps = %f\n",eps);
 			if (eps > 0.6 && eps < 0.7)
 			{
 				x = x + dx;
@@ -151,13 +146,13 @@ public:
 			{
 				y = house.y + house.dy - 1;
 			}
-			
+
 			if (y > house.y - house.dy)
 			{
 				y = house.y - house.dy + 1;
 			}
 
-			}
+		}
 	}
 
 	void actionGoWork()
@@ -200,9 +195,9 @@ public:
 		{
 			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 			std::default_random_engine generator(seed);
-			std::uniform_real_distribution <float> distributionfg(0, 1);
-			float eps = distributionfg(generator);  // uniform distribution	
-			//printf("\neps = %f\n", eps);
+			std::uniform_real_distribution <float> distribution(0, 1);
+			float eps = distribution(generator);  // uniform distribution	
+
 
 			if (eps > 0.6 and eps < 0.7)
 			{
@@ -254,8 +249,7 @@ public:
 		}
 	}
 	void actionWalkFree()
-
-	{    
+	{
 		unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 		std::default_random_engine generator(seed);
 		std::uniform_real_distribution <float> distribution(0, 1);
@@ -286,16 +280,84 @@ public:
 
 };
 
-bool contact(Human& person1, Human& person2)
+
+float homeless_rate = 0.0005;
+float initial_infected_rate = 0.01;
+float unemployment_rate = 0.12;
+float business_proportion = 0.01875;
+float business_proportion_informal = 0.4;
+float total_Wealth = 1000000000;
+float public_Wealth_rate = 0.01;
+float business_Wealt_rate = 0.05;
+float personal_Wealth_rate = 0.04;
+float public_Wealth = total_Wealth * public_Wealth_rate;
+float business_Wealth = total_Wealth * business_Wealt_rate;
+float personal_Wealth = total_Wealth * personal_Wealth_rate;
+float min_income = 900;
+float min_expense = 600;
+
+int N = 400; // Population
+int I_init = N * initial_infected_rate;  //Infected
+int S_init = N - (N * initial_infected_rate);
+
+
+int MostPoor = 0; //Most poor
+int Poor = 0; // Poor
+int WorkingClass = 0; // working class
+int Rich = 0; //Rich
+int MostRich = 0; // Most Rich
+
+
+int family_size_average = 3;
+//int no_houses = (N - N * homeless_rate) / family_size;
+//int no_workplaces = 20;
+
+int no_houses = (int)(N / family_size_average);
+int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_informal));
+
+//Environment
+
+int Length = 300;  //each pixel corresponds to area 5x5 meters.
+int Width = 300;
+
+//for n in range(N) :
+//    PPL[n, 0] = random.uniform(0, Width)
+//    PPL[n, 1] = random.uniform(0, Length)
+
+//Pandemics Parameters
+
+int contagion_distance = 1;
+float contagion_probability = 0.9;
+int incubation_time = 5;
+int transmission_time = 8;
+int recovering_time = 20;
+int ICU_limit = N * 0.05;
+
+
+
+float b = 0.001;//0.001;  // infectious rate, controls the rate of spread which represents the probability of transmitting disease between a susceptible and an infectious individual.
+float q = 0.01;  // b / g // contact ratio
+float g = 0.05;  // b / q // recovery rate
+float e = 0.1;  // incubation rate is the rate of latent individuals becoming infectious(average duration of incubation is 1 / s)
+
+
+//Constraints
+
+int I_hosp_max = N * 0.02;
+int I_icu_max = N * 0.01;
+
+
+bool contact(Human& person1, Human& person2, int day)
 {
-	if ((person1.group != 3 && person2.group != 3) && ((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)))//question
+	if ((person1.x == person2.x) && (person1.y == person2.y))
 	{
-		if ((person1.x == person2.x) && (person1.y == person2.y))
+		if ((person1.group != 3 && person2.group != 3) && ((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)))//question
 		{
+
 			if ((person1.x < person1.house.x + person1.house.dx) && (person1.x > person1.house.x - person1.house.dx) && (person1.y < person1.house.y + person1.house.dy) && (person1.y > person1.house.y - person1.house.dy))
 			{
 				return false;
-             }
+			}
 			else
 			{
 				if ((person2.x < person2.house.x + person2.house.dx) && (person2.x > person2.house.x - person2.house.dx) && (person2.y < person2.house.y + person2.house.dy) && (person2.y > person2.house.y - person2.house.dy))
@@ -306,147 +368,297 @@ bool contact(Human& person1, Human& person2)
 
 					if (person1.group == 2)
 					{
-						person2.group = 2;
+						person2.group = 1;
+						person2.Eday = day;
 					}
-					
+
 					if (person2.group == 2)
 					{
-						person1.group = 2;
+						person1.group = 1;
+						person1.Eday = day;
 					}
-					//printf("\nAdequate Contact\n");
+
 					return true;
 				}
-				
+
 			}
-         
-			
+
+
 		}
 		return false;
 	}
 	return false;
 }
 
+std::vector<Human> PPL;
+std::vector<House> HOU;
+std::vector<Workplace> WRP;
+
+void EtoItransition(int N, int T) {
+	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	for (int i = 0; i < N; i++) {
+		if (PPL[i].group == 1 && T - PPL[i].Eday == 5) {
+			std::default_random_engine generator(seed);
+			std::uniform_real_distribution <float> distribution(0, 1);
+			float eps = distribution(generator);  // uniform distribution
+			if (eps <= contagion_probability) {
+				PPL[i].group = 2;
+				PPL[i].Iday = T;
+				//printf("\nGroup: %d, Iday: %d", PPL[i].group, PPL[i].Iday);
+				if (PPL[i].age >= 0 && PPL[i].age <= 9) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.001) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.05) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 10 && PPL[i].age <= 19) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.003) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.05) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 20 && PPL[i].age <= 29) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.012) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.05) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 30 && PPL[i].age <= 39) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.032) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.05) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 40 && PPL[i].age <= 49) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.049) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.063) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 50 && PPL[i].age <= 59) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.102) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.122) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 60 && PPL[i].age <= 69) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.166) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.274) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 70 && PPL[i].age <= 79) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.243) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.432) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+				if (PPL[i].age >= 80) {
+					std::default_random_engine generator(seed);
+					std::uniform_real_distribution <float> distribution(0, 1);
+					float eps = distribution(generator);  // uniform distribution
+					if (eps < 0.273) {
+						PPL[i].group = 4;
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps < 0.709) {
+							PPL[i].group = 5;
+						}
+					}
+				}
+			}
+		}
+		if ((PPL[i].group == 2 || PPL[i].group == 4 || PPL[i].group == 5) && T - PPL[i].Iday == 20) {
+			PPL[i].group = 3;
+		}
+	}
+}
+
+
+
+
+
 
 int main()
-
 {
 
 	std::ofstream excel_file_initialization; // excel file for exporting initial distribution of houses, workplaces etc.
 	std::ofstream exce_file_results; // excel file for exporting final results of SEIR model
 
 
-//Variables 
-
-	float homeless_rate = 0.0005;
-	float initial_infected_rate = 0.01;
-	float unemployment_rate = 0.12;
-	float business_proportion = 0.01875;
-	float business_proportion_informal = 0.4;
-	float total_Wealth = 1000000000;
-	float public_Wealth_rate = 0.01;
-	float business_Wealt_rate = 0.05;
-	float personal_Wealth_rate = 0.04;
-	float public_Wealth = total_Wealth * public_Wealth_rate;
-	float business_Wealth = total_Wealth * business_Wealt_rate;
-	float personal_Wealth = total_Wealth * personal_Wealth_rate;
-	float min_income = 900;
-	float min_expense = 600;
-
-	/* Social Stratum explanation
-	each workplace and house are given a social stratum
-	according to the house stratum, the respective stratum is assigned to the people that stay at the home --> the family members
-
-	1: Most Poor
-	2:Poor
-	3:Working class
-	4:Rich
-	5:Most Rich
-	*/
-//Groups
-
-
-	int	N = 400;  // Population
-	int S = N - (N*initial_infected_rate);  //Susceptible //maybe parameterize
-	//printf("\nSinit = %d\n",S);
-	int E = 0;   //Exposed
-	int I = N*initial_infected_rate;  //Infected
-	int	I_hosp = 0;  // Infected hospitalized
-	int	I_icu = 0;  // Infected ICU(ventilator)
-	int	R = 0;  // Recovered
-	int	D = 0;  // Deceased
-	int	Q = 0;  // Quarantined
-	int MostPoor = 0; //Most poor
-	int Poor = 0; // Poor
-	int WorkingClass = 0; // working class
-	int Rich = 0; //Rich
-	int MostRich = 0; // Most Rich
-	
-
-	std::vector<float> Sarray;
-	std::vector<float> Earray;
-	std::vector<float> Iarray;
-	std::vector<float> Rarray;
-
-	int contactsPerDay = 0;
-
-//Agents
-
-	std::vector<Human> PPL;  // [x, y, group, action]
-	std::string ACT [] = { "Home", "Work", "WalkFree", "Movement" };
-	std::vector<House> HOU;
-	std::vector<Workplace> WRP;
-	
-	int family_size_average = 3;
-	int no_houses = (int) (N / family_size_average);
-	int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_informal));
 	printf("\ntotal houses are = %d\n", no_houses);
 	printf("\ntottal workplaces are = %d\n", no_workplaces);
+	//Variables 
+		/*
+		float homeless_rate = 0.0005;
+		float initial_infected_rate = 0.01;
+		float unemployment_rate = 0.12;
+		float business_proportion = 0.01875;
+		float business_proportion_informal = 0.4;
+		float total_Wealth = 1000000000;
+		float public_Wealth_rate = 0.01;
+		float business_Wealt_rate = 0.05;
+		float personal_Wealth_rate = 0.04;
+		float public_Wealth = total_Wealth * public_Wealth_rate;
+		float business_Wealth = total_Wealth * business_Wealt_rate;
+		float personal_Wealth = total_Wealth * personal_Wealth_rate;
+		float min_income = 900;
+		float min_expense = 600;
+		*/
+		/* Social Stratum explanation
+		each workplace and house are given a social stratum
+		according to the house stratum, the respective stratum is assigned to the people that stay at the home --> the family members
+
+		1: Most Poor
+		2:Poor
+		3:Working class
+		4:Rich
+		5:Most Rich
+		*/
+
+		//Groups
+
+			/*
+			int S = 399;  //Susceptible //maybe parameterize
+			int E = 0;   //Exposed
+			int I = 1;  //Infected
+			int	I_hosp = 0;  // Infected hospitalized
+			int	I_icu = 0;  // Infected ICU(ventilator)
+			int	R = 0;  // Recovered
+			int	D = 0;  // Deceased
+			int	Q = 0;  // Quarantined
+			int	N = S + E + I + R;  // Population
+			*/
+			/*
+			int N = 400; // Population
+			int I_init = N * initial_infected_rate;  //Infected
+			int S_init = N - (N * initial_infected_rate);
 
 
-//Environment
+			int MostPoor = 0; //Most poor
+			int Poor = 0; // Poor
+			int WorkingClass = 0; // working class
+			int Rich = 0; //Rich
+			int MostRich = 0; // Most Rich
 
-	int Length = 300;  //each pixel corresponds to area 5x5 meters.
-	int Width = 300;
+			*/
 
-		//for n in range(N) :
-		//    PPL[n, 0] = random.uniform(0, Width)
-		//    PPL[n, 1] = random.uniform(0, Length)
+			//Agents
 
-//Parameters
+				//std::vector<Human> PPL;
+				//std::vector<House> HOU;
+				//std::vector<Workplace> WRP;
+				/*
+				int family_size_average = 3;
+				//int no_houses = (N - N * homeless_rate) / family_size;
+				//int no_workplaces = 20;
 
-	int contagion_distance = 1;
-	float contagion_probability = 0.9;
-	int incubation_time = 5;
-	int transmission_time = 8;
-	int recovering_time = 20;
-	int ICU_limit = N * 0.05;
+				int no_houses = (int)(N / family_size_average);
+				int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_informal));
+				printf("\ntotal houses are = %d\n", no_houses);
+				printf("\ntottal workplaces are = %d\n", no_workplaces);
+
+				*/
+				/*
+			//Environment
+
+				int Length = 300;  //each pixel corresponds to area 5x5 meters.
+				int Width = 300;
+
+					//for n in range(N) :
+					//    PPL[n, 0] = random.uniform(0, Width)
+					//    PPL[n, 1] = random.uniform(0, Length)
+
+			//Pandemics Parameters
+
+				int contagion_distance = 1;
+				float contagion_probability = 0.9;
+				int incubation_time = 5;
+				int transmission_time = 8;
+				int recovering_time = 20;
+				int ICU_limit = N * 0.05;
 
 
 
+				float b = 0.001;//0.001;  // infectious rate, controls the rate of spread which represents the probability of transmitting disease between a susceptible and an infectious individual.
+				float q = 0.01;  // b / g // contact ratio
+				float g = 0.05;  // b / q // recovery rate
+				float e = 0.1;  // incubation rate is the rate of latent individuals becoming infectious(average duration of incubation is 1 / s)
 
-	float b = 0.9;//0.001;  // infectious rate, controls the rate of spread which represents the probability of transmitting disease between a susceptible and an infectious individual.
-	float q = 0.01;  // b / g // contact ratio
-	float g = 0.05;  // b / q // recovery rate
-	float e = 0.1;  // incubation rate is the rate of latent individuals becoming infectious(average duration of incubation is 1 / s)
+
+			//Constraints
+
+				int I_hosp_max = N * 0.02;
+				int I_icu_max = N * 0.01;
+				*/
 
 
-//Sim Time
-
-	int T = 0;  // Time horizon
-	std::vector<int> timepassed;
-
-//Constraints
-
-	int I_hosp_max = N * 0.02;
-	int I_icu_max = N * 0.01;
-
-	timepassed.push_back(T);
-	Sarray.push_back(S);
-	Earray.push_back(E);
-	Iarray.push_back(I);
-	Rarray.push_back(R);
-
-	//Random generators
+				//Random generators
 
 	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator(seed);
@@ -456,50 +668,43 @@ int main()
 	std::uniform_int_distribution <int> distribution_dy_house(1, 3);
 	std::uniform_int_distribution <int> distribution_dx_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_dy_workplace(1, 7);
-	std::uniform_int_distribution <int> distribution_family(2, 5);
+	std::uniform_int_distribution <int> distribution_family(2, 4);
 	std::uniform_int_distribution <int> distribution_employees(20, 60);
 	std::uniform_real_distribution <float> distribution_homeless(0, 1);
 	std::uniform_real_distribution <float> distribution_employeed(0, 1);
 	std::_Beta_distribution <float> distribution_age(2, 5);
-	std::uniform_int_distribution <int> distribution_social_stratum(1,5);
+	std::uniform_int_distribution <int> distribution_social_stratum(1, 5);
 	std::uniform_int_distribution <int> distribution_unemployeed_social_stratum(1, 2);
-	
-	
-	
 
 
-//Spawn houses
-	int f = 0;
-	for (f = 0; f < no_houses; f++)
+	//Spawn houses
+	for (int i = 0; i < no_houses; i++)
 	{
-			House house;
-			house.x = distribution_x(generator); 		
-			house.y = distribution_y(generator);
-			house.dx = distribution_dx_house(generator);
-			house.dy= distribution_dy_house(generator);
-			house.socoal_stratum = distribution_social_stratum(generator);
-			house.no_residents = 0;
-			HOU.push_back(house);
-	
-	}
-		
-
-//Spawn workplaces
-	int k = 0;
-	for (k = 0; k < no_workplaces; k++)
-	{
-	
-			Workplace workplace;
-			workplace.x = distribution_x(generator);
-			workplace.y = distribution_y(generator);
-			workplace.dx = distribution_dx_workplace(generator);
-			workplace.dy = distribution_dy_workplace(generator);
-			workplace.socoal_stratum = distribution_social_stratum(generator);
-			workplace.no_workers = 0;
-			WRP.push_back(workplace);
+		House house;
+		house.x = distribution_x(generator);
+		house.y = distribution_y(generator);
+		house.dx = distribution_dx_house(generator);
+		house.dy = distribution_dy_house(generator);
+		house.social_stratum = distribution_social_stratum(generator);
+		house.no_residents = 0;
+		HOU.push_back(house);
 	}
 
-//Spawn people
+
+	//Spawn workplaces
+	for (int i = 0; i < no_workplaces; i++)
+	{
+		Workplace workplace;
+		workplace.x = distribution_x(generator);
+		workplace.y = distribution_y(generator);
+		workplace.dx = distribution_dx_workplace(generator);
+		workplace.dy = distribution_dy_workplace(generator);
+		workplace.social_stratum = distribution_social_stratum(generator);
+		workplace.no_workers = 0;
+		WRP.push_back(workplace);
+	}
+
+	//Spawn people
 
 	Workplace emptyWork;
 	emptyWork.x = 0;
@@ -515,11 +720,8 @@ int main()
 	emptyHouse.dy = 0;
 	emptyHouse.no_residents = 0;
 
-	int i = 0;
-	int j = 0;
-	int p = 0;
-
-	/*for (j = 0; j < 1; j++)
+	/*
+	for (int i = 0; i < 1; i++)
 	{
 		Human person;
 
@@ -539,22 +741,22 @@ int main()
 		person.work = emptyWork;
 		PPL.push_back(person);
 
-	}*/
+	}
+	*/
 
-	
-	for (i = 0; i < N - I; i++)
+	for (int i = 0; i < N - I_init; i++)
 
 	{
 		Human person;
 
 		person.x = 1;
+		person.y = 1;
 		person.dx = 1;
 		person.dy = 1;
-		person.y = 1;
 		person.group = 0;
 		person.action = 0;
 		person.age = (int)(distribution_age(generator) * 100);
-		float w = distribution_homeless(generator); //homeless / unemployed
+		float w = distribution_homeless(generator);
 		if (w <= (1 - homeless_rate))
 
 		{
@@ -563,17 +765,11 @@ int main()
 		else
 		{
 			person.homeless = 1;
-
-		}
-		if (person.homeless == 1)
-		{
-
 			person.unemployed = 1;
 		}
-		else if (person.age < 15 || person.age > 66)
+		if (person.age < 15 || person.age > 66)
 		{
 			person.unemployed = 1;
-
 		}
 		else
 		{
@@ -596,19 +792,17 @@ int main()
 		person.house = emptyHouse;
 		person.work = emptyWork;
 		PPL.push_back(person);
-
-
 	}
 
 
-	for (p = 0; p < I; p++)
+	for (int i = 0; i < I_init; i++)
 	{
 		Human person;
 
 		person.x = 1;
+		person.y = 1;
 		person.dx = 1;
 		person.dy = 1;
-		person.y = 1;
 		person.group = 2;
 		person.action = 0;
 		person.age = 30;
@@ -620,114 +814,111 @@ int main()
 		person.y_work = -1;
 		person.house = emptyHouse;
 		person.work = emptyWork;
+		person.Iday = 0;
 		PPL.push_back(person);
 
 	}
-						
+
 	shuffle(PPL.begin(), PPL.end(), std::default_random_engine(seed));
 
-	i = 0;
-	j = 0;
-	p = 0;
 
-	for (j = 0; j < no_houses; j++) //assign people to houses
+	for (int i = 0; i < no_houses; i++) //assign people to houses
 	{
 		int ff = distribution_family(generator);
 		int temp = 0;
 		//for (Human person : PPL)
-		for(i = 0; i < N; i++)
+		for (int j = 0; j < N; j++)
 		{
-			if (PPL[i].homeless == 0)
+			if (PPL[j].homeless == 0)
 
 			{
-				if (PPL[i].x_home == -1)
+				if (PPL[j].x_home == -1)
 				{
-					PPL[i].house = HOU[j];
-					PPL[i].x_home = HOU[j].x;
-					PPL[i].y_home = HOU[j].y;
-					PPL[i].x = HOU[j].x;
-					PPL[i].y = HOU[j].y;
-					PPL[i].socoal_stratum = HOU[j].socoal_stratum;
-					HOU[j].no_residents = HOU[j].no_residents + 1;
-						
-						temp = temp + 1;
-						if (temp == ff)
-						{
-							break;
-						}
-			     }
+					PPL[j].house = HOU[i];
+					PPL[j].x_home = HOU[i].x;
+					PPL[j].y_home = HOU[i].y;
+					PPL[j].x = HOU[i].x;
+					PPL[j].y = HOU[i].y;
+					HOU[i].no_residents = HOU[i].no_residents + 1;
+					PPL[j].social_stratum = HOU[i].social_stratum;
+
+					temp = temp + 1;
+					if (temp == ff)
+					{
+						break;
+					}
+				}
 			}
 		}
 	}
-	
-		
-	i = 0;
-	j = 0;
-	for (j = 0; j < no_workplaces; j++) //assign people to workplaces
+
+
+
+	for (int i = 0; i < no_workplaces; i++) //assign people to workplaces
 	{
 		int ff = distribution_employees(generator);
 		int temp = 0;
 		//for (Human person : PPL)
-			for (i = 0; i < N; i++)
+		for (int j = 0; j < N; j++)
 		{
-			if (PPL[i].unemployed == 0)
+			if (PPL[j].unemployed == 0)
 			{
-				if (PPL[i].socoal_stratum == WRP[j].socoal_stratum)
-				{ 
-					if (PPL[i].x_work == -1)
+				if (PPL[j].social_stratum == WRP[i].social_stratum)
+				{
+					if (PPL[j].x_work == -1)
 					{
-						PPL[i].work = WRP[j];
-						PPL[i].x_work = WRP[j].x;
-						PPL[i].y_work = WRP[j].y;
-						WRP[j].no_workers = WRP[j].no_workers + 1;
+						PPL[j].work = WRP[i];
+						PPL[j].x_work = WRP[i].x;
+						PPL[j].y_work = WRP[i].y;
+						WRP[i].no_workers = WRP[i].no_workers + 1;
 						temp = temp + 1;
 						if (temp == ff)
 						{
 							break;
 						}
 					}
-                 }
-             }
+				}
+			}
 		}
-		}
+	}
 
-	j = 0;
+	std::vector <int> housesx;
+	std::vector <int> housesy;
+	std::vector <int> worksx;
+	std::vector <int> worksy;
 
-	for (j = 0; j < no_houses; j++)
+
+	for (int j = 0; j < no_houses; j++)
 
 	{
 
-		if (HOU[j].socoal_stratum == 1)
+		if (HOU[j].social_stratum == 1)
 		{
-
 			MostPoor = MostPoor + 1;
 		}
 
-		else if (HOU[j].socoal_stratum == 2)
+		else if (HOU[j].social_stratum == 2)
 		{
-
 			Poor = Poor + 1;
 		}
 
-		else if (HOU[j].socoal_stratum == 3)
+		else if (HOU[j].social_stratum == 3)
 		{
-
 			WorkingClass = WorkingClass + 1;
 		}
 
-		else if (HOU[j].socoal_stratum == 4)
+		else if (HOU[j].social_stratum == 4)
 		{
 			Rich = Rich + 1;
 		}
-		else if (HOU[j].socoal_stratum == 5)
+		else if (HOU[j].social_stratum == 5)
 		{
 			MostRich = MostRich + 1;
 		}
 	}
 	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor, Poor, WorkingClass, Rich, MostRich);
-	i = 0;
 
-	for (i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)
 
 	{
 		if (PPL[i].unemployed == 1)
@@ -740,34 +931,34 @@ int main()
 
 		{
 
-			if (PPL[i].socoal_stratum == 1)
+			if (PPL[i].social_stratum == 1)
 			{
 
 				PPL[i].personal_income = 900;
 				PPL[i].personal_expenses = 600;
 			}
 
-			else if (PPL[i].socoal_stratum == 2)
+			else if (PPL[i].social_stratum == 2)
 			{
 
 				PPL[i].personal_income = 950;
 				PPL[i].personal_expenses = 650;
 			}
 
-			else if (PPL[i].socoal_stratum == 3)
+			else if (PPL[i].social_stratum == 3)
 			{
 
 				PPL[i].personal_income = 1200;
 				PPL[i].personal_expenses = 800;
 			}
 
-			else if (PPL[i].socoal_stratum == 4)
+			else if (PPL[i].social_stratum == 4)
 			{
 
 				PPL[i].personal_income = 1500;
 				PPL[i].personal_expenses = 1000;
 			}
-			else if (PPL[i].socoal_stratum == 5)
+			else if (PPL[i].social_stratum == 5)
 			{
 
 				PPL[i].personal_income = 2000;
@@ -777,158 +968,215 @@ int main()
 
 	}
 
-	std::vector <int> housesx;
-	std::vector <int> housesy;
-	std::vector <int> worksx;
-	std::vector <int> worksy;
-
-	
-
 	/*for (House house : HOU)
 	{
 		housesx.push_back(house.x);
 		housesy.push_back(house.y);
-		
-		}*/
-	
-	//plt::plot(housesx, housesy, "r.");
-	//plt::show();
 
-	/*for (Workplace workplace : WRP)
+		}
+
+	for (Workplace workplace : WRP)
 	{
 		worksx.push_back(workplace.x);
 		worksy.push_back(workplace.y);
 
-		}
-		*/
-	//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
-	//plot(z, u);
+		}*/
 
-	/*for (House house : HOU)
+		//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
+		//plot(z, u);
 
-	{
-		//printf("\n position_house_x = %d\n", house.x);
-		//printf("\n position_house_y = %d\n", house.y);
-		//printf("\n house residents = %d\n", house.no_residents);
-		//printf("\n House social stratum is = %d\n", house.socoal_stratum);
-
-	}*/
-	
-	/*for (Workplace workplace : WRP)
-
-	{
-		//printf("\n position_work_x = %d\n", workplace.x);
-		//printf("\n employees = %d\n", workplace.no_workers);
-		//printf("\n work_x_pos = %d\n", workplace.x);
-		//printf("\n work_y_pos = %d\n", workplace.y);
-		//printf("\n Workplace social stratum is = %d\n", workplace.socoal_stratum);
-	}
-	*/
-	for (Human person1 : PPL)
-	{
-
-		
-		//printf("\n position_x_home = %d\n", person1.x_home);
-		//printf("\n position_y_home = %d\n", person1.y_home);
-		//printf("\n position_x_work = %d\n", person1.x_work);
-		//printf("\n position_y_work = %d\n", person1.y_work);
-		//printf("\n homeless = %d\n", person1.homeless);
-		//printf("\n unemployeed = %d\n", person1.unemployed);
-		//printf("\n person_age = %d\n", person1.age);
-		//printf("\n Person social stratum is = %d\n", person1.socoal_stratum);
-		/*if (person1.unemployed == 0)
+		/*for (House house : HOU)
 
 		{
-
-			printf("\n Person's work social stratum is = %d\n", person1.work.socoal_stratum);
-		}
-		
-		else
-
-		{
-			printf("\nunemployed guy\n");
+			//printf("\n position_house_x = %d\n", house.x);
+			printf("\n house residents = %d\n", house.no_residents);
 
 		}*/
 
-		printf("\n Person income is = %d\n", person1.personal_income);
-	}
-	
-	i = 0;
-
-	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
-	
-		for (i = 0; i < N; i++)
+		/*for (Workplace workplace : WRP)
 
 		{
-			if (i < (no_houses - 1))
+			//printf("\n position_work_x = %d\n", workplace.x);
+			printf("\n employees = %d\n", workplace.no_workers);
+		}
+		*/
+		/*for (Human person1 : PPL)
+		{
 
-			{
-				excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << "," << HOU[i].x << "," << HOU[i].y << std::endl;
+			//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
+			printf("\n position_x = %d\n", person1.x_work);
+
+		}*/
 
 
-			}
+		// ################### EXCEL FILE
 
-			if(i > (no_houses - 1) && i < (no_workplaces - 1))
-			{
-				excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << std::endl;
-			}
+	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
 
-			if (i > (no_workplaces - 1))
-			{
-				excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << std::endl;
-			}
+	for (int i = 0; i < N; i++)
+
+	{
+		if (i < (no_houses - 1))
+
+		{
+			excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << "," << HOU[i].x << "," << HOU[i].y << std::endl;
+
 
 		}
 
-	
-	//excel_file << house.x << "," << house.y << std::endl;
-	
+		if (i > (no_houses - 1) && i < (no_workplaces - 1))
+		{
+			excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << std::endl;
+		}
 
-	//experiment
-	int timestamp = 0;
-	int hour = 0;
-	i = 0;
-	j = 0;
+		if (i > (no_workplaces - 1))
+		{
+			excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << std::endl;
+		}
+
+	}
+
+	// debbuging
+
+	printf("\nxhome = %d, yhome = %d \n", PPL[55].x_home, PPL[55].y_home);
+	printf("\nxwork = %d, ywork = %d \n", PPL[55].x_work, PPL[55].y_work);
+
+
+
+	// plots
+	std::vector<float> Sarray;
+	std::vector<float> Earray;
+	std::vector<float> Iarray;
+	std::vector<float> Rarray;
+	std::vector<int> timepassed;
+
+
+	// INITIAL CONDITION
+	int contactsPerDay = 0;
+	int S = S_init;
+	int E = 0;
+	int I = I_init;
+	int R = 0;
+	int Ih = 0;
+	int Is = 0;
+	int T = 0;
+
+
 	bool done = false;
-
 	while (done == false)
 	{
-		printf("\nS: %d, E: %d, I: %d, R: %d, time: %d\n", S, E, I, R, T);
+		timepassed.push_back(T);
+		Sarray.push_back(S);
+		Earray.push_back(E);
+		Iarray.push_back(I);
+		Rarray.push_back(R);
+		//printf("\nS: %d, E: %d, I: %d, R: %d, time: %d\n", S, E, I, R, T);
+		EtoItransition(N, T);
 
-		for (hour = 0; hour < 24; hour++)
+		/*
+		// ###################   E TO I TRANSITION & I distribution & I to R transition
+		for (int i = 0; i < N; i++)
 		{
+			if (PPL[i].group == 1 && T - PPL[i].Eday == 5)
+			{
+				std::default_random_engine generator1;
+				std::uniform_real_distribution <float> distribution1(0, 1);
+				float eps = distribution1(generator1);  // uniform distribution
+				if (eps > 0.1)
+				{
+					PPL[i].group = 2;
+					PPL[i].Iday = T;
+					//printf("\nGroup: %d, Iday: %d", PPL[personcheck].group, PPL[personcheck].Iday);
+					if (PPL[i].age >= 0 && PPL[i].age <= 9) {
+						std::default_random_engine generator;
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution1(generator);  // uniform distribution
+						if (eps < 0.001) {
+							PPL[i].group = 4;
+							std::default_random_engine generator;
+							std::uniform_real_distribution <float> distribution(0, 1);
+							float eps = distribution1(generator);  // uniform distribution
+							if (eps < 0.05) {
+								PPL[i].group = 5;
+							}
+						}
+					}
+				}
+			}
+			if ((PPL[i].group == 2 || PPL[i].group == 4 || PPL[i].group == 5) && T - PPL[i].Iday == 20) {
+				PPL[i].group = 3;
+			}
+		}
+		*/
+
+
+
+
+		// ################## PRINT NUMBER OF PEOPLE IN GROUPS 
+
+		S = 0;
+		E = 0;
+		I = 0;
+		R = 0;
+		Ih = 0;
+		Is = 0;
+
+		for (int i = 0; i < N; i++)
+		{
+			if (PPL[i].group == 0)
+			{
+				S++;
+			}
+			if (PPL[i].group == 1)
+			{
+				E++;
+			}
+			if (PPL[i].group == 2)
+			{
+				I++;
+			}
+			if (PPL[i].group == 3)
+			{
+				R++;
+			}
+			if (PPL[i].group == 4)
+			{
+				Ih++;
+			}
+			if (PPL[i].group == 5)
+			{
+				Is++;
+			}
+		}
+		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d", S, E, I, R, Ih, Is, contactsPerDay);
+		contactsPerDay = 0;
+
+
+
+
+		// ###################   24 H LOOP 
+
+		for (int hour = 0; hour < 24; hour++)
+		{
+
+			//printf("\nx = %d, y = %d \n", PPL[55].x, PPL[55].y);
 			if (hour >= 0 && hour < 8)
 
 			{
-				for (timestamp = 0; timestamp < 200; timestamp++)
+				for (int timestamp = 0; timestamp < 200; timestamp++)
 				{
-					for (i = 0; i < N; i++)
+					for (int i = 0; i < N; i++)
 					{
 						if (PPL[i].homeless == 0)
 						{
-
-							
 							PPL[i].actionGoHome();
-							if (i == 50)
-							{
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].x_home);
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].x);
 
-							}
 							PPL[i].actionStayHome();
-							
-							if (i == 50)
-							{
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].y_home);
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].y);
 
-							}
-
-							for (j = 0; j < N; j++)
+							for (int j = 0; j < N; j++)
 							{
-								if ((i != j) && (contact(PPL[i], PPL[j]) == true)) //explain
+								if ((i != j) && (contact(PPL[i], PPL[j], T) == true)) //explain
 								{
-
 									contactsPerDay = contactsPerDay + 1;
 								}
 
@@ -943,34 +1191,18 @@ int main()
 			}
 			if (hour > 7 && hour < 12)
 			{
-				timestamp = 0;
-				i = 0;
-				j = 0;
 
-				for (timestamp = 0; timestamp < 200; timestamp++)
+				for (int timestamp = 0; timestamp < 200; timestamp++)
 				{
-					for (i = 0; i < N; i++)
+					for (int i = 0; i < N; i++)
 					{
 						if (PPL[i].unemployed == 0)
 						{
-							
 							PPL[i].actionGoWork();
-							if (i == 30)
-							{
-								//printf("\nwork position of person 1: %d\n", PPL[i].x_work);
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].x);
-//
-							}
 							PPL[i].actionStayAtWork();
-							if (i == 80)
+							for (int j = 0; j < N; j++)
 							{
-								//printf("\nwork position of person 1: %d\n", PPL[i].x_work);
-								//printf("\ncurrent position of person 1: %d\n", PPL[i].x);
-
-							}
-							for (j = 0; j < N; j++)
-							{
-								if ((i != j) && (contact(PPL[i], PPL[j]) == true)) //explain
+								if ((i != j) && (contact(PPL[i], PPL[j], T) == true)) //explain
 								{
 
 									contactsPerDay = contactsPerDay + 1;
@@ -988,26 +1220,16 @@ int main()
 
 			if (hour > 11 && hour < 13)
 			{
-				timestamp = 0;
-				i = 0;
-				j = 0;
 
-				for (timestamp = 0; timestamp < 200; timestamp++)
+				for (int timestamp = 0; timestamp < 200; timestamp++)
 				{
-					for (i = 0; i < N; i++)
+					for (int i = 0; i < N; i++)
 					{
-						
 						PPL[i].actionWalkFree();
-						if (i == 50)
-						{
-							//printf("\ncurrent position of person 1_x: %d\n", PPL[i].x);
-							//printf("\ncurrent position of person 1_y: %d\n", PPL[i].y);
 
-						}
-
-						for (j = 0; j < N; j++)
+						for (int j = 0; j < N; j++)
 						{
-							if ((i != j) && (contact(PPL[i], PPL[j]) == true)) //explain
+							if ((i != j) && (contact(PPL[i], PPL[j], T) == true)) //explain
 							{
 								contactsPerDay = contactsPerDay + 1;
 							}
@@ -1022,22 +1244,18 @@ int main()
 
 			if (hour > 14 && hour < 19)
 			{
-				timestamp = 0;
-				i = 0;
-				j = 0;
 
-				for (timestamp = 0; timestamp < 200; timestamp++)
+				for (int timestamp = 0; timestamp < 200; timestamp++)
 				{
-					for (i = 0; i < N; i++)
+					for (int i = 0; i < N; i++)
 					{
 						if (PPL[i].unemployed == 0)
 						{
-							
 							PPL[i].actionGoWork();
 							PPL[i].actionStayAtWork();
-							for (j = 0; j < N; j++)
+							for (int j = 0; j < N; j++)
 							{
-								if ((i != j) && (contact(PPL[i], PPL[j]) == true)) //explain
+								if ((i != j) && (contact(PPL[i], PPL[j], T) == true)) //explain
 								{
 									contactsPerDay = contactsPerDay + 1;
 								}
@@ -1048,19 +1266,15 @@ int main()
 			}
 			if (hour > 18 && hour < 0)
 			{
-				timestamp = 0;
-				i = 0;
-				j = 0;
 
-				for (timestamp = 0; timestamp < 200; timestamp++)
+				for (int timestamp = 0; timestamp < 200; timestamp++)
 				{
-					for (i = 0; i < N; i++)
+					for (int i = 0; i < N; i++)
 					{
-						
 						PPL[i].actionWalkFree();
-						for (j = 0; j < N; j++)
+						for (int j = 0; j < N; j++)
 						{
-							if ((i != j) && (contact(PPL[i], PPL[j]) == true)) //explain
+							if ((i != j) && (contact(PPL[i], PPL[j], T) == true)) //explain
 							{
 								contactsPerDay = contactsPerDay + 1;
 							}
@@ -1069,88 +1283,64 @@ int main()
 				}
 			}
 
-			//printf("\nHour passed: %d\n", hour);
+
+		}
+		// ### END OF 24 H LOOP
+
+
+
+		//printf("\nContacts : %d\n", contactsPerDay);
+
+		/*
+		int S1 = S;
+		int E1 = E;
+		int I1 = I;
+		int R1 = R;
+
+		float Sdot = -b * contactsPerDay;
+		float Edot = b * contactsPerDay - e * E;
+		float Idot = e * E - g * I;
+		float Rdot = g * I;
+
+		S = S1 + Sdot;
+		E = E1 + Edot;
+		I = I1 + Idot;
+
+		R = R1 + Rdot;
+
+		*/
+
+		if (S < 0)
+		{
+			S = 0;
 		}
 
+		if (E > N)
+		{
+			E = N;
+		}
 
-		        T = T + 1;
-			    int S1 = S;
-				int E1 = E;
-				int I1 = I;
-				int R1 = R;
+		if (I > N)
+		{
+			I = N;
+		}
 
-				float Sdot = (-b * contactsPerDay*S*I)/N;
-				float Edot = ((b * contactsPerDay*S*I) /N) - e * E;
-				float Idot = e * E - g * I;
-				float Rdot = g * I;
+		if (R > N)
+		{
+			R = N;
+		}
 
-				S = S1 + Sdot;
-				E = E1 + Edot;
-				I = I1 + Idot;
-				R = R1 + Rdot;
+		T++;
+		if (T == 5) {
+			done = true;
+		}
 
-				if (S < 0)
-				{
-					S = 0;
-			     }
-
-				if (E > N)
-				{
-					E = N;
-				}
-
-				if (I > N)
-				{
-					I = N;
-				}
-
-				if (R > N)
-				{
-					R = N;
-				}
-		
-
-				timepassed.push_back(T);
-				Sarray.push_back(S);
-				Earray.push_back(E);
-				Iarray.push_back(I);
-				Rarray.push_back(R);
-
-				contactsPerDay = 0;
-
-				
-				
-				//excel_file << Sarray[0] << std:: endl;
-				std::vector <int> people_group;
-				
-
-				/*for (Human person : PPL)
-				{
-
-
-					people_group.push_back(person.group);
-					if (person.group == 2)
-					{
-						
-						printf("\nInfected\n");
-					}
-
-					}*/
-
-				if (T == 1) //150
-				{
-
-					done = true;
-				}
-		
 	}
-	
 
 	exce_file_results.open("SEIR_Results.csv");
-	i = 0;
 
 	printf("\nPreparing results excel file...\n");
-	for (i = 0; i < T; i++)
+	for (int i = 0; i < T; i++)
 
 	{
 		exce_file_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << timepassed[i] << std::endl;
