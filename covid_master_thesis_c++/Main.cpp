@@ -29,6 +29,7 @@ public:
 	int socoal_stratum;
 	float home_income;
 	float home_expenses;
+	float home_wealth;
 
 };
 
@@ -42,6 +43,7 @@ public:
 	int socoal_stratum;
 	float workplace_income;
 	float workplace_expenses;
+	float workplace_wealth;
 
 };
 class Human
@@ -62,6 +64,7 @@ public:
 	int y_work;
 	int personal_income;
 	float personal_expenses;
+	float personal_wealth;
 	int socoal_stratum;
 	House house;
 	Workplace work;
@@ -372,6 +375,11 @@ int main()
 	int	R = 0;  // Recovered
 	int	D = 0;  // Deceased
 	int	Q = 0;  // Quarantined
+	int MostPoor = 0; //Most poor
+	int Poor = 0; // Poor
+	int WorkingClass = 0; // working class
+	int Rich = 0; //Rich
+	int MostRich = 0; // Most Rich
 	
 
 	std::vector<float> Sarray;
@@ -683,6 +691,92 @@ int main()
 		}
 		}
 
+	j = 0;
+
+	for (j = 0; j < no_houses; j++)
+
+	{
+
+		if (HOU[j].socoal_stratum == 1)
+		{
+
+			MostPoor = MostPoor + 1;
+		}
+
+		else if (HOU[j].socoal_stratum == 2)
+		{
+
+			Poor = Poor + 1;
+		}
+
+		else if (HOU[j].socoal_stratum == 3)
+		{
+
+			WorkingClass = WorkingClass + 1;
+		}
+
+		else if (HOU[j].socoal_stratum == 4)
+		{
+			Rich = Rich + 1;
+		}
+		else if (HOU[j].socoal_stratum == 5)
+		{
+			MostRich = MostRich + 1;
+		}
+	}
+	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor, Poor, WorkingClass, Rich, MostRich);
+	i = 0;
+
+	for (i = 0; i < N; i++)
+
+	{
+		if (PPL[i].unemployed == 1)
+		{
+
+			PPL[i].personal_income = 0;
+		}
+
+		else if (PPL[i].unemployed == 0)
+
+		{
+
+			if (PPL[i].socoal_stratum == 1)
+			{
+
+				PPL[i].personal_income = 900;
+				PPL[i].personal_expenses = 600;
+			}
+
+			else if (PPL[i].socoal_stratum == 2)
+			{
+
+				PPL[i].personal_income = 950;
+				PPL[i].personal_expenses = 650;
+			}
+
+			else if (PPL[i].socoal_stratum == 3)
+			{
+
+				PPL[i].personal_income = 1200;
+				PPL[i].personal_expenses = 800;
+			}
+
+			else if (PPL[i].socoal_stratum == 4)
+			{
+
+				PPL[i].personal_income = 1500;
+				PPL[i].personal_expenses = 1000;
+			}
+			else if (PPL[i].socoal_stratum == 5)
+			{
+
+				PPL[i].personal_income = 2000;
+				PPL[i].personal_expenses = 1300;
+			}
+		}
+
+	}
+
 	std::vector <int> housesx;
 	std::vector <int> housesy;
 	std::vector <int> worksx;
@@ -733,7 +827,7 @@ int main()
 	for (Human person1 : PPL)
 	{
 
-		//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
+		
 		//printf("\n position_x_home = %d\n", person1.x_home);
 		//printf("\n position_y_home = %d\n", person1.y_home);
 		//printf("\n position_x_work = %d\n", person1.x_work);
@@ -755,7 +849,8 @@ int main()
 			printf("\nunemployed guy\n");
 
 		}*/
-	
+
+		printf("\n Person income is = %d\n", person1.personal_income);
 	}
 	
 	i = 0;
