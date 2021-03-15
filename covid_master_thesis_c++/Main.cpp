@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <fstream>
 
-
+//original
 class House
 {
 
@@ -1331,7 +1331,7 @@ int main()
 		}
 
 		T++;
-		if (T == 5) {
+		if (T == 30) {
 			done = true;
 		}
 
