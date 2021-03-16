@@ -8,6 +8,9 @@
 #include <fstream>
 
 //original
+
+int house_bill = 150;
+
 class House
 {
 
@@ -23,6 +26,9 @@ public:
 
 };
 
+
+int workplace_bill = 1000;
+
 class Workplace
 {
 public:
@@ -34,6 +40,13 @@ public:
 	float workplace_income;
 	float workplace_expenses;
 	float workplace_wealth;
+
+	void actionPayBills()
+	{
+
+		workplace_wealth = workplace_wealth - workplace_bill;
+	}
+	
 
 };
 class Human
@@ -56,6 +69,7 @@ public:
 	float personal_expenses;
 	float personal_wealth;
 	int social_stratum;
+	
 	House house;
 	Workplace work;
 
@@ -247,6 +261,7 @@ public:
 
 
 		}
+
 	}
 	void actionWalkFree()
 	{
@@ -278,6 +293,29 @@ public:
 		}
 	}
 
+	void actionShopping()
+	{
+
+		personal_wealth = personal_wealth - (personal_expenses / 60); // share the money to the workplaces
+
+	}
+
+	void actionGetPaid()
+	{
+		work.workplace_wealth = work.workplace_wealth - personal_income;
+		personal_wealth = personal_wealth + personal_income;
+		
+	}
+
+	void actionPayBills()
+	{
+		personal_wealth = personal_wealth - (house_bill / house.no_residents);
+
+	}
+
+		
+	
+
 };
 
 
@@ -290,11 +328,13 @@ float total_Wealth = 1000000000;
 float public_Wealth_rate = 0.01;
 float business_Wealt_rate = 0.05;
 float personal_Wealth_rate = 0.04;
-float public_Wealth = total_Wealth * public_Wealth_rate;
-float business_Wealth = total_Wealth * business_Wealt_rate;
-float personal_Wealth = total_Wealth * personal_Wealth_rate;
+float public_Wealth_total = total_Wealth * public_Wealth_rate;
+float business_Wealth_total = total_Wealth * business_Wealt_rate;
+float personal_Wealth_total = total_Wealth * personal_Wealth_rate;
 float min_income = 900;
 float min_expense = 600;
+
+
 
 int N = 400; // Population
 int I_init = N * initial_infected_rate;  //Infected
@@ -936,6 +976,7 @@ int main()
 
 				PPL[i].personal_income = 900;
 				PPL[i].personal_expenses = 600;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.0362) / MostPoor;
 			}
 
 			else if (PPL[i].social_stratum == 2)
@@ -943,6 +984,7 @@ int main()
 
 				PPL[i].personal_income = 950;
 				PPL[i].personal_expenses = 650;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.0788) / Poor;
 			}
 
 			else if (PPL[i].social_stratum == 3)
@@ -950,6 +992,8 @@ int main()
 
 				PPL[i].personal_income = 1200;
 				PPL[i].personal_expenses = 800;
+
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.1262) / WorkingClass;
 			}
 
 			else if (PPL[i].social_stratum == 4)
@@ -957,12 +1001,15 @@ int main()
 
 				PPL[i].personal_income = 1500;
 				PPL[i].personal_expenses = 1000;
+
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.4388) / Rich;
 			}
 			else if (PPL[i].social_stratum == 5)
 			{
 
 				PPL[i].personal_income = 2000;
 				PPL[i].personal_expenses = 1300;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.5612) / MostRich;
 			}
 		}
 
@@ -1226,7 +1273,12 @@ int main()
 					for (int i = 0; i < N; i++)
 					{
 						PPL[i].actionWalkFree();
+						if (PPL[i].homeless == 0)
 
+						{
+							PPL[i].actionShopping();
+
+						}
 						for (int j = 0; j < N; j++)
 						{
 							if ((i != j) && (contact(PPL[i], PPL[j], T) == true)) //explain
@@ -1272,6 +1324,14 @@ int main()
 					for (int i = 0; i < N; i++)
 					{
 						PPL[i].actionWalkFree();
+
+						if (PPL[i].homeless == 0)
+
+						{
+							PPL[i].actionShopping();
+
+						}
+
 						for (int j = 0; j < N; j++)
 						{
 							if ((i != j) && (contact(PPL[i], PPL[j], T) == true)) //explain
@@ -1287,7 +1347,27 @@ int main()
 		}
 		// ### END OF 24 H LOOP
 
+		
+		if (T == 30 || T == 60 || T == 90 || T == 120 || T == 150 || T == 180)
 
+		{
+
+			for (int j = 0; j < no_houses; j++)
+			{
+				for (int i = 0; i < N; i++)
+				{
+
+					if (PPL[i].x_home == HOU[j].x && PPL[i].y_home == HOU[j].y)
+					{
+						PPL[i].actionGetPaid();
+						PPL[i].actionPayBills();
+						//HOU[j].home_wealth = HOU[j].home_wealth + PPL[i].personal_wealth;
+					}
+
+				}
+
+			}
+		}
 
 		//printf("\nContacts : %d\n", contactsPerDay);
 
@@ -1331,7 +1411,7 @@ int main()
 		}
 
 		T++;
-		if (T == 30) {
+		if (T == 1) {
 			done = true;
 		}
 
