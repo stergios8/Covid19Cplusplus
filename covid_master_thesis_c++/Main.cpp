@@ -13,16 +13,16 @@ float initial_infected_rate = 0.01;
 float unemployment_rate = 0.12;
 float business_proportion = 0.01875;
 float business_proportion_informal = 0.4;
-float total_Wealth = 1000000000;
-float public_Wealth_rate = 0.01;
+int total_Wealth = 1000000000;
+//float public_Wealth_rate = 0.01;
 float business_Wealt_rate = 0.05;
-float personal_Wealth_rate = 0.04;
-float public_Wealth_total = total_Wealth * public_Wealth_rate;
-float business_Wealth_total = total_Wealth * business_Wealt_rate;
-float personal_Wealth_total = total_Wealth * personal_Wealth_rate;
-float min_income = 900;
-float min_expense = 600;
-float goverment_wealth_total = 1000000000;
+float personal_Wealth_rate = 0.05;
+//float public_Wealth_total = total_Wealth * public_Wealth_rate;
+int business_Wealth_total = (int)(total_Wealth * business_Wealt_rate);
+int personal_Wealth_total = (int)(total_Wealth * personal_Wealth_rate);
+int min_income = 900;
+int min_expense = 600;
+int goverment_wealth_total = 1000000000;
 
 
 
@@ -31,11 +31,20 @@ int I_init = N * initial_infected_rate;  //Infected
 int S_init = N - (N * initial_infected_rate);
 
 
-int MostPoor = 0; //Most poor
-int Poor = 0; // Poor
-int WorkingClass = 0; // working class
-int Rich = 0; //Rich
-int MostRich = 0; // Most Rich
+int MostPoor_people = 0; //Most poor people
+int Poor_people = 0; // Poor people
+int WorkingClass_people = 0; // working class people
+int Rich_people = 0; //Rich people
+int MostRich_people = 0; // Most Rich people
+
+int MostPoor_workplaces = 0; //Most poor workplaces
+int Poor_workplaces = 0; // Poor workplaces
+int WorkingClass_workplaces = 0; // working class workplaces
+int Rich_workplaces = 0; //Rich workplaces
+int MostRich_workplaces = 0; // Most Rich workplaces
+
+int goverment_money_Healthcare_fixed = (int)(goverment_wealth_total * 0.05);
+int goverment_money_Healthcare_hospitalized = 1000;
 
 
 int family_size_average = 3;
@@ -98,7 +107,7 @@ public:
 	int x, y; //position
 	int no_workers;
 	int social_stratum;
-	float workplace_wealth;
+	int workplace_wealth;
 
 	void actionPayBills()
 	{
@@ -126,8 +135,8 @@ public:
 	int x_work;
 	int y_work;
 	int personal_income;
-	float personal_expenses;
-	float personal_wealth;
+	int personal_expenses;
+	int personal_wealth;
 	int social_stratum;
 	
 	House house;
@@ -369,8 +378,8 @@ public:
 
 	void actionPayBills()
 	{
-		personal_wealth = personal_wealth - (house_bill / house.no_residents);
-		goverment_wealth_total = goverment_wealth_total + (house_bill / house.no_residents);
+		personal_wealth = (int)(personal_wealth - (house_bill / house.no_residents));
+		goverment_wealth_total = (int)(goverment_wealth_total + (house_bill / house.no_residents));
 	}
 
 		
@@ -432,6 +441,13 @@ bool contact(Human& person1, Human& person2, int day)
 			return false;
 	
 	}
+
+void GovermentFinanceHealthcare(int hospitalized_people, int icu_people)
+
+{
+	goverment_wealth_total = goverment_wealth_total - (goverment_money_Healthcare_fixed + (goverment_money_Healthcare_hospitalized * (hospitalized_people + icu_people)));
+
+}
 
 std::vector<Human> PPL;
 std::vector<House> HOU;
@@ -843,29 +859,29 @@ int main()
 
 		if (PPL[j].social_stratum == 1)
 		{
-			MostPoor = MostPoor + 1;
+			MostPoor_people = MostPoor_people + 1;
 		}
 
 		else if (PPL[j].social_stratum == 2)
 		{
-			Poor = Poor + 1;
+			Poor_people = Poor_people + 1;
 		}
 
 		else if (PPL[j].social_stratum == 3)
 		{
-			WorkingClass = WorkingClass + 1;
+			WorkingClass_people = WorkingClass_people + 1;
 		}
 
 		else if (PPL[j].social_stratum == 4)
 		{
-			Rich = Rich + 1;
+			Rich_people = Rich_people + 1;
 		}
 		else if (PPL[j].social_stratum == 5)
 		{
-			MostRich = MostRich + 1;
+			MostRich_people = MostRich_people + 1;
 		}
 	}
-	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor, Poor, WorkingClass, Rich, MostRich);
+	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_people, Poor_people, WorkingClass_people, Rich_people, MostRich_people);
 
 	for (int i = 0; i < N; i++)
 
@@ -885,7 +901,7 @@ int main()
 
 				PPL[i].personal_income = 900;
 				PPL[i].personal_expenses = 600;
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.0362) / MostPoor;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.0362) / MostPoor_people;
 			}
 
 			else if (PPL[i].social_stratum == 2)
@@ -893,7 +909,7 @@ int main()
 
 				PPL[i].personal_income = 950;
 				PPL[i].personal_expenses = 650;
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.0788) / Poor;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.0788) / Poor_people;
 			}
 
 			else if (PPL[i].social_stratum == 3)
@@ -902,7 +918,7 @@ int main()
 				PPL[i].personal_income = 1200;
 				PPL[i].personal_expenses = 800;
 
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.1262) / WorkingClass;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.1262) / WorkingClass_people;
 			}
 
 			else if (PPL[i].social_stratum == 4)
@@ -911,19 +927,26 @@ int main()
 				PPL[i].personal_income = 1500;
 				PPL[i].personal_expenses = 1000;
 
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.4388) / Rich;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.4388) / Rich_people;
 			}
 			else if (PPL[i].social_stratum == 5)
 			{
 
 				PPL[i].personal_income = 2000;
 				PPL[i].personal_expenses = 1300;
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.5612) / MostRich;
+				PPL[i].personal_wealth = (personal_Wealth_total * 0.5612) / MostRich_people;
 			}
 		}
 
 	}
 
+	for (int i = 0; i < N; i++)
+
+	{
+		printf("\nPersonal wealth of person is : %d\n", PPL[i].personal_wealth);
+
+
+	}
 	
 		// ################### EXCEL FILE
 
