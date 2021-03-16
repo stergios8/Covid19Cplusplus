@@ -39,9 +39,6 @@ int MostRich = 0; // Most Rich
 
 
 int family_size_average = 3;
-//int no_houses = (N - N * homeless_rate) / family_size;
-//int no_workplaces = 20;
-
 int no_houses = (int)(N / family_size_average);
 int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_informal));
 
@@ -596,25 +593,9 @@ int main()
 	std::ofstream exce_file_results; // excel file for exporting final results of SEIR model
 
 
-	printf("\ntotal houses are = %d\n", no_houses);
-	printf("\ntottal workplaces are = %d\n", no_workplaces);
-	//Variables 
-		/*
-		float homeless_rate = 0.0005;
-		float initial_infected_rate = 0.01;
-		float unemployment_rate = 0.12;
-		float business_proportion = 0.01875;
-		float business_proportion_informal = 0.4;
-		float total_Wealth = 1000000000;
-		float public_Wealth_rate = 0.01;
-		float business_Wealt_rate = 0.05;
-		float personal_Wealth_rate = 0.04;
-		float public_Wealth = total_Wealth * public_Wealth_rate;
-		float business_Wealth = total_Wealth * business_Wealt_rate;
-		float personal_Wealth = total_Wealth * personal_Wealth_rate;
-		float min_income = 900;
-		float min_expense = 600;
-		*/
+	//printf("\ntotal houses are = %d\n", no_houses);
+	//printf("\ntottal workplaces are = %d\n", no_workplaces);
+	
 		/* Social Stratum explanation
 		each workplace and house are given a social stratum
 		according to the house stratum, the respective stratum is assigned to the people that stay at the home --> the family members
@@ -625,83 +606,6 @@ int main()
 		4:Rich
 		5:Most Rich
 		*/
-
-		//Groups
-
-			/*
-			int S = 399;  //Susceptible //maybe parameterize
-			int E = 0;   //Exposed
-			int I = 1;  //Infected
-			int	I_hosp = 0;  // Infected hospitalized
-			int	I_icu = 0;  // Infected ICU(ventilator)
-			int	R = 0;  // Recovered
-			int	D = 0;  // Deceased
-			int	Q = 0;  // Quarantined
-			int	N = S + E + I + R;  // Population
-			*/
-			/*
-			int N = 400; // Population
-			int I_init = N * initial_infected_rate;  //Infected
-			int S_init = N - (N * initial_infected_rate);
-
-
-			int MostPoor = 0; //Most poor
-			int Poor = 0; // Poor
-			int WorkingClass = 0; // working class
-			int Rich = 0; //Rich
-			int MostRich = 0; // Most Rich
-
-			*/
-
-			//Agents
-
-				//std::vector<Human> PPL;
-				//std::vector<House> HOU;
-				//std::vector<Workplace> WRP;
-				/*
-				int family_size_average = 3;
-				//int no_houses = (N - N * homeless_rate) / family_size;
-				//int no_workplaces = 20;
-
-				int no_houses = (int)(N / family_size_average);
-				int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_informal));
-				printf("\ntotal houses are = %d\n", no_houses);
-				printf("\ntottal workplaces are = %d\n", no_workplaces);
-
-				*/
-				/*
-			//Environment
-
-				int Length = 300;  //each pixel corresponds to area 5x5 meters.
-				int Width = 300;
-
-					//for n in range(N) :
-					//    PPL[n, 0] = random.uniform(0, Width)
-					//    PPL[n, 1] = random.uniform(0, Length)
-
-			//Pandemics Parameters
-
-				int contagion_distance = 1;
-				float contagion_probability = 0.9;
-				int incubation_time = 5;
-				int transmission_time = 8;
-				int recovering_time = 20;
-				int ICU_limit = N * 0.05;
-
-
-
-				float b = 0.001;//0.001;  // infectious rate, controls the rate of spread which represents the probability of transmitting disease between a susceptible and an infectious individual.
-				float q = 0.01;  // b / g // contact ratio
-				float g = 0.05;  // b / q // recovery rate
-				float e = 0.1;  // incubation rate is the rate of latent individuals becoming infectious(average duration of incubation is 1 / s)
-
-
-			//Constraints
-
-				int I_hosp_max = N * 0.02;
-				int I_icu_max = N * 0.01;
-				*/
-
 
 				//Random generators
 
@@ -866,7 +770,7 @@ int main()
 
 	shuffle(PPL.begin(), PPL.end(), std::default_random_engine(seed));
 
-
+	
 	for (int i = 0; i < no_houses; i++) //assign people to houses
 	{
 		int ff = distribution_family(generator);
@@ -933,30 +837,30 @@ int main()
 	std::vector <int> worksy;
 
 
-	for (int j = 0; j < no_houses; j++)
+	for (int j = 0; j < N; j++)
 
 	{
 
-		if (HOU[j].social_stratum == 1)
+		if (PPL[j].social_stratum == 1)
 		{
 			MostPoor = MostPoor + 1;
 		}
 
-		else if (HOU[j].social_stratum == 2)
+		else if (PPL[j].social_stratum == 2)
 		{
 			Poor = Poor + 1;
 		}
 
-		else if (HOU[j].social_stratum == 3)
+		else if (PPL[j].social_stratum == 3)
 		{
 			WorkingClass = WorkingClass + 1;
 		}
 
-		else if (HOU[j].social_stratum == 4)
+		else if (PPL[j].social_stratum == 4)
 		{
 			Rich = Rich + 1;
 		}
-		else if (HOU[j].social_stratum == 5)
+		else if (PPL[j].social_stratum == 5)
 		{
 			MostRich = MostRich + 1;
 		}
@@ -1020,47 +924,7 @@ int main()
 
 	}
 
-	/*for (House house : HOU)
-	{
-		housesx.push_back(house.x);
-		housesy.push_back(house.y);
-
-		}
-
-	for (Workplace workplace : WRP)
-	{
-		worksx.push_back(workplace.x);
-		worksy.push_back(workplace.y);
-
-		}*/
-
-		//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
-		//plot(z, u);
-
-		/*for (House house : HOU)
-
-		{
-			//printf("\n position_house_x = %d\n", house.x);
-			printf("\n house residents = %d\n", house.no_residents);
-
-		}*/
-
-		/*for (Workplace workplace : WRP)
-
-		{
-			//printf("\n position_work_x = %d\n", workplace.x);
-			printf("\n employees = %d\n", workplace.no_workers);
-		}
-		*/
-		/*for (Human person1 : PPL)
-		{
-
-			//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
-			printf("\n position_x = %d\n", person1.x_work);
-
-		}*/
-
-
+	
 		// ################### EXCEL FILE
 
 	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
@@ -1090,11 +954,7 @@ int main()
 
 	// debbuging
 
-	printf("\nxhome = %d, yhome = %d \n", PPL[55].x_home, PPL[55].y_home);
-	printf("\nxwork = %d, ywork = %d \n", PPL[55].x_work, PPL[55].y_work);
-
-
-
+	
 	// plots
 	std::vector<float> Sarray;
 	std::vector<float> Earray;
@@ -1124,45 +984,6 @@ int main()
 		Rarray.push_back(R);
 		//printf("\nS: %d, E: %d, I: %d, R: %d, time: %d\n", S, E, I, R, T);
 		EtoItransition(N, T);
-
-		/*
-		// ###################   E TO I TRANSITION & I distribution & I to R transition
-		for (int i = 0; i < N; i++)
-		{
-			if (PPL[i].group == 1 && T - PPL[i].Eday == 5)
-			{
-				std::default_random_engine generator1;
-				std::uniform_real_distribution <float> distribution1(0, 1);
-				float eps = distribution1(generator1);  // uniform distribution
-				if (eps > 0.1)
-				{
-					PPL[i].group = 2;
-					PPL[i].Iday = T;
-					//printf("\nGroup: %d, Iday: %d", PPL[personcheck].group, PPL[personcheck].Iday);
-					if (PPL[i].age >= 0 && PPL[i].age <= 9) {
-						std::default_random_engine generator;
-						std::uniform_real_distribution <float> distribution(0, 1);
-						float eps = distribution1(generator);  // uniform distribution
-						if (eps < 0.001) {
-							PPL[i].group = 4;
-							std::default_random_engine generator;
-							std::uniform_real_distribution <float> distribution(0, 1);
-							float eps = distribution1(generator);  // uniform distribution
-							if (eps < 0.05) {
-								PPL[i].group = 5;
-							}
-						}
-					}
-				}
-			}
-			if ((PPL[i].group == 2 || PPL[i].group == 4 || PPL[i].group == 5) && T - PPL[i].Iday == 20) {
-				PPL[i].group = 3;
-			}
-		}
-		*/
-
-
-
 
 		// ################## PRINT NUMBER OF PEOPLE IN GROUPS 
 
@@ -1211,7 +1032,6 @@ int main()
 		for (int hour = 0; hour < 24; hour++)
 		{
 
-			//printf("\nx = %d, y = %d \n", PPL[55].x, PPL[55].y);
 			if (hour >= 0 && hour < 8)
 
 			{
