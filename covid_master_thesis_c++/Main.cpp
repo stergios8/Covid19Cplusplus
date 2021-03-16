@@ -15,14 +15,14 @@ float business_proportion = 0.01875;
 float business_proportion_informal = 0.4;
 int total_Wealth = 1000000000;
 //float public_Wealth_rate = 0.01;
-float business_Wealt_rate = 0.05;
-float personal_Wealth_rate = 0.05;
+float business_Wealth_rate = 0.07;
+float personal_Wealth_rate = 0.03;
 //float public_Wealth_total = total_Wealth * public_Wealth_rate;
-int business_Wealth_total = (int)(total_Wealth * business_Wealt_rate);
+int business_Wealth_total = (int)(total_Wealth * business_Wealth_rate);
 int personal_Wealth_total = (int)(total_Wealth * personal_Wealth_rate);
 int min_income = 900;
 int min_expense = 600;
-int goverment_wealth_total = 1000000000;
+int goverment_wealth_total = total_Wealth - (business_Wealth_total + personal_Wealth_total);
 
 
 
@@ -853,6 +853,7 @@ int main()
 	std::vector <int> worksy;
 
 
+	//wealth sharing people
 	for (int j = 0; j < N; j++)
 
 	{
@@ -901,7 +902,8 @@ int main()
 
 				PPL[i].personal_income = 900;
 				PPL[i].personal_expenses = 600;
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.0362) / MostPoor_people;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0362) / MostPoor_people);
+				//printf("\nPersonal wealth of very poor person is : %d\n", PPL[i].personal_wealth);
 			}
 
 			else if (PPL[i].social_stratum == 2)
@@ -909,7 +911,8 @@ int main()
 
 				PPL[i].personal_income = 950;
 				PPL[i].personal_expenses = 650;
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.0788) / Poor_people;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0788) / Poor_people);
+				//printf("\nPersonal wealth of poor person is : %d\n", PPL[i].personal_wealth);
 			}
 
 			else if (PPL[i].social_stratum == 3)
@@ -918,7 +921,8 @@ int main()
 				PPL[i].personal_income = 1200;
 				PPL[i].personal_expenses = 800;
 
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.1262) / WorkingClass_people;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.1262) / WorkingClass_people);
+				//printf("\nPersonal wealth of working class person is : %d\n", PPL[i].personal_wealth);
 			}
 
 			else if (PPL[i].social_stratum == 4)
@@ -927,27 +931,98 @@ int main()
 				PPL[i].personal_income = 1500;
 				PPL[i].personal_expenses = 1000;
 
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.4388) / Rich_people;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.4388) / Rich_people);
+				//printf("\nPersonal wealth of rich person is : %d\n", PPL[i].personal_wealth);
 			}
 			else if (PPL[i].social_stratum == 5)
 			{
 
 				PPL[i].personal_income = 2000;
 				PPL[i].personal_expenses = 1300;
-				PPL[i].personal_wealth = (personal_Wealth_total * 0.5612) / MostRich_people;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.5612) / MostRich_people);
+				//printf("\nPersonal wealth of very rich person is : %d\n", PPL[i].personal_wealth);
 			}
 		}
 
 	}
 
-	for (int i = 0; i < N; i++)
+
+	//wealth sharing workplaces
+
+	for (int j = 0; j < no_workplaces; j++)
 
 	{
-		printf("\nPersonal wealth of person is : %d\n", PPL[i].personal_wealth);
 
+		if (WRP[j].social_stratum == 1)
+		{
+			MostPoor_workplaces = MostPoor_workplaces + 1;
+		}
 
+		else if (WRP[j].social_stratum == 2)
+		{
+			Poor_workplaces = Poor_workplaces + 1;
+		}
+
+		else if (WRP[j].social_stratum == 3)
+		{
+			WorkingClass_workplaces = WorkingClass_workplaces + 1;
+		}
+
+		else if (WRP[j].social_stratum == 4)
+		{
+			Rich_workplaces = Rich_workplaces + 1;
+		}
+		else if (WRP[j].social_stratum == 5)
+		{
+			MostRich_workplaces = MostRich_workplaces + 1;
+		}
 	}
+	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_workplaces, Poor_workplaces, WorkingClass_workplaces, Rich_workplaces, MostRich_workplaces);
+
+	for (int i = 0; i < no_workplaces; i++)
+
+	{
+		
+			if (WRP[i].social_stratum == 1)
+			{
+
+				
+				WRP[i].workplace_wealth = (int)((business_Wealth_total * 0.0362) / MostPoor_workplaces);
+				//printf("\nWealth of very poor workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+
+			else if (WRP[i].social_stratum == 2)
+			{
+
+				
+				WRP[i].workplace_wealth = (int)((business_Wealth_total * 0.0788) / Poor_workplaces);
+				//printf("\nWealth of poor workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+
+			else if (WRP[i].social_stratum == 3)
+			{
+
+				WRP[i].workplace_wealth = (int)((business_Wealth_total * 0.1262) / WorkingClass_workplaces);
+				//printf("\nWealth of working class workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+
+			else if (WRP[i].social_stratum == 4)
+			{
+
+				WRP[i].workplace_wealth = (int)((business_Wealth_total * 0.4388) / Rich_workplaces);
+				//printf("\nWealth of rich workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+			else if (WRP[i].social_stratum == 5)
+			{
+				WRP[i].workplace_wealth = (int)((business_Wealth_total * 0.5612) / MostRich_workplaces);
+				//printf("\nWealth of very rich workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+		}
+
 	
+
+
+
 		// ################### EXCEL FILE
 
 	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
