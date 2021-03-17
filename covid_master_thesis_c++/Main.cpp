@@ -371,15 +371,21 @@ public:
 
 	void actionGetPaid()
 	{
-		work.workplace_wealth = work.workplace_wealth - personal_income;
-		personal_wealth = personal_wealth + personal_income;
-		
+		if (unemployed == 0)
+		{
+			work.workplace_wealth = work.workplace_wealth - personal_income;
+			personal_wealth = personal_wealth + personal_income;
+
+		}
 	}
 
 	void actionPayBills()
 	{
-		personal_wealth = (int)(personal_wealth - (house_bill / house.no_residents));
-		goverment_wealth_total = (int)(goverment_wealth_total + (house_bill / house.no_residents));
+		if (homeless == 0)
+		{
+			personal_wealth = (int)(personal_wealth - (house_bill / family_size_average));
+			goverment_wealth_total = (int)(goverment_wealth_total + (house_bill / family_size_average));
+		}
 	}
 
 		
@@ -606,7 +612,8 @@ int main()
 {
 
 	std::ofstream excel_file_initialization; // excel file for exporting initial distribution of houses, workplaces etc.
-	std::ofstream exce_file_results; // excel file for exporting final results of SEIR model
+	std::ofstream exce_file_SEIR_results; // excel file for exporting final results of SEIR model
+	std::ofstream exce_file_Financial_results; // excel file for exporting final results of Economical conditions
 
 
 	//printf("\ntotal houses are = %d\n", no_houses);
@@ -814,6 +821,18 @@ int main()
 					}
 				}
 			}
+			if (PPL[j].homeless == 1)
+			{
+				if (PPL[j].x_home == -1)
+				
+				{
+					PPL[j].x_home = 0;
+					PPL[j].y_home = 0;
+					PPL[j].x = 0;
+					PPL[j].y = 0;
+					PPL[j].social_stratum = 1;
+				}
+			}
 		}
 	}
 
@@ -881,6 +900,13 @@ int main()
 		{
 			MostRich_people = MostRich_people + 1;
 		}
+		else
+		{
+
+			printf("\nERROR!! Social Stratum dont assigned for a person\n");
+			printf("\nhas this guy home : %d\n", PPL[j].x_home);
+			printf("\nhas this guy work : %d\n", PPL[j].x_work);
+		}
 	}
 	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_people, Poor_people, WorkingClass_people, Rich_people, MostRich_people);
 
@@ -891,6 +917,53 @@ int main()
 		{
 
 			PPL[i].personal_income = 0;
+
+			if (PPL[i].social_stratum == 1)
+			{
+
+				
+				PPL[i].personal_expenses = 600;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0362) / MostPoor_people);
+				//printf("\nPersonal wealth of very poor person is : %d\n", PPL[i].personal_wealth);
+			}
+
+			else if (PPL[i].social_stratum == 2)
+			{
+
+		
+				PPL[i].personal_expenses = 650;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0788) / Poor_people);
+				//printf("\nPersonal wealth of poor person is : %d\n", PPL[i].personal_wealth);
+			}
+
+			else if (PPL[i].social_stratum == 3)
+			{
+
+			
+				PPL[i].personal_expenses = 800;
+
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.1262) / WorkingClass_people);
+				//printf("\nPersonal wealth of working class person is : %d\n", PPL[i].personal_wealth);
+			}
+
+			else if (PPL[i].social_stratum == 4)
+			{
+
+				
+				PPL[i].personal_expenses = 1000;
+
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.4388) / Rich_people);
+				//printf("\nPersonal wealth of rich person is : %d\n", PPL[i].personal_wealth);
+			}
+			else if (PPL[i].social_stratum == 5)
+			{
+
+				
+				PPL[i].personal_expenses = 1300;
+				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.5612) / MostRich_people);
+				//printf("\nPersonal wealth of very rich person is : %d\n", PPL[i].personal_wealth);
+			}
+
 		}
 
 		else if (PPL[i].unemployed == 0)
@@ -1059,6 +1132,10 @@ int main()
 	std::vector<float> Iarray;
 	std::vector<float> Rarray;
 	std::vector<int> timepassed;
+	std::vector<int> Personal_Wealth_Array;
+	std::vector<int> Business_Wealth_Array;
+	std::vector<int> Goverment_Wealth_Array;
+	
 
 
 	// INITIAL CONDITION
@@ -1071,6 +1148,28 @@ int main()
 	int Is = 0;
 	int T = 0;
 
+	printf("\nTotal business wealth = %d\n", business_Wealth_total);
+	printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
+
+	business_Wealth_total = 0;
+	for (int i = 0; i < no_workplaces; i++)
+	{
+
+		business_Wealth_total = business_Wealth_total + WRP[i].workplace_wealth;
+
+	}
+	printf("\nTotal business wealth = %d\n", business_Wealth_total);
+
+	personal_Wealth_total = 0;
+
+	for (int i = 0; i < N; i++)
+	{
+
+		personal_Wealth_total = personal_Wealth_total + PPL[i].personal_wealth;
+
+	}
+	printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
+	
 
 	bool done = false;
 	while (done == false)
@@ -1080,6 +1179,9 @@ int main()
 		Earray.push_back(E);
 		Iarray.push_back(I);
 		Rarray.push_back(R);
+		Personal_Wealth_Array.push_back(personal_Wealth_total);
+		Business_Wealth_Array.push_back(business_Wealth_total);
+		Goverment_Wealth_Array.push_back(goverment_wealth_total);
 		//printf("\nS: %d, E: %d, I: %d, R: %d, time: %d\n", S, E, I, R, T);
 		EtoItransition(N, T);
 
@@ -1121,8 +1223,10 @@ int main()
 		}
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d", S, E, I, R, Ih, Is, contactsPerDay);
 		contactsPerDay = 0;
+		
 
-
+		personal_Wealth_total = 0;
+		business_Wealth_total = 0;
 
 
 		// ###################   24 H LOOP 
@@ -1298,7 +1402,12 @@ int main()
 		if (T == 30 || T == 60 || T == 90 || T == 120 || T == 150 || T == 180)
 
 		{
+			for (int i = 0; i < no_workplaces; i++)
+			{
 
+				WRP[i].actionPayBills();
+
+			}
 			for (int j = 0; j < no_houses; j++)
 			{
 				for (int i = 0; i < N; i++)
@@ -1306,7 +1415,13 @@ int main()
 
 					if (PPL[i].x_home == HOU[j].x && PPL[i].y_home == HOU[j].y)
 					{
-						PPL[i].actionGetPaid();
+						if (PPL[i].unemployed == 0)
+
+						{
+							PPL[i].actionGetPaid();
+
+						}
+
 						PPL[i].actionPayBills();
 						//HOU[j].home_wealth = HOU[j].home_wealth + PPL[i].personal_wealth;
 					}
@@ -1314,7 +1429,25 @@ int main()
 				}
 
 			}
+
+			GovermentFinanceHealthcare(Ih, Is);
 		}
+
+		for (int i = 0; i < no_workplaces; i++)
+		{
+
+			business_Wealth_total = business_Wealth_total + WRP[i].workplace_wealth;
+
+		}
+
+		for (int i = 0; i < N; i++)
+		{
+
+			personal_Wealth_total = personal_Wealth_total + PPL[i].personal_wealth;
+
+		}
+
+		
 
 		//printf("\nContacts : %d\n", contactsPerDay);
 
@@ -1358,26 +1491,39 @@ int main()
 		}
 
 		T++;
-		if (T == 10) {
+		if (T == 120) {
 			done = true;
 		}
 
 	}
 
-	exce_file_results.open("SEIR_Results.csv");
+	exce_file_SEIR_results.open("SEIR_Results.csv");
 
-	printf("\nPreparing results excel file...\n");
+	printf("\nPreparing SEIR results excel file...\n");
 	for (int i = 0; i < T; i++)
 
 	{
-		exce_file_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << timepassed[i] << std::endl;
+		exce_file_SEIR_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << timepassed[i] << std::endl;
 
 	}
 
-	exce_file_results.close();
+	exce_file_Financial_results.open("Financial_Results.csv");
+
+	printf("\nPreparing Financial results excel file...\n");
+
+	for (int i = 0; i < T; i++)
+
+	{
+		exce_file_Financial_results << Personal_Wealth_Array[i] << "," << Business_Wealth_Array[i] << "," << Goverment_Wealth_Array[i] << "," << timepassed[i] << std::endl;
+
+	}
+
+	exce_file_SEIR_results.close();
 
 
-	printf("\nResults excel file done!\n");
+	printf("\nSEIR results excel file done!\n");
+
+	printf("\nFinancial results excel file done!\n");
 
 	printf("\nSimulation completed!\n");
 
