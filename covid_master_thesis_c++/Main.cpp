@@ -14,15 +14,16 @@ float unemployment_rate = 0.12;
 float business_proportion = 0.01875;
 float business_proportion_informal = 0.4;
 int total_Wealth = 1000000000;
-//float public_Wealth_rate = 0.01;
-float business_Wealth_rate = 0.07;
-float personal_Wealth_rate = 0.03;
-//float public_Wealth_total = total_Wealth * public_Wealth_rate;
+float public_Wealth_rate = 0.01;
+float business_Wealth_rate = 0.05;
+float personal_Wealth_rate = 0.04;
+int public_Wealth_total = (int)(total_Wealth * public_Wealth_rate);
 int business_Wealth_total = (int)(total_Wealth * business_Wealth_rate);
 int personal_Wealth_total = (int)(total_Wealth * personal_Wealth_rate);
 int min_income = 900;
 int min_expense = 600;
-int goverment_wealth_total = total_Wealth - (business_Wealth_total + personal_Wealth_total);
+int goverment_wealth_total = total_Wealth - (business_Wealth_total + personal_Wealth_total + public_Wealth_total);
+int goverment_aid = 400;
 
 
 
@@ -37,14 +38,20 @@ int WorkingClass_people = 0; // working class people
 int Rich_people = 0; //Rich people
 int MostRich_people = 0; // Most Rich people
 
+int MostPoor_houses = 0; //Most poor house
+int Poor_houses = 0; // Poor house
+int WorkingClass_houses = 0; // working class house
+int Rich_houses = 0; //Rich house
+int MostRich_houses = 0; // Most Rich house
+
 int MostPoor_workplaces = 0; //Most poor workplaces
 int Poor_workplaces = 0; // Poor workplaces
 int WorkingClass_workplaces = 0; // working class workplaces
 int Rich_workplaces = 0; //Rich workplaces
 int MostRich_workplaces = 0; // Most Rich workplaces
 
-int goverment_money_Healthcare_fixed = (int)(goverment_wealth_total * 0.05);
-int goverment_money_Healthcare_hospitalized = 1000;
+int goverment_money_Healthcare_fixed = (int)(goverment_wealth_total * 0.08); //from danish aep
+int hospital_fee = 100;
 
 
 int family_size_average = 3;
@@ -92,7 +99,17 @@ public:
 	int x, y; //position
 	int no_residents;
 	int social_stratum;
-	float home_wealth;
+	int home_wealth;
+	int home_income;
+	int home_expense;
+
+	void actionPayBills()
+	{
+		
+		home_wealth = home_wealth - house_bill;
+		goverment_wealth_total = goverment_wealth_total + house_bill;
+		
+	}
 
 };
 
@@ -108,6 +125,8 @@ public:
 	int no_workers;
 	int social_stratum;
 	int workplace_wealth;
+	int workplace_income;
+	int workplace_expense;
 
 	void actionPayBills()
 	{
@@ -362,38 +381,56 @@ public:
 		}
 	}
 
-	void actionShopping()
-	{
 
-		personal_wealth = personal_wealth - (personal_expenses / 60); // share the money to the workplaces
-
-	}
 
 	void actionGetPaid()
 	{
 		if (unemployed == 0)
 		{
 			work.workplace_wealth = work.workplace_wealth - personal_income;
-			personal_wealth = personal_wealth + personal_income;
+			house.home_wealth = house.home_wealth + personal_income;
 
 		}
 	}
 
-	void actionPayBills()
+	void actionPayHospitalFee()
 	{
-		if (homeless == 0)
+
+		if (group == 4 || group == 5)
+
 		{
-			personal_wealth = (int)(personal_wealth - (house_bill / family_size_average));
-			goverment_wealth_total = (int)(goverment_wealth_total + (house_bill / family_size_average));
+
+			personal_wealth = personal_wealth - hospital_fee;
 		}
 	}
 
-		
-	
+	void financialInterferenceHome()
+	{
+		personal_wealth = personal_wealth + (personal_expenses / 30);
+		house.home_wealth = house.home_wealth - (personal_expenses / 30);
 
+
+	}
+	
 };
 
 
+
+
+bool actionShopping(Human& person, Workplace& workplace)
+{
+	if (person.x == workplace.x && person.y == workplace.y && person.x_work != workplace.x && person.y_work != workplace.y)
+	{
+		
+		return true;
+	}
+
+	else
+	{
+
+		return false;
+	}
+}
 
 
 
@@ -448,10 +485,19 @@ bool contact(Human& person1, Human& person2, int day)
 	
 	}
 
-void GovermentFinanceHealthcare(int hospitalized_people, int icu_people)
+void GovermentFinanceHealthcare()
 
 {
-	goverment_wealth_total = goverment_wealth_total - (goverment_money_Healthcare_fixed + (goverment_money_Healthcare_hospitalized * (hospitalized_people + icu_people)));
+	goverment_wealth_total = goverment_wealth_total - goverment_money_Healthcare_fixed;
+
+}
+
+void GovermentAid(Human& person)
+
+{
+
+	goverment_wealth_total = goverment_wealth_total - goverment_aid;
+	person.personal_wealth = person.personal_wealth + goverment_aid;
 
 }
 
@@ -659,6 +705,7 @@ int main()
 		house.dy = distribution_dy_house(generator);
 		house.social_stratum = distribution_social_stratum(generator);
 		house.no_residents = 0;
+		
 		HOU.push_back(house);
 	}
 
@@ -823,15 +870,8 @@ int main()
 			}
 			if (PPL[j].homeless == 1)
 			{
-				if (PPL[j].x_home == -1)
-				
-				{
-					PPL[j].x_home = 0;
-					PPL[j].y_home = 0;
-					PPL[j].x = 0;
-					PPL[j].y = 0;
 					PPL[j].social_stratum = 1;
-				}
+				
 			}
 		}
 	}
@@ -1092,6 +1132,80 @@ int main()
 			}
 		}
 
+	//wealth sharing houses
+
+	for (int j = 0; j < no_houses; j++)
+
+	{
+
+		if (HOU[j].social_stratum == 1)
+		{
+			MostPoor_houses = MostPoor_houses + 1;
+		}
+
+		else if (HOU[j].social_stratum == 2)
+		{
+			Poor_houses = Poor_houses + 1;
+		}
+
+		else if (HOU[j].social_stratum == 3)
+		{
+			WorkingClass_houses = WorkingClass_houses + 1;
+		}
+
+		else if (HOU[j].social_stratum == 4)
+		{
+			Rich_houses = Rich_houses + 1;
+		}
+		else if (HOU[j].social_stratum == 5)
+		{
+			MostRich_houses = MostRich_houses + 1;
+		}
+	}
+	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_houses, Poor_houses, WorkingClass_houses, Rich_houses, MostRich_houses);
+
+	for (int i = 0; i < no_houses; i++)
+
+	{
+
+		if (HOU[i].social_stratum == 1)
+		{
+
+
+			HOU[i].home_wealth = (int)((public_Wealth_total * 0.0362) / MostPoor_houses);
+			//printf("\nWealth of very poor home is : %d\n", HOU[i].home_wealth);
+		}
+
+		else if (HOU[i].social_stratum == 2)
+		{
+
+
+			HOU[i].home_wealth = (int)((public_Wealth_total * 0.0788) / Poor_houses);
+			//printf("\nWealth of poor home is : %d\n", HOU[i].home_wealth);
+		}
+
+		else if (HOU[i].social_stratum == 3)
+		{
+
+			HOU[i].home_wealth = (int)((public_Wealth_total * 0.1262) / WorkingClass_houses);
+			//printf("\nWealth of working class home is : %d\n", HOU[i].home_wealth);
+		}
+
+		else if (HOU[i].social_stratum == 4)
+		{
+
+			HOU[i].home_wealth = (int)((public_Wealth_total * 0.4388) / Rich_houses);
+			//printf("\nWealth of rich home is : %d\n", HOU[i].home_wealth);
+		}
+		else if (HOU[i].social_stratum == 5)
+		{
+			HOU[i].home_wealth = (int)((public_Wealth_total * 0.5612) / MostRich_houses);
+			//printf("\nWealth of very rich home is : %d\n", HOU[i].home_wealth);
+		}
+
+		//printf("\nhome wealth = %d\n", HOU[i].home_wealth);
+	}
+
 	
 
 
@@ -1133,6 +1247,7 @@ int main()
 	std::vector<float> Rarray;
 	std::vector<int> timepassed;
 	std::vector<int> Personal_Wealth_Array;
+	std::vector<int> House_Wealth_Array;
 	std::vector<int> Business_Wealth_Array;
 	std::vector<int> Goverment_Wealth_Array;
 	
@@ -1149,9 +1264,10 @@ int main()
 	int T = 0;
 
 	printf("\nTotal business wealth = %d\n", business_Wealth_total);
+	printf("\nTotal house wealth = %d\n", public_Wealth_total);
 	printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
 
-	business_Wealth_total = 0;
+	/*business_Wealth_total = 0;
 	for (int i = 0; i < no_workplaces; i++)
 	{
 
@@ -1170,7 +1286,7 @@ int main()
 	}
 	printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
 	
-
+	*/
 	bool done = false;
 	while (done == false)
 	{
@@ -1180,6 +1296,7 @@ int main()
 		Iarray.push_back(I);
 		Rarray.push_back(R);
 		Personal_Wealth_Array.push_back(personal_Wealth_total);
+		House_Wealth_Array.push_back(public_Wealth_total);
 		Business_Wealth_Array.push_back(business_Wealth_total);
 		Goverment_Wealth_Array.push_back(goverment_wealth_total);
 		//printf("\nS: %d, E: %d, I: %d, R: %d, time: %d\n", S, E, I, R, T);
@@ -1227,6 +1344,7 @@ int main()
 
 		personal_Wealth_total = 0;
 		business_Wealth_total = 0;
+		public_Wealth_total = 0;
 
 
 		// ###################   24 H LOOP 
@@ -1309,11 +1427,25 @@ int main()
 					for (int i = 0; i < N; i++)
 					{
 						PPL[i].actionWalkFree();
-						if (PPL[i].homeless == 0)
 
+						for (int m = 0; m < no_workplaces; m++)
 						{
-							PPL[i].actionShopping();
+							if (PPL[i].homeless == 0)
+							
+							if (actionShopping(PPL[i], WRP[m]) == true)
+							{
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
 
+								}
+
+							
+							
 						}
 						for (int j = 0; j < N; j++)
 						{
@@ -1371,13 +1503,23 @@ int main()
 					{
 						PPL[i].actionWalkFree();
 
-						if (PPL[i].homeless == 0)
-
+						for (int m = 0; m < no_workplaces; m++)
 						{
-							PPL[i].actionShopping();
+							if (PPL[i].homeless == 0)
+
+								if (actionShopping(PPL[i], WRP[m]) == true)
+								{
+									//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+									//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+									PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+									WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+									//printf("\nshop\n");
+									//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+									//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+
+								}
 
 						}
-
 						for (int j = 0; j < N; j++)
 						{
 							if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
@@ -1396,47 +1538,79 @@ int main()
 
 
 		}
-		// ### END OF 24 H LOOP
 
 		
-		if (T == 30 || T == 60 || T == 90 || T == 120 || T == 150 || T == 180)
 
+		// ### END OF 24 H LOOP
+		for (int i = 0; i < N; i++)
+		{
+			//printf("\npersonal money pro home_interference = %d\n", PPL[i].personal_wealth);
+			//printf("\nphome money pro home_interference = %d\n", PPL[i].house.home_wealth);
+			PPL[i].financialInterferenceHome();
+			//printf("\npersonal money after home_interference = %d\n", PPL[i].personal_wealth);
+			//printf("\nphome money after home_interference = %d\n", PPL[i].house.home_wealth);
+		}
+		
+		if (T == 30 || T == 60 || T == 90 || T == 120 || T == 150 || T == 180)
+			//if (T == 2)
 		{
 			for (int i = 0; i < no_workplaces; i++)
 			{
-
-				WRP[i].actionPayBills();
+				//printf("\nwork money pro bills = %d\n", WRP[i].workplace_wealth);
+				//printf("\ngov money pro bills_w = %d\n", goverment_wealth_total);
+				WRP[i].actionPayBills(); // works
+				//printf("\nwork money after bills = %d\n", WRP[i].workplace_wealth);
+				//printf("\ngov money after_w bills = %d\n", goverment_wealth_total);
 
 			}
 			for (int j = 0; j < no_houses; j++)
 			{
+				//printf("\nhome money before bills = %d\n", HOU[j].home_wealth);
+				//printf("\ngov money pro bills_h = %d\n", goverment_wealth_total);
+				HOU[j].actionPayBills(); // works
+				//printf("\nhome money after bills = %d\n", HOU[j].home_wealth);
+				//printf("\ngov money after bills_h = %d\n", goverment_wealth_total);
+			}
+				
 				for (int i = 0; i < N; i++)
 				{
-
-					if (PPL[i].x_home == HOU[j].x && PPL[i].y_home == HOU[j].y)
-					{
 						if (PPL[i].unemployed == 0)
 
 						{
-							PPL[i].actionGetPaid();
-
+							//printf("\nwork money pro salary = %d\n", PPL[i].work.workplace_wealth);
+							//printf("\nphome money pro salary = %d\n", PPL[i].house.home_wealth);
+							PPL[i].actionGetPaid(); //works
+							//printf("\nwork money after salary = %d\n", PPL[i].work.workplace_wealth);
+							//printf("\nphome money after salary = %d\n", PPL[i].house.home_wealth);
 						}
+						else if (PPL[i].unemployed == 1 || PPL[i].homeless == 1)
 
-						PPL[i].actionPayBills();
-						//HOU[j].home_wealth = HOU[j].home_wealth + PPL[i].personal_wealth;
-					}
-
+						{
+							//printf("\ngov money before aid = %d\n", goverment_wealth_total);
+							//printf("\npoor person money pro aid = %d\n", PPL[i].personal_wealth);
+							GovermentAid(PPL[i]); //works
+							//printf("\ngov money after aid = %d\n", goverment_wealth_total);
+							//printf("\npoor person money after aid = %d\n", PPL[i].personal_wealth);
+						}
 				}
 
-			}
-
-			GovermentFinanceHealthcare(Ih, Is);
+			
+				//printf("\ngov money before healthcare = %d\n", goverment_wealth_total);
+			GovermentFinanceHealthcare(); //works
+			//printf("\ngov money after healthcare = %d\n", goverment_wealth_total);
 		}
 
 		for (int i = 0; i < no_workplaces; i++)
 		{
 
 			business_Wealth_total = business_Wealth_total + WRP[i].workplace_wealth;
+
+		}
+
+		for (int i = 0; i < no_houses; i++)
+		{
+
+			public_Wealth_total = public_Wealth_total + HOU[i].home_wealth;
 
 		}
 
@@ -1514,7 +1688,7 @@ int main()
 	for (int i = 0; i < T; i++)
 
 	{
-		exce_file_Financial_results << Personal_Wealth_Array[i] << "," << Business_Wealth_Array[i] << "," << Goverment_Wealth_Array[i] << "," << timepassed[i] << std::endl;
+		exce_file_Financial_results << Personal_Wealth_Array[i] << "," << House_Wealth_Array[i] << "," << Business_Wealth_Array[i] << "," << Goverment_Wealth_Array[i] << "," << timepassed[i] << std::endl;
 
 	}
 
