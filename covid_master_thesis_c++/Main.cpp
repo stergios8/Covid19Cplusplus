@@ -87,8 +87,8 @@ int I_icu_max = N * 0.01;
 
 
 //Bills
-int workplace_bill = 1000;
-int house_bill = 150;
+int workplace_tax = 1000;
+int house_tax = 500;
 
 class House
 {
@@ -106,8 +106,8 @@ public:
 	void actionPayBills()
 	{
 		
-		home_wealth = home_wealth - house_bill;
-		goverment_wealth_total = goverment_wealth_total + house_bill;
+		home_wealth = home_wealth - house_tax;
+		goverment_wealth_total = goverment_wealth_total + house_tax;
 		
 	}
 
@@ -131,8 +131,8 @@ public:
 	void actionPayBills()
 	{
 
-		workplace_wealth = workplace_wealth - workplace_bill;
-		goverment_wealth_total = goverment_wealth_total + workplace_bill;
+		workplace_wealth = workplace_wealth - workplace_tax;
+		goverment_wealth_total = goverment_wealth_total + workplace_tax;
 	}
 	
 
@@ -705,6 +705,7 @@ int main()
 		house.dy = distribution_dy_house(generator);
 		house.social_stratum = distribution_social_stratum(generator);
 		house.no_residents = 0;
+		//printf("\nstratum of house is : %d\n", house.social_stratum);
 		
 		HOU.push_back(house);
 	}
@@ -720,6 +721,7 @@ int main()
 		workplace.dy = distribution_dy_workplace(generator);
 		workplace.social_stratum = distribution_social_stratum(generator);
 		workplace.no_workers = 0;
+		//printf("\nstratum of work is : %d\n", workplace.social_stratum);
 		WRP.push_back(workplace);
 	}
 
@@ -873,9 +875,36 @@ int main()
 					PPL[j].social_stratum = 1;
 				
 			}
+
+
+		}
+	}
+	for (int i = 0; i < N; i++)
+
+	{
+
+		if (PPL[i].homeless == 0 && PPL[i].x_home == -1 && PPL[i].y_home == -1)
+
+		{
+			//printf("\nError to houses people assignment\n");
+			PPL[i].homeless = 1;
+			PPL[i].unemployed = 1;
+			PPL[i].social_stratum = 1;
+
 		}
 	}
 
+	/*for (int i = 0; i < N; i++)
+	{
+
+		
+		if (PPL[i].social_stratum < 1 || PPL[i].social_stratum > 5)
+		{
+			printf("\nstratum of person is : PIIIIIIPAAAAAAAAA\n");
+			printf("\nstratum of person is : %d\n", PPL[i].social_stratum);
+
+		}
+	}*/
 
 
 	for (int i = 0; i < no_workplaces; i++) //assign people to workplaces
@@ -943,9 +972,9 @@ int main()
 		else
 		{
 
-			printf("\nERROR!! Social Stratum dont assigned for a person\n");
-			printf("\nhas this guy home : %d\n", PPL[j].x_home);
-			printf("\nhas this guy work : %d\n", PPL[j].x_work);
+			//printf("\nERROR!! Social Stratum dont assigned for a person\n");
+			//printf("\nhas this guy home : %d\n", PPL[j].x_home);
+			//printf("\nhas this guy work : %d\n", PPL[j].x_work);
 		}
 	}
 	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_people, Poor_people, WorkingClass_people, Rich_people, MostRich_people);
@@ -1665,7 +1694,7 @@ int main()
 		}
 
 		T++;
-		if (T == 120) {
+		if (T == 1) {
 			done = true;
 		}
 
