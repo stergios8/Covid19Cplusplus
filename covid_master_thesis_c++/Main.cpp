@@ -10,6 +10,7 @@
 //original
 float homeless_rate = 0.0005;
 float initial_infected_rate = 0.01;
+float initial_immune_rate = 0.01;
 float unemployment_rate = 0.12;
 float business_proportion = 0.01875;
 float business_proportion_informal = 0.4;
@@ -137,6 +138,19 @@ public:
 	
 
 };
+
+
+class School
+{
+public:
+	int dx, dy;
+	int x, y;
+	int no_students;
+
+
+};
+
+
 class Human
 
 {
@@ -153,6 +167,7 @@ public:
 	int y_home;
 	int x_work;
 	int y_work;
+	int student;
 	int personal_income;
 	int personal_expenses;
 	int personal_wealth;
@@ -351,6 +366,102 @@ public:
 		}
 
 	}
+	
+	void actionGoSchool(School& school)
+
+	{
+		if ((x - school.x > 200) || (x - school.x < -200) || (y - school.y > 200) || (y - school.y < -200))
+		{
+			x = school.x;
+			y = school.y;
+		}
+
+		//IF student not in school, at this function call, move student by 1 px towards school
+		if ((x < school.x - school.dx) || (x > school.x + school.dx) || (y < school.y - school.dy) || (y > school.y + school.dy))
+		{
+			if (x < school.x)
+			{
+				x = x + dx;
+			}
+			if (x > school.x)
+			{
+				x = x - dx;
+			}
+			if (y < school.y)
+			{
+				y = y + dy;
+			}
+			if (y > school.y)
+			{
+				y = y - dy;
+			}
+
+		}
+	}
+
+	void actionStayAtSchool(School& school)
+
+	{
+		//If student at school, stay at px or move with probability inside school
+		if ((x >= school.x - school.dx) && (x <= school.x + school.dx) && (y >= school.y - school.dy) && (y <= school.y + school.dy))
+		{
+			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::default_random_engine generator(seed);
+			std::uniform_real_distribution <float> distribution(0, 1);
+			float eps = distribution(generator);  // uniform distribution	
+
+
+			if (eps > 0.6 and eps < 0.7)
+			{
+				x = x + dx;
+				y = y + dy;
+			}
+			if (eps > 0.7 and eps < 0.8)
+			{
+				x = x - dx;
+				y = y - dy;
+			}
+			if (eps > 0.8 and eps < 0.85)
+			{
+				x = x - dx;
+			}
+			if (eps > 0.85 and eps < 0.9)
+			{
+				x = x + dx;
+			}
+			if (eps > 0.9 and eps < 0.95)
+			{
+				y = y - dy;
+			}
+			if (eps > 0.95)
+			{
+				y = y + dy;
+			}
+			if (x > school.x + school.dx)
+			{
+				x = school.x + school.dx - 1;
+			}
+
+			if (x > school.x - school.dx) //check
+			{
+				x = school.x - school.dx + 1;
+			}
+
+			if (y > school.y + school.dy)
+			{
+				y = school.y + school.dy - 1;
+			}
+
+			if (y > school.y - school.dy)
+			{
+				y = school.y - school.dy + 1;
+			}
+
+
+		}
+
+	}
+	
 	void actionWalkFree()
 	{
 		unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -708,6 +819,8 @@ int main()
 	std::uniform_int_distribution <int> distribution_y(0, Width + 1);
 	std::uniform_int_distribution <int> distribution_dx_house(1, 3);
 	std::uniform_int_distribution <int> distribution_dy_house(1, 3);
+	std::uniform_int_distribution <int> distribution_dx_school(1, 5);
+	std::uniform_int_distribution <int> distribution_dy_school(1, 5);
 	std::uniform_int_distribution <int> distribution_dx_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_dy_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_family(2, 4);
@@ -717,6 +830,7 @@ int main()
 	std::_Beta_distribution <float> distribution_age(2, 5);
 	std::uniform_int_distribution <int> distribution_social_stratum(1, 5);
 	std::uniform_int_distribution <int> distribution_unemployeed_social_stratum(1, 2);
+	std::uniform_real_distribution <float> distribution_immune(0, 1);
 
 
 	//Spawn houses
@@ -748,6 +862,18 @@ int main()
 		//printf("\nstratum of work is : %d\n", workplace.social_stratum);
 		WRP.push_back(workplace);
 	}
+
+	//Create School
+	School school;
+	school.x = 406;
+	school.y = 406;
+	school.dx = distribution_dx_school(generator);
+	school.dy = distribution_dy_school(generator);
+	school.no_students = 0;
+	//printf("\nschool x_pos = %d\n", school.x);
+	//printf("\nschool y_pos = %d\n", school.y);
+	//printf("\nschool dx_pos = %d\n", school.dx);
+	//printf("\nschool dy_pos = %d\n", school.dy);
 
 	//Spawn people
 
@@ -798,7 +924,16 @@ int main()
 		person.y = 1;
 		person.dx = 1;
 		person.dy = 1;
-		person.group = 0;
+		float l = distribution_immune(generator);
+		if (l <= (1 - initial_immune_rate)) // initial immunity
+		{
+			person.group = 0;
+		}
+		else
+		{
+			person.group = 3;
+
+		}
 		person.action = 0;
 		person.age = (int)(distribution_age(generator) * 100);
 		float w = distribution_homeless(generator);
@@ -812,7 +947,7 @@ int main()
 			person.homeless = 1;
 			person.unemployed = 1;
 		}
-		if (person.age < 15 || person.age > 66)
+		if (person.age < 17 || person.age > 66)
 		{
 			person.unemployed = 1;
 		}
@@ -829,6 +964,19 @@ int main()
 				person.unemployed = 1;
 
 			}
+		}
+		if (person.age < 17)
+		{
+
+			person.student = 1;
+			school.no_students = school.no_students + 1;
+		}
+
+		else if (person.age > 16)
+
+		{
+
+			person.student = 0;
 		}
 		person.x_home = -1;
 		person.y_home = -1;
@@ -850,9 +998,43 @@ int main()
 		person.dy = 1;
 		person.group = 2;
 		person.action = 0;
-		person.age = 30;
+		//person.age = 30;
+		//person.homeless = 0;
+		//person.unemployed = 0;
+		person.age = (int)(distribution_age(generator) * 100);
 		person.homeless = 0;
-		person.unemployed = 0;
+		
+		if (person.age < 17 || person.age > 66)
+		{
+			person.unemployed = 1;
+		}
+		else
+		{
+			float z = distribution_employeed(generator);
+			if (z <= (1 - unemployment_rate))
+
+			{
+				person.unemployed = 0;
+			}
+			else
+			{
+				person.unemployed = 1;
+
+			}
+		}
+		if (person.age < 17)
+		{
+
+			person.student = 1;
+			school.no_students = school.no_students + 1;
+		}
+
+		else if (person.age > 16)
+
+		{
+
+			person.student = 0;
+		}
 		person.x_home = -1;
 		person.y_home = -1;
 		person.x_work = -1;
@@ -863,6 +1045,8 @@ int main()
 		PPL.push_back(person);
 
 	}
+
+	printf("\nschool studentds are = %d\n", school.no_students);
 
 	shuffle(PPL.begin(), PPL.end(), std::default_random_engine(seed));
 
@@ -1468,6 +1652,25 @@ int main()
 						{
 							PPL[i].actionGoWork();
 							PPL[i].actionStayAtWork();
+							for (int j = 0; j < N; j++)
+							{
+								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
+								{
+
+									if ((contact(PPL[i], PPL[j], T) == true))
+									{
+										contactsPerDay = contactsPerDay + 1;
+
+									}
+								}
+
+							}
+
+						}
+						if (PPL[i].student == 1)
+						{
+							PPL[i].actionGoSchool(school);
+							PPL[i].actionStayAtSchool(school);
 							for (int j = 0; j < N; j++)
 							{
 								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
