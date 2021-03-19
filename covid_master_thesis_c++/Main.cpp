@@ -1722,6 +1722,7 @@ int main()
 				//printf("\ngov money before healthcare = %d\n", goverment_wealth_total);
 			GovermentFinanceHealthcare(); //works ok
 			//printf("\ngov money after healthcare = %d\n", goverment_wealth_total);
+			printf("\nFinancial processes done!\n");
 		}
 
 		for (int i = 0; i < no_workplaces; i++)
@@ -1789,7 +1790,7 @@ int main()
 		}
 
 		T++;
-		if (T == 3) {
+		if (T == 91) {
 			done = true;
 		}
 
