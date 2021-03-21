@@ -827,7 +827,12 @@ int policy0(int hour, int T, School school) {
 
 				{
 					PPL[i].actionGoSchool(school);
+					//printf("\nstudent position_x is = %d\n", PPL[i].x);
+					//printf("\nstudent position_y is = %d\n", PPL[i].y);
+
 					PPL[i].actionStayAtSchool(school);
+					//printf("\nstudent position_x is = %d\n", PPL[i].x);
+					//printf("\nstudent position_y is = %d\n", PPL[i].y);
 					for (int j = 0; j < N; j++)
 					{
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
@@ -1272,6 +1277,7 @@ int policy3(int hour, int T) {
 	return contactsPerDay;
 }
 int policy4(int hour, int T) {
+	School school;
 	contagion_distance = 1;
 	double contagion_probability = 0.4; // FACEMASK
 	int contactsPerDay = 0;
@@ -1280,7 +1286,7 @@ int policy4(int hour, int T) {
 
 	for (int i = 0; i < N; i++) {
 		// VERTICAL ISOLATION
-		if (PPL[i].age >= 65 && PPL[i].age <= 18) {
+		if (PPL[i].age >= 65 && PPL[i].age <= 17) {
 			PPL[i].actionGoHome();
 			PPL[i].actionStayHome();
 		}
@@ -1296,7 +1302,7 @@ int policy4(int hour, int T) {
 			if (eps < 0.1) {
 				if (hour >= 0 && hour < 8) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].homeless == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+						if (PPL[i].homeless == 0 && PPL[i].age < 65 && PPL[i].age > 17) {
 							PPL[i].actionGoHome();
 							PPL[i].actionStayHome();
 							for (int j = 0; j < N; j++) {
@@ -1311,7 +1317,7 @@ int policy4(int hour, int T) {
 				}
 				if (hour > 7 && hour < 12) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+						if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 17) {
 							PPL[i].actionGoWork();
 							PPL[i].actionStayAtWork();
 							for (int j = 0; j < N; j++) {
@@ -1326,7 +1332,7 @@ int policy4(int hour, int T) {
 				}
 				if (hour > 11 && hour < 13) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].age < 65 && PPL[i].age > 18) {
+						if (PPL[i].age < 65 && PPL[i].age > 17) {
 							PPL[i].actionWalkFree();
 							for (int j = 0; j < N; j++) {
 								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
@@ -1340,7 +1346,7 @@ int policy4(int hour, int T) {
 				}
 				if (hour > 14 && hour < 19) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+						if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 17) {
 							PPL[i].actionGoWork();
 							PPL[i].actionStayAtWork();
 							for (int j = 0; j < N; j++) {
@@ -1355,7 +1361,7 @@ int policy4(int hour, int T) {
 				}
 				if (hour > 18 && hour < 0) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].age < 65 && PPL[i].age > 18) {
+						if (PPL[i].age < 65 && PPL[i].age > 17) {
 							PPL[i].actionWalkFree();
 							for (int j = 0; j < N; j++) {
 								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
@@ -1374,7 +1380,7 @@ int policy4(int hour, int T) {
 			}
 		}
 		else {
-			return policy0(hour, T);
+			return policy0(hour, T, school);
 		}
 	}
 
@@ -2336,24 +2342,7 @@ int main()
 
 		}
 
-		/*
-		int S1 = S;
-		int E1 = E;
-		int I1 = I;
-		int R1 = R;
-
-		float Sdot = -b * contactsPerDay;
-		float Edot = b * contactsPerDay - e * E;
-		float Idot = e * E - g * I;
-		float Rdot = g * I;
-
-		S = S1 + Sdot;
-		E = E1 + Edot;
-		I = I1 + Idot;
-
-		R = R1 + Rdot;
-
-		*/
+	
 
 		// LIMIT PPL
 
@@ -2385,6 +2374,7 @@ int main()
 		R = 0;
 		Ih = 0;
 		Is = 0;
+		//seir groups counting
 		for (int i = 0; i < N; i++) {
 			if (PPL[i].group == 0) {
 				S++;
@@ -2418,7 +2408,7 @@ int main()
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 
 		T++;
-		if (T == 2) {
+		if (T == 91) {
 			done = true;
 		}
 
