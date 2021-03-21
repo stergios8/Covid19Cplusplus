@@ -118,8 +118,8 @@ C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.
               _Ty=float
           ]
   Generating code
-  30 of 433 functions ( 6.9%) were compiled, the rest were copied from previous compilation.
-    7 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+  1 of 433 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   covid_master_thesis_c++.vcxproj -> C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\x64\Release\covid_master_thesis_c++.exe

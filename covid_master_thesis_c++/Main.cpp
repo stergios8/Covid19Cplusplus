@@ -7,6 +7,9 @@
 #include <iomanip>
 #include <fstream>
 
+//add go school to policies
+//add goshoppinf to policies
+
 float homeless_rate = 0.0005;
 float initial_infected_rate = 0.01;
 float initial_immune_rate = 0.01;
@@ -2315,7 +2318,7 @@ int main()
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 
 		T++;
-		if (T == 60) {
+		if (T == 2) {
 			done = true;
 		}
 
