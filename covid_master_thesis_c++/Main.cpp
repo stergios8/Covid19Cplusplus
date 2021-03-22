@@ -157,6 +157,7 @@ public:
 	int personal_expenses;
 	int personal_wealth;
 	int social_stratum;
+	int essential_worker = 0;
 	House house;
 	Workplace work;
 
@@ -1411,15 +1412,15 @@ int policy4(int hour, int T) {
 		// lockdownForPolicy4 is set in main 24h loop.
 
 		if (lockdownForPolicy4 == 1) {
-			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
-			std::default_random_engine generator(seed);
-			std::uniform_real_distribution <float> distribution(0, 1);
-			float eps = distribution(generator);  // uniform distribution
+			//unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			//std::default_random_engine generator(seed);
+			//std::uniform_real_distribution <float> distribution(0, 1);
+			//float eps = distribution(generator);  // uniform distribution
 			// CONDITION FOR PARTIAL ISOLATION
-			if (eps < 0.1) {
+			if (PPL[i].essential_worker == 1) {
 				if (hour >= 0 && hour < 8) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].homeless == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+						if (PPL[i].homeless == 0) {
 							PPL[i].actionGoHome();
 							PPL[i].actionStayHome();
 							for (int j = 0; j < N; j++) {
@@ -1432,9 +1433,9 @@ int policy4(int hour, int T) {
 						}
 					}
 				}
-				if (hour > 7 && hour < 12) {
+				if (hour > 7 && hour < 17) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+						if (PPL[i].unemployed == 0) {
 							PPL[i].actionGoWork();
 							PPL[i].actionStayAtWork();
 							for (int j = 0; j < N; j++) {
@@ -1447,84 +1448,15 @@ int policy4(int hour, int T) {
 						}
 					}
 				}
-				if (hour > 11 && hour < 13) {
+
+				if (hour > 16 && hour < 0) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].age < 65 && PPL[i].age > 18) {
-							PPL[i].actionWalkFree();
-							for (int m = 0; m < no_workplaces; m++)
-							{
-								if (PPL[i].homeless == 0)
-
-									if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-									{
-										//printf("\nshop\n");
-										//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-										//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-										PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-										WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-										//printf("\nshop\n");
-										//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-										//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-									}
-
-
-
-							}
-							for (int j = 0; j < N; j++) {
-								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-									if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-										contactsPerDay = contactsPerDay + 1;
-									}
-								}
-							}
-						}
-					}
-				}
-				if (hour > 14 && hour < 19) {
-					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
-							PPL[i].actionGoWork();
-							PPL[i].actionStayAtWork();
-							for (int j = 0; j < N; j++) {
-								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-									if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-										contactsPerDay = contactsPerDay + 1;
-									}
-								}
-							}
-						}
-					}
-				}
-				if (hour > 18 && hour < 0) {
-					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].age < 65 && PPL[i].age > 18) {
-							PPL[i].actionWalkFree();
-							for (int m = 0; m < no_workplaces; m++)
-							{
-								if (PPL[i].homeless == 0)
-
-									if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-									{
-										//printf("\nshop\n");
-										//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-										//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-										PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-										WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-										//printf("\nshop\n");
-										//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-										//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-									}
-
-
-
-							}
-							for (int j = 0; j < N; j++) {
-								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-									if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-										contactsPerDay = contactsPerDay + 1;
-									}
+						PPL[i].actionGoHome();
+						PPL[i].actionStayHome();
+						for (int j = 0; j < N; j++) {
+							if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+								if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+									contactsPerDay = contactsPerDay + 1;
 								}
 							}
 						}
@@ -1548,11 +1480,11 @@ int policy5(int hour, int T) {
 	double contagion_probability = 0.4; // FACEMASK
 	int contactsPerDay = 0;
 	for (int i = 0; i < N; i++) {
-		unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
-		std::default_random_engine generator(seed);
-		std::uniform_real_distribution <float> distribution(0, 1);
-		float eps = distribution(generator);  // uniform distribution
-		if (eps < 0.01) {
+		//unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+		//std::default_random_engine generator(seed);
+		//std::uniform_real_distribution <float> distribution(0, 1);
+		//float eps = distribution(generator);  // uniform distribution
+		if (PPL[i].essential_worker == 1) {
 			if (hour >= 0 && hour < 8) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
 					if (PPL[i].homeless == 0) {
@@ -1568,7 +1500,7 @@ int policy5(int hour, int T) {
 					}
 				}
 			}
-			if (hour > 7 && hour < 12) {
+			if (hour > 7 && hour < 17) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
 					if (PPL[i].unemployed == 0) {
 						PPL[i].actionGoWork();
@@ -1583,76 +1515,11 @@ int policy5(int hour, int T) {
 					}
 				}
 			}
-			if (hour > 11 && hour < 13) {
+
+			if (hour > 16 && hour < 0) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
-					PPL[i].actionWalkFree();
-					for (int m = 0; m < no_workplaces; m++)
-					{
-						if (PPL[i].homeless == 0)
-
-							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-							{
-								//printf("\nshop\n");
-								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-								//printf("\nshop\n");
-								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-							}
-
-
-
-					}
-					for (int j = 0; j < N; j++) {
-						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-								contactsPerDay = contactsPerDay + 1;
-							}
-						}
-					}
-				}
-			}
-			if (hour > 14 && hour < 19) {
-				for (int timestamp = 0; timestamp < 200; timestamp++) {
-					if (PPL[i].unemployed == 0) {
-						PPL[i].actionGoWork();
-						PPL[i].actionStayAtWork();
-						for (int j = 0; j < N; j++) {
-							if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-								if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-									contactsPerDay = contactsPerDay + 1;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (hour > 18 && hour < 0) {
-				for (int timestamp = 0; timestamp < 200; timestamp++) {
-					PPL[i].actionWalkFree();
-					for (int m = 0; m < no_workplaces; m++)
-					{
-						if (PPL[i].homeless == 0)
-
-							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-							{
-								//printf("\nshop\n");
-								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-								//printf("\nshop\n");
-								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-							}
-
-
-
-					}
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1677,6 +1544,13 @@ int policy6(int hour, int T) {
 	for (int i = 0; i < N; i++) {
 		PPL[i].actionGoHome();
 		PPL[i].actionStayHome();
+		for (int j = 0; j < N; j++) {
+			if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+				if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+					contactsPerDay = contactsPerDay + 1;
+				}
+			}
+		}
 	}
 	return contactsPerDay;
 }
@@ -1688,8 +1562,8 @@ int main()
 	std::ofstream exce_file_SEIR_results; // excel file for exporting final results of SEIR model
 	std::ofstream exce_file_Financial_results; // excel file for exporting final results of Economical conditions
 
-	printf("\ntotal houses are = %d\n", no_houses);
-	printf("\ntottal workplaces are = %d\n", no_workplaces);
+	//printf("\ntotal houses are = %d\n", no_houses);
+	//printf("\ntottal workplaces are = %d\n", no_workplaces);
 
 	//Random generators
 
@@ -1711,6 +1585,7 @@ int main()
 	std::uniform_int_distribution <int> distribution_social_stratum(1, 5);
 	std::uniform_int_distribution <int> distribution_unemployeed_social_stratum(1, 2);
 	std::uniform_real_distribution <float> distribution_immune(0, 1);
+	std::uniform_real_distribution <float> essential_job(0, 1);
 
 	//Spawn houses
 	for (int i = 0; i < no_houses; i++) {
@@ -1813,7 +1688,12 @@ int main()
 			float z = distribution_employeed(generator);
 			if (z <= (1 - unemployment_rate)) {
 				person.unemployed = 0;
+				float z1 = essential_job(generator);
+				if (z1 < 0.2) {
+					person.essential_worker = 1;
+				}
 			}
+			
 			else {
 				person.unemployed = 1;
 			}
@@ -1856,7 +1736,12 @@ int main()
 			float z = distribution_employeed(generator);
 			if (z <= (1 - unemployment_rate)) {
 				person.unemployed = 0;
+				float z1 = essential_job(generator);
+				if (z1 < 0.2) {
+					person.essential_worker = 1;
+				}
 			}
+			
 			else {
 				person.unemployed = 1;
 			}
@@ -1983,7 +1868,7 @@ int main()
 		}
 	}
 
-	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_people, Poor_people, WorkingClass_people, Rich_people, MostRich_people);
+	//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_people, Poor_people, WorkingClass_people, Rich_people, MostRich_people);
 
 	// Share money, set income, expenses
 
@@ -2126,7 +2011,7 @@ int main()
 			MostRich_workplaces = MostRich_workplaces + 1;
 		}
 	}
-	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_workplaces, Poor_workplaces, WorkingClass_workplaces, Rich_workplaces, MostRich_workplaces);
+	//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_workplaces, Poor_workplaces, WorkingClass_workplaces, Rich_workplaces, MostRich_workplaces);
 
 	for (int i = 0; i < no_workplaces; i++)
 
@@ -2198,7 +2083,7 @@ int main()
 			MostRich_houses = MostRich_houses + 1;
 		}
 	}
-	printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_houses, Poor_houses, WorkingClass_houses, Rich_houses, MostRich_houses);
+	//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_houses, Poor_houses, WorkingClass_houses, Rich_houses, MostRich_houses);
 
 	for (int i = 0; i < no_houses; i++)
 
@@ -2344,6 +2229,8 @@ int main()
 	Rarray.push_back(R);
 	int contactsPerDay1 = 0;
 
+	//initial SEIR counting
+
 	for (int i = 0; i < N; i++) {
 		if (PPL[i].group == 0) {
 			S++;
@@ -2365,9 +2252,9 @@ int main()
 		}
 	}
 
-	printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe);
+	//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe);
 
-	printf("\nTotal business wealth = %d\n", business_Wealth_total);
+	//printf("\nTotal business wealth = %d\n", business_Wealth_total);
 	business_Wealth_total = 0;
 	for (int i = 0; i < no_workplaces; i++)
 	{
@@ -2375,9 +2262,9 @@ int main()
 		business_Wealth_total = business_Wealth_total + WRP[i].workplace_wealth;
 
 	}
-	printf("\nTotal business wealth = %d\n", business_Wealth_total);
+	//printf("\nTotal business wealth = %d\n", business_Wealth_total);
 
-	printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
+	//printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
 	personal_Wealth_total = 0;
 	for (int i = 0; i < N; i++)
 	{
@@ -2385,9 +2272,9 @@ int main()
 		personal_Wealth_total = personal_Wealth_total + PPL[i].personal_wealth;
 
 	}
-	printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
+	//printf("\nTotal personal wealth = %d\n", personal_Wealth_total);
 
-	printf("\nTotal house wealth = %d\n", public_Wealth_total);
+	//printf("\nTotal house wealth = %d\n", public_Wealth_total);
 	public_Wealth_total = 0;
 	for (int i = 0; i < no_houses; i++)
 	{
@@ -2395,12 +2282,20 @@ int main()
 		public_Wealth_total = public_Wealth_total + HOU[i].home_wealth;
 
 	}
-	printf("\nTotal house wealth = %d\n", public_Wealth_total);
+	//printf("\nTotal house wealth = %d\n", public_Wealth_total);
 
 	Personal_Wealth_Array.push_back(personal_Wealth_total);
 	House_Wealth_Array.push_back(public_Wealth_total);
 	Business_Wealth_Array.push_back(business_Wealth_total);
 	Goverment_Wealth_Array.push_back(goverment_wealth_total);
+
+
+	//scanf for policy choice
+	//int choice;
+
+	//printf("\nChoose the policy you want to simulate...\n");
+	//printf("\nPress 0 if you want policy0, 1 for policy1, 2 for policy2, 3 for policy3, , 4 for policy4, 5 for policy5 or 6 for policy6\n");
+	//scanf("%d", &choice);
 
 	// MAIN LOOP
 
@@ -2437,9 +2332,11 @@ int main()
 		}
 		// END OF CODE FOR POLICY 4
 
+	
+
 		for (int hour = 0; hour < 24; hour++)
 		{
-			contactsPerDay1 = contactsPerDay1 + policy1(hour, T);
+			contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
 		}
 		// ### END OF 24 H LOOP
 
@@ -2460,9 +2357,9 @@ int main()
 			}
 			if (PPL[i].group == 4 || PPL[i].group == 5)
 			{
-				printf("\npersonal money pro fee = %d\n", PPL[i].personal_wealth);
+				//printf("\npersonal money pro fee = %d\n", PPL[i].personal_wealth);
 				PPL[i].actionPayHospitalFee();
-				printf("\npersonal money after fee = %d\n", PPL[i].personal_wealth);
+				//printf("\npersonal money after fee = %d\n", PPL[i].personal_wealth);
 			}
 		}
 
