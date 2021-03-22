@@ -1128,7 +1128,7 @@ int policy2(int hour, int T) {
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
 	for (int i = 0; i < N; i++) {
-		if (PPL[i].age >= 65 || PPL[i].age <= 16) {
+		if (PPL[i].age >= 60 || PPL[i].age <= 16) {
 			PPL[i].actionGoHome();
 			PPL[i].actionStayHome();
 		}
@@ -1137,7 +1137,7 @@ int policy2(int hour, int T) {
 	if (hour >= 0 && hour < 8) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].homeless == 0 && (PPL[i].age < 65 || PPL[i].age > 16)) {
+				if (PPL[i].homeless == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
@@ -1154,7 +1154,7 @@ int policy2(int hour, int T) {
 	if (hour > 7 && hour < 12) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 && (PPL[i].age < 65 || PPL[i].age > 16)) {
+				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -1171,7 +1171,7 @@ int policy2(int hour, int T) {
 	if (hour > 11 && hour < 13) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 65 || PPL[i].age > 16) {
+				if (PPL[i].age < 60 && PPL[i].age > 16) {
 					PPL[i].actionWalkFree();
 					for (int m = 0; m < no_workplaces; m++)
 					{
@@ -1207,7 +1207,7 @@ int policy2(int hour, int T) {
 	if (hour > 14 && hour < 19) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 || PPL[i].age < 65 || PPL[i].age > 16) {
+				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -1224,7 +1224,7 @@ int policy2(int hour, int T) {
 	if (hour > 18 && hour < 0) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 65 || PPL[i].age > 16) {
+				if (PPL[i].age < 60 && PPL[i].age > 16) {
 					PPL[i].actionWalkFree();
 					for (int m = 0; m < no_workplaces; m++)
 					{
@@ -1264,7 +1264,7 @@ int policy3(int hour, int T) {
 	double contagion_probability = 0.4; // FACEMASK
 	int contactsPerDay = 0;
 	for (int i = 0; i < N; i++) {
-		if (PPL[i].age >= 65 && PPL[i].age <= 18) {
+		if (PPL[i].age >= 60 || PPL[i].age <= 16) {
 			PPL[i].actionGoHome();
 			PPL[i].actionStayHome();
 		}
@@ -1273,7 +1273,7 @@ int policy3(int hour, int T) {
 	if (hour >= 0 && hour < 8) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].homeless == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+				if (PPL[i].homeless == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
@@ -1290,7 +1290,7 @@ int policy3(int hour, int T) {
 	if (hour > 7 && hour < 12) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -1307,7 +1307,7 @@ int policy3(int hour, int T) {
 	if (hour > 11 && hour < 13) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 65 && PPL[i].age > 18) {
+				if (PPL[i].age < 60 && PPL[i].age > 16) {
 					PPL[i].actionWalkFree();
 					for (int m = 0; m < no_workplaces; m++)
 					{
@@ -1343,7 +1343,7 @@ int policy3(int hour, int T) {
 	if (hour > 14 && hour < 19) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 && PPL[i].age < 65 && PPL[i].age > 18) {
+				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -1360,7 +1360,7 @@ int policy3(int hour, int T) {
 	if (hour > 18 && hour < 0) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 65 && PPL[i].age > 18) {
+				if (PPL[i].age < 60 && PPL[i].age > 16) {
 					PPL[i].actionWalkFree();
 					for (int m = 0; m < no_workplaces; m++)
 					{
@@ -1404,7 +1404,7 @@ int policy4(int hour, int T) {
 
 	for (int i = 0; i < N; i++) {
 		// VERTICAL ISOLATION
-		if (PPL[i].age >= 65 && PPL[i].age <= 18) {
+		if (PPL[i].age >= 60 || PPL[i].age <= 16) {
 			PPL[i].actionGoHome();
 			PPL[i].actionStayHome();
 		}
@@ -1417,7 +1417,7 @@ int policy4(int hour, int T) {
 			//std::uniform_real_distribution <float> distribution(0, 1);
 			//float eps = distribution(generator);  // uniform distribution
 			// CONDITION FOR PARTIAL ISOLATION
-			if (PPL[i].essential_worker == 1) {
+			if (PPL[i].essential_worker == 1 && PPL[i].age < 60 && PPL[i].age > 16) {
 				if (hour >= 0 && hour < 8) {
 					for (int timestamp = 0; timestamp < 200; timestamp++) {
 						if (PPL[i].homeless == 0) {
@@ -1484,7 +1484,7 @@ int policy5(int hour, int T) {
 		//std::default_random_engine generator(seed);
 		//std::uniform_real_distribution <float> distribution(0, 1);
 		//float eps = distribution(generator);  // uniform distribution
-		if (PPL[i].essential_worker == 1) {
+		if (PPL[i].essential_worker == 1 && PPL[i].age < 60 && PPL[i].age > 16) {
 			if (hour >= 0 && hour < 8) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
 					if (PPL[i].homeless == 0) {
@@ -1554,7 +1554,6 @@ int policy6(int hour, int T) {
 	}
 	return contactsPerDay;
 }
-
 
 int main()
 {
