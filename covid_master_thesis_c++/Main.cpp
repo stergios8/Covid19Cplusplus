@@ -2204,6 +2204,8 @@ int main()
 	std::vector<float> Earray;
 	std::vector<float> Iarray;
 	std::vector<float> Rarray;
+	std::vector<float> Iharray;
+	std::vector<float> Isarray;
 	std::vector<int> timepassed;
 	std::vector<int> Personal_Wealth_Array;
 	std::vector<int> House_Wealth_Array;
@@ -2222,11 +2224,8 @@ int main()
 	int T = 0;
 	int Iold = I;
 	int Rold = R;
-	timepassed.push_back(T);
-	Sarray.push_back(S);
-	Earray.push_back(E);
-	Iarray.push_back(I);
-	Rarray.push_back(R);
+	
+
 	int contactsPerDay1 = 0;
 
 	//initial SEIR counting
@@ -2251,6 +2250,14 @@ int main()
 			Is++;
 		}
 	}
+
+	timepassed.push_back(T);
+	Sarray.push_back(S);
+	Earray.push_back(E);
+	Iarray.push_back(I);
+	Rarray.push_back(R);
+	Iharray.push_back(Ih);
+	Isarray.push_back(Is);
 
 	//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe);
 
@@ -2336,7 +2343,7 @@ int main()
 
 		for (int hour = 0; hour < 24; hour++)
 		{
-			contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
+			contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
 		}
 		// ### END OF 24 H LOOP
 
@@ -2549,11 +2556,13 @@ int main()
 		Earray.push_back(E);
 		Iarray.push_back(I);
 		Rarray.push_back(R);
+		Iharray.push_back(Ih);
+		Isarray.push_back(Is);
 
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 
 		T++;
-		if (T == 181) {
+		if (T == 2) {
 			done = true;
 		}
 
@@ -2563,7 +2572,7 @@ int main()
 	exce_file_SEIR_results.open("SEIR_Results.csv");
 	printf("\nPreparing results excel file...\n");
 	for (int i = 0; i < T; i++) {
-		exce_file_SEIR_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << timepassed[i] << std::endl;
+		exce_file_SEIR_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << Iharray[i] << "," << Isarray[i] << std::endl;
 	}
 	exce_file_SEIR_results.close();
 
