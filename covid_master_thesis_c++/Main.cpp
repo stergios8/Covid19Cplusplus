@@ -2336,7 +2336,7 @@ int main()
 
 		for (int hour = 0; hour < 24; hour++)
 		{
-			contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
+			contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
 		}
 		// ### END OF 24 H LOOP
 
@@ -2553,7 +2553,7 @@ int main()
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 
 		T++;
-		if (T == 60) {
+		if (T == 181) {
 			done = true;
 		}
 
