@@ -4,7 +4,7 @@
 #include <random>
 #include <string>
 #include <chrono>
-#include <iomanip>
+
 #include <fstream>
 
 //add go school to policies
@@ -136,9 +136,13 @@ public:
 
 class School {
 public:
-	int dx, dy;
-	int x, y;
-	int no_students;
+	
+	int x = 406;
+	int y = 406;
+	int dx = 5;
+	int dy = 5;
+	int no_students = 0;
+	
 
 };
 
@@ -520,6 +524,7 @@ std::vector<Human> PPL;
 std::vector<House> HOU;
 std::vector<Workplace> WRP;
 Hospital HOS;
+School school;
 
 
 void financialInterferenceHome(Human& person, House& house)
@@ -789,7 +794,7 @@ void EtoItransition(int N, int T) {
 	}
 }
 
-int policy0(int hour, int T, School school) {
+int policy0(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
@@ -939,7 +944,7 @@ int policy0(int hour, int T, School school) {
 	}
 	return contactsPerDay;
 }
-int policy1(int hour, int T, School school) {
+int policy1(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.8;
 	int contactsPerDay = 0;
@@ -1179,7 +1184,7 @@ int policy2(int hour, int T) {
 		}
 	}
 	return contactsPerDay;
-}
+} 
 int policy3(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.4; // FACEMASK
@@ -1277,7 +1282,7 @@ int policy3(int hour, int T) {
 	return contactsPerDay;
 }
 int policy4(int hour, int T) {
-	School school;
+	
 	contagion_distance = 1;
 	double contagion_probability = 0.4; // FACEMASK
 	int contactsPerDay = 0;
@@ -1380,7 +1385,7 @@ int policy4(int hour, int T) {
 			}
 		}
 		else {
-			return policy0(hour, T, school);
+			return policy0(hour, T);
 		}
 	}
 
@@ -1540,17 +1545,7 @@ int main()
 	}
 
 	//Create School
-	School school;
-	school.x = 406;
-	school.y = 406;
-	school.dx = distribution_dx_school(generator);
-	school.dy = distribution_dy_school(generator);
-	school.no_students = 0;
-	//printf("\nschool x_pos = %d\n", school.x);
-	//printf("\nschool y_pos = %d\n", school.y);
-	//printf("\nschool dx_pos = %d\n", school.dx);
-	//printf("\nschool dy_pos = %d\n", school.dy);
-
+	
 //Spawn people
 
 	Workplace emptyWork;
@@ -2207,7 +2202,7 @@ int main()
 
 		for (int hour = 0; hour < 24; hour++)
 		{
-			contactsPerDay1 = contactsPerDay1 + policy0(hour, T, school);
+			contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
 		}
 		// ### END OF 24 H LOOP
 
