@@ -2342,7 +2342,7 @@ int main()
 
 		for (int hour = 0; hour < 24; hour++)
 		{
-			contactsPerDay1 = contactsPerDay1 + policy2(hour, T);
+			contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
 		}
 		// ### END OF 24 H LOOP
 
