@@ -636,19 +636,20 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 }
 
 void EtoItransition(int N, int T) {
-	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 	for (int i = 0; i < N; i++) {
 		if (PPL[i].group == 1 && T - PPL[i].Eday == 5) {
 			PPL[i].group = 2;
 			PPL[i].Iday = T;
 			//printf("\nGroup: %d, Iday: %d", PPL[i].group, PPL[i].Iday);
 			if (PPL[i].age >= 0 && PPL[i].age <= 9) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.001) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -659,12 +660,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 10 && PPL[i].age <= 19) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.003) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -675,12 +678,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 20 && PPL[i].age <= 29) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.012) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -691,12 +696,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 30 && PPL[i].age <= 39) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.032) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -707,12 +714,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 40 && PPL[i].age <= 49) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.049) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -723,12 +732,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 50 && PPL[i].age <= 59) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.102) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -739,12 +750,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 60 && PPL[i].age <= 69) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.166) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -755,12 +768,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 70 && PPL[i].age <= 79) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.243) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
@@ -771,12 +786,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 			if (PPL[i].age >= 80) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution
 				if (eps < 0.273) {
 					PPL[i].group = 4;
 					HOS.goToHospital(PPL[i]);
+					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 					std::default_random_engine generator(seed);
 					std::uniform_real_distribution <float> distribution(0, 1);
 					float eps = distribution(generator);  // uniform distribution
