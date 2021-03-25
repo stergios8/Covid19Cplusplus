@@ -148,8 +148,8 @@ public:
 	int group;
 	int action;
 	int age;
-	bool homeless;
-	bool unemployed;
+	int homeless;
+	int unemployed;
 	int x_home;
 	int y_home;
 	int x_work;
@@ -1577,52 +1577,6 @@ int policy6(int hour, int T) {
 int main()
 {
 
-	char press_button_data;
-	printf("\nDo you want to generate new initiallization data and objects or use the saved ones? Press n if you want new or s if you want saved...\n");
-	std::cin >> press_button_data;
-	if (press_button_data == 's')
-	{
-		std::ifstream read_excel_HUMANS("HUMAN_OBJECTS.csv");
-		std::ifstream read_excel_HOUSES("HOUSES_OBJECTS.csv");
-		std::ifstream read_excel_WORKPLACES("WORKPLACES_OBJECTS.csv");
-		std::ifstream read_excel_SCHOOL("SCHOOL_OBJECT.csv");
-		std::ifstream read_excel_HOSPITAL("HUMAN_OBJECT.csv");
-		std::string x;
-		float a;
-		float b;
-		for (int i = 0; i < 2; i++)
-		{
-			//while (read_excel_HUMANS.good())
-
-			//{
-
-				std::getline(read_excel_HUMANS, x, ',');
-				PPL[i].x = stoi(x);
-		//}
-			
-
-			printf("\nx = %s, x = %d\n",x, PPL[i].x);
-		}
-
-		
-
-	}
-
-	else if (press_button_data == 'n')
-
-	{
-
-
-	}
-
-	else
-	{
-		printf("\nYou pressed wrong button..The program will exit..Please try again\n");
-		getchar();
-		return 0;
-
-	}
-
 	std::ofstream excel_file_initialization; // excel file for exporting initial distribution of houses, workplaces etc.
 	std::ofstream excel_file_SEIR_results; // excel file for exporting final results of SEIR model
 	std::ofstream excel_file_Financial_results; // excel file for exporting final results of Economical conditions
@@ -1631,10 +1585,6 @@ int main()
 	std::ofstream excel_file_WORKPLACES; // excel file for exporting WORKPLACES Objects
 	std::ofstream excel_file_SCHOOL; // excel file for exporting SCHOOL
 	std::ofstream excel_file_HOSPITAL; // excel file for exporting HOSPITAL
-
-
-	//printf("\ntotal houses are = %d\n", no_houses);
-	//printf("\ntottal workplaces are = %d\n", no_workplaces);
 
 	//Random generators
 
@@ -1658,6 +1608,227 @@ int main()
 	std::uniform_real_distribution <float> distribution_immune(0, 1);
 	std::uniform_real_distribution <float> essential_job(0, 1);
 
+
+	char press_button_data;
+	printf("\nDo you want to generate new initiallization data and objects or use the saved ones? Press n if you want new or s if you want saved...\n");
+	std::cin >> press_button_data;
+	if (press_button_data == 's')
+	{
+		std::ifstream read_excel_HUMANS("HUMAN_OBJECTS.csv");
+		std::ifstream read_excel_HOUSES("HOUSES_OBJECTS.csv");
+		std::ifstream read_excel_WORKPLACES("WORKPLACES_OBJECTS.csv");
+		std::ifstream read_excel_SCHOOL("SCHOOL_OBJECT.csv");
+		std::ifstream read_excel_HOSPITAL("HOSPITAL_OBJECT.csv");
+
+
+		//Spawn houses
+		for (int i = 0; i < no_houses; i++) {
+			std::string x;
+			std::string y;
+			std::string dx;
+			std::string dy;
+			std::string ss;
+			std::string nr;
+			std::string hw;
+			House house;
+
+			std::getline(read_excel_HOUSES, x, ',');
+			house.x = std::stoi(x);
+			std::getline(read_excel_HOUSES, y, ',');
+			house.y = std::stoi(y);
+			std::getline(read_excel_HOUSES, dx, ',');
+			house.dx = std::stoi(dx);
+			std::getline(read_excel_HOUSES, dy, ',');
+			house.dy = std::stoi(dy);
+			std::getline(read_excel_HOUSES, nr, ',');
+			house.no_residents = std::stoi(nr);
+			std::getline(read_excel_HOUSES, ss, ',');
+			house.social_stratum = std::stoi(ss);
+			std::getline(read_excel_HOUSES, hw);
+			house.home_wealth = std::stoi(hw);
+			HOU.push_back(house);
+			//printf("\nx = %d, y = %d, dx = %d, dy = %d, nr = %d, ss = %d, hw = %d\n", HOU[i].x, HOU[i].y, HOU[i].dx, HOU[i].dy, HOU[i].social_stratum, HOU[i].no_residents, HOU[i].home_wealth);
+		}
+		//Spawn workplaces
+		for (int i = 0; i < no_workplaces; i++) {
+			std::string x;
+			std::string y;
+			std::string dx;
+			std::string dy;
+			std::string ss;
+			std::string nw;
+			std::string ww;
+			Workplace workplace;
+
+
+			std::getline(read_excel_WORKPLACES, x, ',');
+			workplace.x = std::stoi(x);
+			std::getline(read_excel_WORKPLACES, y, ',');
+			workplace.y = std::stoi(y);
+			std::getline(read_excel_WORKPLACES, dx, ',');
+			workplace.dx = std::stoi(dx);
+			std::getline(read_excel_WORKPLACES, dy, ',');
+			workplace.dy = std::stoi(dy);
+			std::getline(read_excel_WORKPLACES, nw, ',');
+			workplace.no_workers = std::stoi(nw);
+			std::getline(read_excel_WORKPLACES, ss, ',');
+			workplace.social_stratum = std::stoi(ss);
+			std::getline(read_excel_WORKPLACES, ww);
+			workplace.workplace_wealth = std::stoi(ww);
+			WRP.push_back(workplace);
+			//	printf("\nx = %d, y = %d, dx = %d, dy = %d, nw = %d, ss = %d, ww = %d\n", WRP[i].x, WRP[i].y, WRP[i].dx, WRP[i].dy, WRP[i].no_workers, WRP[i].social_stratum, WRP[i].workplace_wealth);
+
+		}
+		//spawn people
+		for (int i = 0; i < N; i++) {
+			std::string x;
+			std::string y;
+			std::string dx;
+			std::string dy;
+			std::string group;
+			std::string age;
+			std::string homeless;
+			std::string unemployed;
+			std::string x_home;
+			std::string y_home;
+			std::string x_work;
+			std::string y_work;
+			std::string student;
+			std::string pi;
+			std::string pe;
+			std::string pw;
+			std::string ss;
+			std::string ee;
+
+			Human person;
+
+			std::getline(read_excel_HUMANS, x, ',');
+			person.x = std::stoi(x);
+			std::getline(read_excel_HUMANS, y, ',');
+			person.y = std::stoi(y);
+			std::getline(read_excel_HUMANS, dx, ',');
+			person.dx = std::stoi(dx);
+			std::getline(read_excel_HUMANS, dy, ',');
+			person.dy = std::stoi(dy);
+			std::getline(read_excel_HUMANS, group, ',');
+			person.group = std::stoi(group);
+			std::getline(read_excel_HUMANS, age, ',');
+			person.age = std::stoi(age);
+			std::getline(read_excel_HUMANS, homeless, ',');
+			person.homeless = std::stoi(homeless);
+			std::getline(read_excel_HUMANS, unemployed, ',');
+			person.unemployed = std::stoi(unemployed);
+			std::getline(read_excel_HUMANS, x_home, ',');
+			person.x_home = std::stoi(x_home);
+			std::getline(read_excel_HUMANS, y_home, ',');
+			person.y_home = std::stoi(y_home);
+			std::getline(read_excel_HUMANS, x_work, ',');
+			person.x_work = std::stoi(x_work);
+			std::getline(read_excel_HUMANS, y_work, ',');
+			person.y_work = std::stoi(y_work);
+			std::getline(read_excel_HUMANS, student, ',');
+			person.student = std::stoi(student);
+			std::getline(read_excel_HUMANS, ss, ',');
+			person.social_stratum = std::stoi(ss);
+			std::getline(read_excel_HUMANS, pi, ',');
+			person.personal_income = std::stoi(pi);
+			std::getline(read_excel_HUMANS, pe, ',');
+			person.personal_expenses = std::stoi(pe);
+			std::getline(read_excel_HUMANS, pw, ',');
+			person.personal_wealth = std::stoi(pw);
+			std::getline(read_excel_HUMANS, ee);
+			person.essential_worker = std::stoi(ee);
+
+			PPL.push_back(person);
+			//printf("\nx = %d, y = %d, dx = %d, dy = %d, group = %d, age = %d, hl = %d, ue = %d, xh = %d, yh = %d, xw = %d, yw = %d, stu = %d, ss = %d, pi = %d, pe = %d,  pw = %d, ee = %d\n", PPL[i].x, PPL[i].y, PPL[i].dx, PPL[i].dy, PPL[i].group, PPL[i].age, PPL[i].homeless, PPL[i].unemployed, PPL[i].x_home, PPL[i].y_home, PPL[i].x_work, PPL[i].y_work, PPL[i].student, PPL[i].social_stratum, PPL[i].personal_income, PPL[i].personal_expenses, PPL[i].personal_wealth, PPL[i].essential_worker);
+		}
+
+		//SCHOOL
+
+		for (int i = 0; i < 1; i++) {
+			std::string x;
+			std::string y;
+			std::string dx;
+			std::string dy;
+			std::string ns;
+
+			std::getline(read_excel_SCHOOL, x, ',');
+			school.x = std::stoi(x);
+			std::getline(read_excel_SCHOOL, y, ',');
+			school.y = std::stoi(y);
+			std::getline(read_excel_SCHOOL, dx, ',');
+			school.dx = std::stoi(dx);
+			std::getline(read_excel_SCHOOL, dy, ',');
+			school.dy = std::stoi(dy);
+			std::getline(read_excel_SCHOOL, ns);
+			school.no_students = std::stoi(ns);
+
+
+			//printf("\nx = %d, y = %d, dx = %d, dy = %d, ns = %d\n", school.x, school.y, school.dx, school.dy, school.no_students);
+		}
+
+
+		//Hospital
+		for (int i = 0; i < 1; i++) {
+			std::string x;
+			std::string y;
+			std::string ih;
+			std::string is;
+
+			std::getline(read_excel_HOSPITAL, x, ',');
+			HOS.x = std::stoi(x);
+			std::getline(read_excel_HOSPITAL, y, ',');
+			HOS.y = std::stoi(y);
+			std::getline(read_excel_HOSPITAL, ih, ',');
+			HOS.infected_hospitalized = std::stoi(ih);
+			std::getline(read_excel_HOSPITAL, is);
+			HOS.intected_severe = std::stoi(is);
+
+			//printf("\nx = %d, y = %d, ih = %d, is = %d\n", HOS.x, HOS.y, HOS.infected_hospitalized, HOS.intected_severe);
+		}
+
+		// assign people to houses
+
+		for (int i = 0; i < no_houses; i++) {
+			for (int j = 0; j < N; j++) {
+
+				if (PPL[j].x_home == HOU[i].x && PPL[j].y_home == HOU[i].y) {
+					PPL[j].house = HOU[i];
+
+				}
+			}
+		}
+
+		// Check if everone has a home
+
+		for (int i = 0; i < N; i++) {
+			if (PPL[i].homeless == 0 && PPL[i].x_home == -1 && PPL[i].y_home == -1) {
+				printf("\nError to houses people assignment\n");
+				PPL[i].homeless = 1;
+				PPL[i].unemployed = 1;
+				PPL[i].social_stratum = 1;
+			}
+		}
+
+		// assign people to workplaces
+
+		for (int i = 0; i < no_workplaces; i++) {
+
+			for (int j = 0; j < N; j++) {
+
+
+				if (PPL[j].x_work == WRP[i].x && PPL[j].y_work == WRP[i].y) {
+					PPL[j].work = WRP[i];
+				}
+			}
+		}
+
+	}
+
+	else if (press_button_data == 'n')
+
+	{
+	
 	//Spawn houses
 	for (int i = 0; i < no_houses; i++) {
 		House house;
@@ -1682,9 +1853,9 @@ int main()
 		WRP.push_back(workplace);
 	}
 
-	
 
-//Spawn people
+
+	//Spawn people
 
 	Workplace emptyWork;
 	emptyWork.x = 0;
@@ -1764,7 +1935,7 @@ int main()
 					person.essential_worker = 1;
 				}
 			}
-			
+
 			else {
 				person.unemployed = 1;
 			}
@@ -1812,7 +1983,7 @@ int main()
 					person.essential_worker = 1;
 				}
 			}
-			
+
 			else {
 				person.unemployed = 1;
 			}
@@ -2240,7 +2411,7 @@ int main()
 		// ################### EXCEL FILE
 	char press_button_save;
 	printf("\n Do you want the initiallisation data to be saved? Press y if yes or any other button if not...\n");
-    std::cin >> press_button_save;
+	std::cin >> press_button_save;
 	if (press_button_save == 'y')
 	{
 		excel_file_HOUSES.open("HOUSES_OBJECTS.csv");
@@ -2249,7 +2420,7 @@ int main()
 		excel_file_SCHOOL.open("SCHOOL_OBJECT.csv");
 		excel_file_HOSPITAL.open("HOSPITAL_OBJECT.csv");
 
-		// data save
+		// DATA SAVE
 
 		for (int i = 0; i < N; i++)
 
@@ -2294,6 +2465,23 @@ int main()
 
 	}
 
+
+	}
+
+	else
+	{
+		printf("\nYou pressed wrong button..The program will exit..Please try again\n");
+		getchar();
+		return 0;
+
+	}
+
+
+
+	//printf("\ntotal houses are = %d\n", no_houses);
+	//printf("\ntottal workplaces are = %d\n", no_workplaces);
+
+	
 	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
 
 	for (int i = 0; i < N; i++)
@@ -2467,11 +2655,11 @@ int main()
 		// END OF CODE FOR POLICY 4
 
 	
-			if (policyx == 0)
+		if (policyx == 0)
 			{
 				for (int hour = 0; hour < 24; hour++)
 				{
-					contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
+					contactsPerDay1 = contactsPerDay1 + policy1(hour, T);
 				}
 			}
 
@@ -2745,7 +2933,7 @@ int main()
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 
 		T++;
-		if (T == 1) {
+		if (T == 10) {
 			done = true;
 		}
 
