@@ -8,6 +8,8 @@
 #include <iomanip>
 #include <fstream>
 
+
+
 float homeless_rate = 0.0005;
 float initial_infected_rate = 0.01;
 float initial_immune_rate = 0.01;
@@ -1586,16 +1588,23 @@ int main()
 		std::ifstream read_excel_SCHOOL("SCHOOL_OBJECT.csv");
 		std::ifstream read_excel_HOSPITAL("HUMAN_OBJECT.csv");
 		std::string x;
-		for (int i = 0; i < N; i++)
+		float a;
+		float b;
+		for (int i = 0; i < 2; i++)
 		{
-			while (read_excel_HUMANS.good())
-			{
+			//while (read_excel_HUMANS.good())
+
+			//{
+
 				std::getline(read_excel_HUMANS, x, ',');
-				//PPL[i].x = stoi(x);
-				printf("x = %c", x);
-				return 0;
-			}
+				PPL[i].x = stoi(x);
+		//}
+			
+
+			printf("\nx = %s, x = %d\n",x, PPL[i].x);
 		}
+
+		
 
 	}
 
