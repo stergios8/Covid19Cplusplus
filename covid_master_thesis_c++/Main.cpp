@@ -1574,6 +1574,46 @@ int policy6(int hour, int T) {
 
 int main()
 {
+
+	char press_button_data;
+	printf("\nDo you want to generate new initiallization data and objects or use the saved ones? Press n if you want new or s if you want saved...\n");
+	std::cin >> press_button_data;
+	if (press_button_data == 's')
+	{
+		std::ifstream read_excel_HUMANS("HUMAN_OBJECTS.csv");
+		std::ifstream read_excel_HOUSES("HOUSES_OBJECTS.csv");
+		std::ifstream read_excel_WORKPLACES("WORKPLACES_OBJECTS.csv");
+		std::ifstream read_excel_SCHOOL("SCHOOL_OBJECT.csv");
+		std::ifstream read_excel_HOSPITAL("HUMAN_OBJECT.csv");
+		std::string x;
+		for (int i = 0; i < N; i++)
+		{
+			while (read_excel_HUMANS.good())
+			{
+				std::getline(read_excel_HUMANS, x, ',');
+				//PPL[i].x = stoi(x);
+				printf("x = %c", x);
+				return 0;
+			}
+		}
+
+	}
+
+	else if (press_button_data == 'n')
+
+	{
+
+
+	}
+
+	else
+	{
+		printf("\nYou pressed wrong button..The program will exit..Please try again\n");
+		getchar();
+		return 0;
+
+	}
+
 	std::ofstream excel_file_initialization; // excel file for exporting initial distribution of houses, workplaces etc.
 	std::ofstream excel_file_SEIR_results; // excel file for exporting final results of SEIR model
 	std::ofstream excel_file_Financial_results; // excel file for exporting final results of Economical conditions
