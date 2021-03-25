@@ -1575,8 +1575,14 @@ int policy6(int hour, int T) {
 int main()
 {
 	std::ofstream excel_file_initialization; // excel file for exporting initial distribution of houses, workplaces etc.
-	std::ofstream exce_file_SEIR_results; // excel file for exporting final results of SEIR model
-	std::ofstream exce_file_Financial_results; // excel file for exporting final results of Economical conditions
+	std::ofstream excel_file_SEIR_results; // excel file for exporting final results of SEIR model
+	std::ofstream excel_file_Financial_results; // excel file for exporting final results of Economical conditions
+	std::ofstream excel_file_HOUSES; // excel file for exporting HOUSES Objects
+	std::ofstream excel_file_HUMANS; // excel file for exporting HUMANS Objects
+	std::ofstream excel_file_WORKPLACES; // excel file for exporting WORKPLACES Objects
+	std::ofstream excel_file_SCHOOL; // excel file for exporting SCHOOL
+	std::ofstream excel_file_HOSPITAL; // excel file for exporting HOSPITAL
+
 
 	//printf("\ntotal houses are = %d\n", no_houses);
 	//printf("\ntottal workplaces are = %d\n", no_workplaces);
@@ -2183,6 +2189,61 @@ int main()
 
 
 		// ################### EXCEL FILE
+	char press_button_save;
+	printf("\n Do you want the initiallisation data to be saved? Press y if yes or any other button if not...\n");
+    std::cin >> press_button_save;
+	if (press_button_save == 'y')
+	{
+		excel_file_HOUSES.open("HOUSES_OBJECTS.csv");
+		excel_file_HUMANS.open("HUMAN_OBJECTS.csv");
+		excel_file_WORKPLACES.open("WORKPLACES_OBJECTS.csv");
+		excel_file_SCHOOL.open("SCHOOL_OBJECT.csv");
+		excel_file_HOSPITAL.open("HOSPITAL_OBJECT.csv");
+
+		// data save
+
+		for (int i = 0; i < N; i++)
+
+		{
+			excel_file_HUMANS << PPL[i].x << "," << PPL[i].y << "," << PPL[i].dx << "," << PPL[i].dy << "," << PPL[i].group << "," << PPL[i].age << "," << PPL[i].homeless << "," << PPL[i].unemployed << "," << PPL[i].x_home << "," << PPL[i].y_home << "," << PPL[i].x_work << "," << PPL[i].y_work << "," << PPL[i].student << "," << PPL[i].social_stratum << "," << PPL[i].personal_income << "," << PPL[i].personal_expenses << "," << PPL[i].personal_wealth << "," << PPL[i].essential_worker << std::endl;
+
+		}
+
+		for (int i = 0; i < no_houses; i++)
+
+		{
+			excel_file_HOUSES << HOU[i].x << "," << HOU[i].y << "," << HOU[i].dx << "," << HOU[i].dy << "," << HOU[i].no_residents << "," << HOU[i].social_stratum << "," << HOU[i].home_wealth << std::endl;
+
+		}
+
+		for (int i = 0; i < no_workplaces; i++)
+
+		{
+			excel_file_WORKPLACES << WRP[i].x << "," << WRP[i].y << "," << WRP[i].dx << "," << WRP[i].dy << "," << WRP[i].no_workers << "," << WRP[i].social_stratum << "," << WRP[i].workplace_wealth << std::endl;
+
+		}
+
+		for (int i = 0; i < 1; i++)
+
+		{
+			excel_file_SCHOOL << school.x << "," << school.y << "," << school.dx << "," << school.dy << "," << school.no_students << std::endl;
+
+		}
+
+		for (int i = 0; i < 1; i++)
+
+		{
+			excel_file_HOSPITAL << HOS.x << "," << HOS.y << "," << HOS.infected_hospitalized << "," << HOS.intected_severe << std::endl;
+
+		}
+
+		excel_file_HOUSES.close();
+		excel_file_HUMANS.close();
+		excel_file_WORKPLACES.close();
+		excel_file_SCHOOL.close();
+		excel_file_HOSPITAL.close();
+
+	}
 
 	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
 
@@ -2209,12 +2270,13 @@ int main()
 
 	}
 
+	
 	// debbuging
 
 		//printf("\nxhome = %d, yhome = %d \n", PPL[55].x_home, PPL[55].y_home);
 		//printf("\nxwork = %d, ywork = %d \n", PPL[55].x_work, PPL[55].y_work);
 
-	// plots
+	
 
 	std::vector<float> Sarray;
 	std::vector<float> Earray;
@@ -2313,12 +2375,12 @@ int main()
 	Goverment_Wealth_Array.push_back(goverment_wealth_total);
 
 
-	//scanf for policy choice
-	//int choice;
 
-	//printf("\nChoose the policy you want to simulate...\n");
-	//printf("\nPress 0 if you want policy0, 1 for policy1, 2 for policy2, 3 for policy3, , 4 for policy4, 5 for policy5 or 6 for policy6\n");
-	//scanf("%d", &choice);
+	int policyx;
+	bool choice = false;
+	printf("\nChoose the policy you want to simulate...\n");
+	printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
+	std::cin >> policyx;
 
 	// MAIN LOOP
 
@@ -2356,11 +2418,67 @@ int main()
 		// END OF CODE FOR POLICY 4
 
 	
+			if (policyx == 0)
+			{
+				for (int hour = 0; hour < 24; hour++)
+				{
+					contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
+				}
+			}
 
-		for (int hour = 0; hour < 24; hour++)
-		{
-			contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
-		}
+			else if (policyx == 1)
+			{
+				for (int hour = 0; hour < 24; hour++)
+				{
+					contactsPerDay1 = contactsPerDay1 + policy1(hour, T);
+				}
+			}
+
+			else if (policyx == 2)
+			{
+				for (int hour = 0; hour < 24; hour++)
+				{
+					contactsPerDay1 = contactsPerDay1 + policy2(hour, T);
+				}
+			}
+
+			else if (policyx == 3)
+			{
+				for (int hour = 0; hour < 24; hour++)
+				{
+					contactsPerDay1 = contactsPerDay1 + policy3(hour, T);
+				}
+			}
+			else if (policyx == 4)
+			{
+				for (int hour = 0; hour < 24; hour++)
+				{
+					contactsPerDay1 = contactsPerDay1 + policy4(hour, T);
+				}
+			}
+			else if (policyx == 5)
+			{
+				for (int hour = 0; hour < 24; hour++)
+				{
+					contactsPerDay1 = contactsPerDay1 + policy5(hour, T);
+				}
+			}
+			else if (policyx == 6)
+			{
+				for (int hour = 0; hour < 24; hour++)
+				{
+					contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
+				}
+			}
+			else
+			{
+
+				printf("\nWrong choice, the program will exit...Try again...\n");
+
+				getchar();
+				return 0;
+			}
+		
 		// ### END OF 24 H LOOP
 
 		// finances ppl - houses, hospital fee
@@ -2578,27 +2696,27 @@ int main()
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 
 		T++;
-		if (T == 181) {
+		if (T == 1) {
 			done = true;
 		}
 
 	}
 
 
-	exce_file_SEIR_results.open("SEIR_Results.csv");
+	excel_file_SEIR_results.open("SEIR_Results.csv");
 	printf("\nPreparing results excel file...\n");
 	for (int i = 0; i < T; i++) {
-		exce_file_SEIR_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << Iharray[i] << "," << Isarray[i] << std::endl;
+		excel_file_SEIR_results << Sarray[i] << "," << Earray[i] << "," << Iarray[i] << "," << Rarray[i] << "," << Iharray[i] << "," << Isarray[i] << std::endl;
 	}
-	exce_file_SEIR_results.close();
+	excel_file_SEIR_results.close();
 
 
-	exce_file_Financial_results.open("Financial_Results.csv");
+	excel_file_Financial_results.open("Financial_Results.csv");
 	printf("\nPreparing Financial results excel file...\n");
 	for (int i = 0; i < T; i++) {
-		exce_file_Financial_results << Personal_Wealth_Array[i] << "," << House_Wealth_Array[i] << "," << Business_Wealth_Array[i] << "," << Goverment_Wealth_Array[i] << "," << timepassed[i] << std::endl;
+		excel_file_Financial_results << Personal_Wealth_Array[i] << "," << House_Wealth_Array[i] << "," << Business_Wealth_Array[i] << "," << Goverment_Wealth_Array[i] << "," << timepassed[i] << std::endl;
 	}
-	exce_file_Financial_results.close();
+	excel_file_Financial_results.close();
 
 
 	printf("\nSEIR results excel file done!\n");
