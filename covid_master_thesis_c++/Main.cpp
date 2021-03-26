@@ -66,6 +66,10 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
 
+//new 
+int quarantine = 1; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
+int EcanSpread = 0;
+
 //Pandemics Parameters
 
 double contagion_distance = 1;
@@ -162,6 +166,8 @@ public:
 	int essential_worker = 0;
 	House house;
 	Workplace work;
+	int quarantined = 0;
+	int inHospital = 0;
 
 	int Eday;
 	int Iday;
@@ -591,7 +597,7 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 
 	if ((person1.x == person2.x) && (person1.y == person2.y))
 	{
-		if ((person1.group != 3 && person2.group != 3) && ((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)))//question
+		if ((person1.group != 3 && person2.group != 3) && (((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)) || (EcanSpread == 1 && ((person1.group == 1 && person2.group == 0) || (person1.group == 0 && person2.group == 1)))))
 		{
 
 			if ((person1.x < person1.house.x + person1.house.dx) && (person1.x > person1.house.x - person1.house.dx) && (person1.y < person1.house.y + person1.house.dy) && (person1.y > person1.house.y - person1.house.dy))
@@ -619,6 +625,18 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 						}
 
 						if (person2.group == 2)
+						{
+							person1.group = 1;
+							person1.Eday = day;
+						}
+
+						if (EcanSpread == 1 && person1.group == 1)
+						{
+							person2.group = 1;
+							person2.Eday = day;
+						}
+
+						if (EcanSpread == 1 && person2.group == 1)
 						{
 							person1.group = 1;
 							person1.Eday = day;
@@ -806,6 +824,14 @@ void EtoItransition(int N, int T) {
 				}
 			}
 		}
+		if (quarantine == 1) {
+			if (PPL[i].group == 2 && T - PPL[i].Iday == 1 && PPL[i].inHospital == 0) {
+				PPL[i].quarantined = 1;
+			}
+			if (PPL[i].group == 3 && PPL[i].quarantined == 1) {
+				PPL[i].quarantined = 0;
+			}
+		}
 		if ((PPL[i].group == 2 || PPL[i].group == 4 || PPL[i].group == 5) && T - PPL[i].Iday == 20) {
 			HOS.releaseFromHospital(PPL[i]);
 			PPL[i].group = 3;
@@ -817,10 +843,11 @@ int policy0(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
+
 	if (hour >= 0 && hour < 8) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].homeless == 0) {
+				if (PPL[i].homeless == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
@@ -837,7 +864,7 @@ int policy0(int hour, int T) {
 	if (hour > 7 && hour < 12) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -848,25 +875,27 @@ int policy0(int hour, int T) {
 						}
 					}
 				}
-
-				if (PPL[i].student == 1)
-				{
+				if (PPL[i].student == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoSchool(school);
 					PPL[i].actionStayAtSchool(school);
-					for (int j = 0; j < N; j++)
-					{
-						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
-						{
-
-							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true))
-							{
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
 								contactsPerDay = contactsPerDay + 1;
-
 							}
 						}
-
 					}
-
+				}
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -874,31 +903,24 @@ int policy0(int hour, int T) {
 	if (hour > 11 && hour < 13) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				PPL[i].actionWalkFree();
-				for (int m = 0; m < no_workplaces; m++)
-				{
-					if (PPL[i].homeless == 0)
-
-						if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-						{
-							//printf("\nshop\n");
-							//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-							PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-							WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-							//printf("\nshop\n");
-							//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
+					PPL[i].actionWalkFree();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
-
-
-
+					}
 				}
-				for (int j = 0; j < N; j++) {
-					if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-						if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-							contactsPerDay = contactsPerDay + 1;
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
 					}
 				}
@@ -908,7 +930,7 @@ int policy0(int hour, int T) {
 	if (hour > 14 && hour < 19) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -919,25 +941,27 @@ int policy0(int hour, int T) {
 						}
 					}
 				}
-
-				if (PPL[i].student == 1)
-				{
+				if (PPL[i].student == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
-					for (int j = 0; j < N; j++)
-					{
-						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
-						{
-
-							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true))
-							{
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
 								contactsPerDay = contactsPerDay + 1;
-
 							}
 						}
-
 					}
-
+				}
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -945,31 +969,24 @@ int policy0(int hour, int T) {
 	if (hour > 18 && hour < 0) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				PPL[i].actionWalkFree();
-				for (int m = 0; m < no_workplaces; m++)
-				{
-					if (PPL[i].homeless == 0)
-
-						if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-						{
-							//printf("\nshop\n");
-							//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-							PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-							WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-							//printf("\nshop\n");
-							//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
+					PPL[i].actionWalkFree();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
-
-
-
+					}
 				}
-				for (int j = 0; j < N; j++) {
-					if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-						if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-							contactsPerDay = contactsPerDay + 1;
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
 					}
 				}
@@ -985,7 +1002,7 @@ int policy1(int hour, int T) {
 	if (hour >= 0 && hour < 8) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].homeless == 0) {
+				if (PPL[i].homeless == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
@@ -1002,7 +1019,7 @@ int policy1(int hour, int T) {
 	if (hour > 7 && hour < 12) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -1013,25 +1030,27 @@ int policy1(int hour, int T) {
 						}
 					}
 				}
-
-				if (PPL[i].student == 1)
-				{
+				if (PPL[i].student == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoSchool(school);
 					PPL[i].actionStayAtSchool(school);
-					for (int j = 0; j < N; j++)
-					{
-						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
-						{
-
-							if ((contact(PPL[i], PPL[j], T,contagion_probability) == true))
-							{
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
 								contactsPerDay = contactsPerDay + 1;
-
 							}
 						}
-
 					}
-
+				}
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1039,31 +1058,24 @@ int policy1(int hour, int T) {
 	if (hour > 11 && hour < 13) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				PPL[i].actionWalkFree();
-				for (int m = 0; m < no_workplaces; m++)
-				{
-					if (PPL[i].homeless == 0)
-
-						if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-						{
-							//printf("\nshop\n");
-							//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-							PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-							WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-							//printf("\nshop\n");
-							//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
+					PPL[i].actionWalkFree();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
-
-
-
+					}
 				}
-				for (int j = 0; j < N; j++) {
-					if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-						if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-							contactsPerDay = contactsPerDay + 1;
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
 					}
 				}
@@ -1073,7 +1085,7 @@ int policy1(int hour, int T) {
 	if (hour > 14 && hour < 19) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
 					for (int j = 0; j < N; j++) {
@@ -1084,24 +1096,27 @@ int policy1(int hour, int T) {
 						}
 					}
 				}
-				if (PPL[i].student == 1)
-				{
+				if (PPL[i].student == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
-					for (int j = 0; j < N; j++)
-					{
-						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) //explain
-						{
-
-							if ((contact(PPL[i], PPL[j], T,contagion_probability) == true))
-							{
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
 								contactsPerDay = contactsPerDay + 1;
-
 							}
 						}
-
 					}
-
+				}
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1109,31 +1124,24 @@ int policy1(int hour, int T) {
 	if (hour > 18 && hour < 0) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				PPL[i].actionWalkFree();
-				for (int m = 0; m < no_workplaces; m++)
-				{
-					if (PPL[i].homeless == 0)
-
-						if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-						{
-							//printf("\nshop\n");
-							//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-							PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-							WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-							//printf("\nshop\n");
-							//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-							//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
+					PPL[i].actionWalkFree();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
-
-
-
+					}
 				}
-				for (int j = 0; j < N; j++) {
-					if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-						if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-							contactsPerDay = contactsPerDay + 1;
+				if (PPL[i].quarantined == 1 && PPL[i].inHospital == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
 						}
 					}
 				}
@@ -1146,17 +1154,11 @@ int policy2(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
-	for (int i = 0; i < N; i++) {
-		if (PPL[i].age >= 60 || PPL[i].age <= 16) {
-			PPL[i].actionGoHome();
-			PPL[i].actionStayHome();
-		}
-	}
 
 	if (hour >= 0 && hour < 8) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].homeless == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
+				if (PPL[i].homeless == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
@@ -1173,9 +1175,20 @@ int policy2(int hour, int T) {
 	if (hour > 7 && hour < 12) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1190,28 +1203,19 @@ int policy2(int hour, int T) {
 	if (hour > 11 && hour < 13) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 60 && PPL[i].age > 16) {
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					for (int m = 0; m < no_workplaces; m++)
-					{
-						if (PPL[i].homeless == 0)
-
-							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-							{
-								//printf("\nshop\n");
-								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-								//printf("\nshop\n");
-								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
 							}
-
-
-
+						}
 					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1226,9 +1230,20 @@ int policy2(int hour, int T) {
 	if (hour > 14 && hour < 19) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1243,28 +1258,19 @@ int policy2(int hour, int T) {
 	if (hour > 18 && hour < 0) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 60 && PPL[i].age > 16) {
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					for (int m = 0; m < no_workplaces; m++)
-					{
-						if (PPL[i].homeless == 0)
-
-							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-							{
-								//printf("\nshop\n");
-								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-								//printf("\nshop\n");
-								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
 							}
-
-
-
+						}
 					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1282,17 +1288,11 @@ int policy3(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.4; // FACEMASK
 	int contactsPerDay = 0;
-	for (int i = 0; i < N; i++) {
-		if (PPL[i].age >= 60 || PPL[i].age <= 16) {
-			PPL[i].actionGoHome();
-			PPL[i].actionStayHome();
-		}
-	}
 
 	if (hour >= 0 && hour < 8) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].homeless == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
+				if (PPL[i].homeless == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
@@ -1309,9 +1309,20 @@ int policy3(int hour, int T) {
 	if (hour > 7 && hour < 12) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1326,28 +1337,19 @@ int policy3(int hour, int T) {
 	if (hour > 11 && hour < 13) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 60 && PPL[i].age > 16) {
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					for (int m = 0; m < no_workplaces; m++)
-					{
-						if (PPL[i].homeless == 0)
-
-							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-							{
-								//printf("\nshop\n");
-								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-								//printf("\nshop\n");
-								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
 							}
-
-
-
+						}
 					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1362,9 +1364,20 @@ int policy3(int hour, int T) {
 	if (hour > 14 && hour < 19) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].unemployed == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
+				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1379,28 +1392,19 @@ int policy3(int hour, int T) {
 	if (hour > 18 && hour < 0) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
-				if (PPL[i].age < 60 && PPL[i].age > 16) {
+				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					for (int m = 0; m < no_workplaces; m++)
-					{
-						if (PPL[i].homeless == 0)
-
-							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
-							{
-								//printf("\nshop\n");
-								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
-
-								//printf("\nshop\n");
-								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
-								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
 							}
-
-
-
+						}
 					}
+				}
+				if ((PPL[i].quarantined == 1 && PPL[i].inHospital == 0) || (PPL[i].age >= 60 || PPL[i].age <= 16)) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1422,88 +1426,10 @@ int policy4(int hour, int T) {
 	// MAKE CONDITION FOR CONDITIONAL LOCKDOWN
 
 	for (int i = 0; i < N; i++) {
-		// VERTICAL ISOLATION
-		if (PPL[i].age >= 60 || PPL[i].age <= 16) {
-			PPL[i].actionGoHome();
-			PPL[i].actionStayHome();
-		}
-		// IF .. CONDITIONAL LOCKDOWN ELSE POLICY 0
+		// IF .. CONDITIONAL LOCKDOWN ELSE POLICY 3
 		// lockdownForPolicy4 is set in main 24h loop.
 
 		if (lockdownForPolicy4 == 1) {
-			//unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
-			//std::default_random_engine generator(seed);
-			//std::uniform_real_distribution <float> distribution(0, 1);
-			//float eps = distribution(generator);  // uniform distribution
-			// CONDITION FOR PARTIAL ISOLATION
-			if (PPL[i].essential_worker == 1 && PPL[i].age < 60 && PPL[i].age > 16) {
-				if (hour >= 0 && hour < 8) {
-					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].homeless == 0) {
-							PPL[i].actionGoHome();
-							PPL[i].actionStayHome();
-							for (int j = 0; j < N; j++) {
-								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-									if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-										contactsPerDay = contactsPerDay + 1;
-									}
-								}
-							}
-						}
-					}
-				}
-				if (hour > 7 && hour < 17) {
-					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						if (PPL[i].unemployed == 0) {
-							PPL[i].actionGoWork();
-							PPL[i].actionStayAtWork();
-							for (int j = 0; j < N; j++) {
-								if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-									if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-										contactsPerDay = contactsPerDay + 1;
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if (hour > 16 && hour < 0) {
-					for (int timestamp = 0; timestamp < 200; timestamp++) {
-						PPL[i].actionGoHome();
-						PPL[i].actionStayHome();
-						for (int j = 0; j < N; j++) {
-							if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-								if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-									contactsPerDay = contactsPerDay + 1;
-								}
-							}
-						}
-					}
-				}
-			}
-			else {
-				PPL[i].actionGoHome();
-				PPL[i].actionStayHome();
-			}
-		}
-		else {
-			return policy3(hour, T);
-		}
-	}
-
-	return contactsPerDay;
-}
-int policy5(int hour, int T) {
-	contagion_distance = 1;
-	double contagion_probability = 0.4; // FACEMASK
-	int contactsPerDay = 0;
-	for (int i = 0; i < N; i++) {
-		//unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
-		//std::default_random_engine generator(seed);
-		//std::uniform_real_distribution <float> distribution(0, 1);
-		//float eps = distribution(generator);  // uniform distribution
-		if (PPL[i].essential_worker == 1 && PPL[i].age < 60 && PPL[i].age > 16) {
 			if (hour >= 0 && hour < 8) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
 					if (PPL[i].homeless == 0) {
@@ -1521,7 +1447,7 @@ int policy5(int hour, int T) {
 			}
 			if (hour > 7 && hour < 17) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
-					if (PPL[i].unemployed == 0) {
+					if (PPL[i].unemployed == 0 && PPL[i].essential_worker == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && PPL[i].age < 60 && PPL[i].age > 16) {
 						PPL[i].actionGoWork();
 						PPL[i].actionStayAtWork();
 						for (int j = 0; j < N; j++) {
@@ -1532,9 +1458,19 @@ int policy5(int hour, int T) {
 							}
 						}
 					}
+					else {
+						PPL[i].actionGoHome();
+						PPL[i].actionStayHome();
+						for (int j = 0; j < N; j++) {
+							if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+								if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+									contactsPerDay = contactsPerDay + 1;
+								}
+							}
+						}
+					}
 				}
 			}
-
 			if (hour > 16 && hour < 0) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
 					PPL[i].actionGoHome();
@@ -1550,8 +1486,70 @@ int policy5(int hour, int T) {
 			}
 		}
 		else {
-			PPL[i].actionGoHome();
-			PPL[i].actionStayHome();
+			return policy3(hour, T);
+		}
+	}
+
+	return contactsPerDay;
+}
+int policy5(int hour, int T) {
+	contagion_distance = 1;
+	double contagion_probability = 0.4; // FACEMASK
+	int contactsPerDay = 0;
+	for (int i = 0; i < N; i++) {
+		if (hour >= 0 && hour < 8) {
+			for (int timestamp = 0; timestamp < 200; timestamp++) {
+				if (PPL[i].homeless == 0) {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (hour > 7 && hour < 17) {
+			for (int timestamp = 0; timestamp < 200; timestamp++) {
+				if (PPL[i].unemployed == 0 && PPL[i].essential_worker == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && PPL[i].age < 60 && PPL[i].age > 16) {
+					PPL[i].actionGoWork();
+					PPL[i].actionStayAtWork();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
+				}
+				else {
+					PPL[i].actionGoHome();
+					PPL[i].actionStayHome();
+					for (int j = 0; j < N; j++) {
+						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								contactsPerDay = contactsPerDay + 1;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (hour > 16 && hour < 0) {
+			for (int timestamp = 0; timestamp < 200; timestamp++) {
+				PPL[i].actionGoHome();
+				PPL[i].actionStayHome();
+				for (int j = 0; j < N; j++) {
+					if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+						if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+							contactsPerDay = contactsPerDay + 1;
+						}
+					}
+				}
+			}
 		}
 	}
 	return contactsPerDay;
@@ -1560,19 +1558,22 @@ int policy6(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.4; // FACEMASK
 	int contactsPerDay = 0;
-	for (int i = 0; i < N; i++) {
-		PPL[i].actionGoHome();
-		PPL[i].actionStayHome();
-		for (int j = 0; j < N; j++) {
-			if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
-				if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
-					contactsPerDay = contactsPerDay + 1;
+	for (int timestamp = 0; timestamp < 200; timestamp++) {
+		for (int i = 0; i < N; i++) {
+			PPL[i].actionGoHome();
+			PPL[i].actionStayHome();
+			for (int j = 0; j < N; j++) {
+				if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
+					if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+						contactsPerDay = contactsPerDay + 1;
+					}
 				}
 			}
 		}
 	}
 	return contactsPerDay;
 }
+
 
 int main()
 {
@@ -2468,13 +2469,13 @@ int main()
 
 	}
 
-	else
+	/*else
 	{
 		printf("\nYou pressed wrong button..The program will exit..Please try again\n");
 		getchar();
 		return 0;
 
-	}
+	}*/
 
 
 
@@ -2539,9 +2540,13 @@ int main()
 	int T = 0;
 	int Iold = I;
 	int Rold = R;
-	
-
+	//timepassed.push_back(T);
 	int contactsPerDay1 = 0;
+	int essential_workers = 0;
+	int essential_workers_I = 0;
+	int risk_group = 0;
+	int students = 0;
+	int selfQuarantined = 0;
 
 	//initial SEIR counting
 
@@ -2564,6 +2569,18 @@ int main()
 		if (PPL[i].group == 5) {
 			Is++;
 		}
+		if (PPL[i].essential_worker == 1) {
+			essential_workers++;
+		}
+		if (PPL[i].essential_worker == 1 && PPL[i].group == 2) {
+			essential_workers_I++;
+		}
+		if (PPL[i].age >= 60) {
+			risk_group++;
+		}
+		if (PPL[i].age <= 16) {
+			students++;
+		}
 	}
 
 	timepassed.push_back(T);
@@ -2573,6 +2590,11 @@ int main()
 	Rarray.push_back(R);
 	Iharray.push_back(Ih);
 	Isarray.push_back(Is);
+
+	printf("\nNumber of essential workers = %d, Number of INFECTED essential workers = %d\n", essential_workers, essential_workers_I);
+	printf("\nRisk group: %d, PPL <= 16: %d, PPL in School: %d\n", risk_group, students, school.no_students);
+	printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe);
+
 
 	//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe);
 
@@ -2898,6 +2920,8 @@ int main()
 		R = 0;
 		Ih = 0;
 		Is = 0;
+		selfQuarantined = 0;
+
 		for (int i = 0; i < N; i++) {
 			if (PPL[i].group == 0) {
 				S++;
@@ -2917,6 +2941,9 @@ int main()
 			if (PPL[i].group == 5) {
 				Is++;
 			}
+			if (PPL[i].quarantined == 1) {
+				selfQuarantined++;
+			}
 		}
 
 		deltaR = R - Rold;
@@ -2930,7 +2957,8 @@ int main()
 		Iharray.push_back(Ih);
 		Isarray.push_back(Is);
 
-		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
+		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
+		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
 		T++;
 		if (T == 10) {
