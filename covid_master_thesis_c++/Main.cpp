@@ -67,7 +67,7 @@ int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
 
 //new 
-int quarantine = 1; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
+int quarantine = 0; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
 int EcanSpread = 0;
 
 //Pandemics Parameters
@@ -554,19 +554,22 @@ void actionTransferSalaryToHome(Human& person, House& house)
 	house.home_wealth = house.home_wealth + person.personal_income;
 
 }
-bool actionShopping(Human& person, Workplace& workplace)
+void actionShopping(Human& person, int total_works)
 {
-	if (person.x == workplace.x && person.y == workplace.y && person.x_work != workplace.x && person.y_work != workplace.y)
-	{
-
-		return true;
-	}
-
-	else
-	{
-
-		return false;
-	}
+	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+	std::uniform_int_distribution <int> distribution_empl(0, total_works);
+	int m = distribution_empl(generator);
+	// printf("\nm = %d\n", m);
+	//printf("\nshop1\n");
+	//printf("\npersonal money pro shopping = %d\n", person.personal_wealth);
+	//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+	person.personal_wealth = person.personal_wealth - (person.personal_expenses / 60);
+	WRP[m].workplace_wealth = WRP[m].workplace_wealth + (person.personal_expenses / 60);
+	//printf("\nshop\n");
+	//printf("\npersonal money after shopping = %d\n", person.personal_wealth);
+	//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+	
 }
 void actionHouseSupplyBusiness(House& house, Workplace& workplace)
 
@@ -843,7 +846,6 @@ int policy0(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
-
 	if (hour >= 0 && hour < 8) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
@@ -905,6 +907,12 @@ int policy0(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
+						if (PPL[i].homeless == 0)
+						{
+							//actionShopping(PPL[i], no_workplaces); // works ok
+							
+						}
+					
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -933,6 +941,7 @@ int policy0(int hour, int T) {
 				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoWork();
 					PPL[i].actionStayAtWork();
+
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -966,11 +975,16 @@ int policy0(int hour, int T) {
 			}
 		}
 	}
-	if (hour > 18 && hour < 0) {
+	if (hour > 18 && hour < 24) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
+					if (PPL[i].homeless == 0)
+					{
+						actionShopping(PPL[i], no_workplaces); // works ok
+					}
+
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1060,6 +1074,11 @@ int policy1(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
+					
+					if (PPL[i].homeless == 0)
+					{
+						actionShopping(PPL[i], no_workplaces); // works ok
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1121,11 +1140,17 @@ int policy1(int hour, int T) {
 			}
 		}
 	}
-	if (hour > 18 && hour < 0) {
+	if (hour > 18 && hour < 24) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
+					
+						if (PPL[i].homeless == 0)
+						{
+							actionShopping(PPL[i], no_workplaces); // works ok
+						}
+					
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1205,6 +1230,10 @@ int policy2(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
+					if (PPL[i].homeless == 0)
+					{
+						actionShopping(PPL[i], no_workplaces); // works ok
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1255,11 +1284,15 @@ int policy2(int hour, int T) {
 			}
 		}
 	}
-	if (hour > 18 && hour < 0) {
+	if (hour > 18 && hour < 24) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
+					if (PPL[i].homeless == 0)
+					{
+						actionShopping(PPL[i], no_workplaces); // works ok
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1286,7 +1319,7 @@ int policy2(int hour, int T) {
 }
 int policy3(int hour, int T) {
 	contagion_distance = 1;
-	double contagion_probability = 0.4; // FACEMASK
+	double contagion_probability = 0.3; // FACEMASK 0.3 is the value used in paper
 	int contactsPerDay = 0;
 
 	if (hour >= 0 && hour < 8) {
@@ -1339,6 +1372,10 @@ int policy3(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
+					if (PPL[i].homeless == 0)
+					{
+						actionShopping(PPL[i], no_workplaces); // works ok
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1389,11 +1426,15 @@ int policy3(int hour, int T) {
 			}
 		}
 	}
-	if (hour > 18 && hour < 0) {
+	if (hour > 18 && hour < 24) {
 		for (int timestamp = 0; timestamp < 200; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
+					if (PPL[i].homeless == 0)
+					{
+						actionShopping(PPL[i], no_workplaces); // works ok
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1471,7 +1512,7 @@ int policy4(int hour, int T) {
 					}
 				}
 			}
-			if (hour > 16 && hour < 0) {
+			if (hour > 16 && hour < 24) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
@@ -1538,7 +1579,7 @@ int policy5(int hour, int T) {
 				}
 			}
 		}
-		if (hour > 16 && hour < 0) {
+		if (hour > 16 && hour < 24) {
 			for (int timestamp = 0; timestamp < 200; timestamp++) {
 				PPL[i].actionGoHome();
 				PPL[i].actionStayHome();
@@ -1556,7 +1597,7 @@ int policy5(int hour, int T) {
 }
 int policy6(int hour, int T) {
 	contagion_distance = 1;
-	double contagion_probability = 0.4; // FACEMASK
+	double contagion_probability = 0.3; // FACEMASK
 	int contactsPerDay = 0;
 	for (int timestamp = 0; timestamp < 200; timestamp++) {
 		for (int i = 0; i < N; i++) {
@@ -2681,7 +2722,7 @@ int main()
 			{
 				for (int hour = 0; hour < 24; hour++)
 				{
-					contactsPerDay1 = contactsPerDay1 + policy1(hour, T);
+					contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
 				}
 			}
 
@@ -2785,10 +2826,10 @@ int main()
 				//printf("\ngov money after bills_h = %d\n", goverment_wealth_total);
 				std::uniform_int_distribution <int> distribution_supply(0, no_workplaces);
 
-				int z = distribution_supply(generator);
+			//	int z = distribution_supply(generator);
 				//printf("\nhome money before supply = %d\n", HOU[j].home_wealth);
 				//printf("\nwork money pro supply = %d\n", WRP[z].workplace_wealth);
-				actionHouseSupplyBusiness(HOU[j], WRP[z]);
+				//actionHouseSupplyBusiness(HOU[j], WRP[z]);
 				//printf("\nhome money after supply = %d\n", HOU[j].home_wealth);
 				//printf("\nwork money after supply = %d\n", WRP[z].workplace_wealth);
 
@@ -2961,7 +3002,7 @@ int main()
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
 		T++;
-		if (T == 10) {
+		if (T == 91) {
 			done = true;
 		}
 
@@ -2987,6 +3028,16 @@ int main()
 	printf("\nSEIR results excel file done!\n");
 
 	printf("\nFinancial results excel file done!\n");
+
+	int financial_difference_people = ((Personal_Wealth_Array[T-1] - Personal_Wealth_Array[0]) / Personal_Wealth_Array[0])*100;
+	int financial_difference_houses = ((House_Wealth_Array[T-1] - House_Wealth_Array[0]) / House_Wealth_Array[0])*100;
+	int financial_difference_business = ((Business_Wealth_Array[T-1] - Business_Wealth_Array[0]) / Business_Wealth_Array[0])* 100;
+	int financial_difference_gov = ((Goverment_Wealth_Array[T-1] - Goverment_Wealth_Array[0]) / Goverment_Wealth_Array[0])* 100;
+
+	printf("\nFinancial difference in people is %d\n", financial_difference_people);
+	printf("\nFinancial difference in houses is %d\n", financial_difference_houses);
+	printf("\nFinancial difference in businesses is %d\n", financial_difference_business);
+	printf("\nFinancial difference in goverment is %d\n", financial_difference_gov);
 
 	printf("\nSimulation completed!\n");
 
