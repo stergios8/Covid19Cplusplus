@@ -37,189 +37,188 @@ C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(559,20): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(633,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(617,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(684,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(668,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(691,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(675,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(702,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(686,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(709,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(693,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(720,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(704,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(727,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(711,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(738,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(722,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(745,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(729,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(756,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(740,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(763,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(747,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(774,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(758,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(781,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(765,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(792,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(776,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(799,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(783,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(810,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(794,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(817,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(801,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(828,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(812,23): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(835,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(819,24): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(1767,20): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
           with
           [
               _Rep=std::chrono::system_clock::rep
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(1633,20): warning C4244: 'initializing': conversion from '_Rep' to 'unsigned int', possible loss of data
-          with
-          [
-              _Rep=std::chrono::system_clock::rep
-          ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2224,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2233,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2243,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2253,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2261,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2308,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2316,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2323,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2330,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2335,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2380,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2388,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2395,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2402,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2407,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2628,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2358,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2367,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2377,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2387,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2395,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2442,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2450,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2457,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2464,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2469,64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2514,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2522,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2529,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2536,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2541,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2762,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2629,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2763,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2630,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2764,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2631,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2765,19): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2632,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2766,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2633,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2767,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2994,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3128,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2995,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3129,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2996,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3130,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2997,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3131,20): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2998,21): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3132,21): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
-C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(2999,21): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3133,21): warning C4244: 'argument': conversion from 'int' to 'const _Ty', possible loss of data
           with
           [
               _Ty=float
           ]
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3167,36): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3170,36): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3171,38): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\Main.cpp(3172,33): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   Generating code
-  1 of 475 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  1 of 463 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   covid_master_thesis_c++.vcxproj -> C:\Users\SterPol\Documents\GitHub\Covid19Cplusplus\covid_master_thesis_c++\x64\Release\covid_master_thesis_c++.exe

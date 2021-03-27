@@ -554,7 +554,7 @@ void actionTransferSalaryToHome(Human& person, House& house)
 	house.home_wealth = house.home_wealth + person.personal_income;
 
 }
-void actionShopping(Human& person, int total_works)
+/*void actionShopping(Human& person, int total_works)
 {
 	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator(seed);
@@ -570,7 +570,23 @@ void actionShopping(Human& person, int total_works)
 	//printf("\npersonal money after shopping = %d\n", person.personal_wealth);
 	//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
 	
+}*/ //alternative shopping
+
+bool actionShopping(Human& person, Workplace& workplace)
+{
+	if (person.x == workplace.x && person.y == workplace.y && person.x_work != workplace.x && person.y_work != workplace.y)
+	{
+
+		return true;
+	}
+
+	else
+	{
+
+		return false;
+	}
 }
+
 void actionHouseSupplyBusiness(House& house, Workplace& workplace)
 
 {
@@ -907,12 +923,26 @@ int policy0(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
+					for (int m = 0; m < no_workplaces; m++)
+					{
 						if (PPL[i].homeless == 0)
 						{
-							//actionShopping(PPL[i], no_workplaces); // works ok
-							
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop1\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+
+								//printf("\nshop\n");
+							    //printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
+
 						}
-					
+
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -980,11 +1010,26 @@ int policy0(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
-					if (PPL[i].homeless == 0)
+					for (int m = 0; m < no_workplaces; m++)
 					{
-						actionShopping(PPL[i], no_workplaces); // works ok
-					}
+						if (PPL[i].homeless == 0)
+						{
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop2\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
 
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
+
+						}
+
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1075,9 +1120,25 @@ int policy1(int hour, int T) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
 					
-					if (PPL[i].homeless == 0)
+					for (int m = 0; m < no_workplaces; m++)
 					{
-						actionShopping(PPL[i], no_workplaces); // works ok
+						if (PPL[i].homeless == 0)
+						{
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
+						}
+
+
 					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
@@ -1145,12 +1206,26 @@ int policy1(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
-					
+					for (int m = 0; m < no_workplaces; m++)
+					{
 						if (PPL[i].homeless == 0)
 						{
-							actionShopping(PPL[i], no_workplaces); // works ok
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
 						}
-					
+
+
+					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1230,9 +1305,23 @@ int policy2(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					if (PPL[i].homeless == 0)
+					for (int m = 0; m < no_workplaces; m++)
 					{
-						actionShopping(PPL[i], no_workplaces); // works ok
+						if (PPL[i].homeless == 0)
+						{
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
+						}
 					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
@@ -1289,9 +1378,25 @@ int policy2(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					if (PPL[i].homeless == 0)
+					for (int m = 0; m < no_workplaces; m++)
 					{
-						actionShopping(PPL[i], no_workplaces); // works ok
+						if (PPL[i].homeless == 0)
+						{
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
+						}
+
+
 					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
@@ -1372,9 +1477,22 @@ int policy3(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					if (PPL[i].homeless == 0)
+					for (int m = 0; m < no_workplaces; m++)
 					{
-						actionShopping(PPL[i], no_workplaces); // works ok
+						if (PPL[i].homeless == 0)
+
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
 					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
@@ -1431,9 +1549,25 @@ int policy3(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
-					if (PPL[i].homeless == 0)
+					for (int m = 0; m < no_workplaces; m++)
 					{
-						actionShopping(PPL[i], no_workplaces); // works ok
+						if (PPL[i].homeless == 0)
+						{
+							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
+							{
+								//printf("\nshop\n");
+								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+
+								//printf("\nshop\n");
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+							}
+						}
+
+
 					}
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
@@ -2722,7 +2856,7 @@ int main()
 			{
 				for (int hour = 0; hour < 24; hour++)
 				{
-					contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
+					contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
 				}
 			}
 
@@ -3009,6 +3143,7 @@ int main()
 	}
 
 
+
 	excel_file_SEIR_results.open("SEIR_Results.csv");
 	printf("\nPreparing results excel file...\n");
 	for (int i = 0; i < T; i++) {
@@ -3029,15 +3164,17 @@ int main()
 
 	printf("\nFinancial results excel file done!\n");
 
-	int financial_difference_people = ((Personal_Wealth_Array[T-1] - Personal_Wealth_Array[0]) / Personal_Wealth_Array[0])*100;
-	int financial_difference_houses = ((House_Wealth_Array[T-1] - House_Wealth_Array[0]) / House_Wealth_Array[0])*100;
-	int financial_difference_business = ((Business_Wealth_Array[T-1] - Business_Wealth_Array[0]) / Business_Wealth_Array[0])* 100;
-	int financial_difference_gov = ((Goverment_Wealth_Array[T-1] - Goverment_Wealth_Array[0]) / Goverment_Wealth_Array[0])* 100;
+	float financial_difference_people = (((Personal_Wealth_Array[90] - Personal_Wealth_Array[0]) / Personal_Wealth_Array[0])*100);
+	printf("\nbusiness wealth T - 1 = %d\n", Business_Wealth_Array[90]);
+	printf("\nbusiness wealth 0 = %d\n", Business_Wealth_Array[0]);
+	float financial_difference_houses = (((House_Wealth_Array[90] - House_Wealth_Array[0]) / House_Wealth_Array[0])*100);
+	float financial_difference_business = (((Business_Wealth_Array[90] - Business_Wealth_Array[0]) / Business_Wealth_Array[0])* 100);
+	float financial_difference_gov = (((Goverment_Wealth_Array[90] - Goverment_Wealth_Array[0]) / Goverment_Wealth_Array[0])* 100);
 
-	printf("\nFinancial difference in people is %d\n", financial_difference_people);
-	printf("\nFinancial difference in houses is %d\n", financial_difference_houses);
-	printf("\nFinancial difference in businesses is %d\n", financial_difference_business);
-	printf("\nFinancial difference in goverment is %d\n", financial_difference_gov);
+	printf("\nFinancial difference in people is %f\n", financial_difference_people);
+	printf("\nFinancial difference in houses is %f\n", financial_difference_houses);
+	printf("\nFinancial difference in businesses is %f\n", financial_difference_business);
+	printf("\nFinancial difference in goverment is %f\n", financial_difference_gov);
 
 	printf("\nSimulation completed!\n");
 
