@@ -932,15 +932,22 @@ int policy0(int hour, int T) {
 								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								//printf("\nhome money pro shopping = %d\n", PPL[i].house.home_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
-
+								
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 							    //printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-								//printf("\nhome money after shopping = %d\n", PPL[i].house.home_wealth);
+								
 							}
 
 						}
@@ -1022,15 +1029,22 @@ int policy0(int hour, int T) {
 								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								//printf("\nhome money pro shopping = %d\n", PPL[i].house.home_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
-
+								
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-								//printf("\nhome money after shopping = %d\n", PPL[i].house.home_wealth);
+								
 							}
 
 						}
@@ -1132,13 +1146,21 @@ int policy1(int hour, int T) {
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
-								//printf("\nshop\n");
+								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
@@ -1219,13 +1241,21 @@ int policy1(int hour, int T) {
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
-								//printf("\nshop\n");
+								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
@@ -1319,13 +1349,21 @@ int policy2(int hour, int T) {
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
-								//printf("\nshop\n");
+								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
@@ -1393,13 +1431,21 @@ int policy2(int hour, int T) {
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
-								//printf("\nshop\n");
+								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
@@ -1493,13 +1539,21 @@ int policy3(int hour, int T) {
 
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
-								//printf("\nshop\n");
+								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
@@ -1566,13 +1620,21 @@ int policy3(int hour, int T) {
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
-								//printf("\nshop\n");
+								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
-								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								for (int z = 0; z < no_houses; z++)
+								{
+									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
+									{
+										//printf("\nhome money pro shopping = %d\n", HOU[z].home_wealth);
+										HOU[z].home_wealth = HOU[z].home_wealth - (PPL[i].personal_expenses / 60);
+										//printf("\nhome money after shopping = %d\n", HOU[z].home_wealth);
+									}
+								}
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
@@ -3153,7 +3215,7 @@ int main()
 		}
 
 	}
-
+	
 
 
 	excel_file_SEIR_results.open("SEIR_Results.csv");
