@@ -537,7 +537,7 @@ School school;
 
 void financialInterferenceHome(Human& person, House& house)
 {
-	person.personal_wealth = person.personal_wealth + (person.personal_expenses / 30);
+	//person.personal_wealth = person.personal_wealth + (person.personal_expenses / 30);
 	house.home_wealth = (house.home_wealth - (person.personal_expenses / 30));
 
 
@@ -932,12 +932,15 @@ int policy0(int hour, int T) {
 								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								//printf("\nhome money pro shopping = %d\n", PPL[i].house.home_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 							    //printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+								//printf("\nhome money after shopping = %d\n", PPL[i].house.home_wealth);
 							}
 
 						}
@@ -1016,15 +1019,18 @@ int policy0(int hour, int T) {
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
-								//printf("\nshop2\n");
+								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								//printf("\nhome money pro shopping = %d\n", PPL[i].house.home_wealth);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
+								//printf("\nhome money after shopping = %d\n", PPL[i].house.home_wealth);
 							}
 
 						}
@@ -1129,8 +1135,9 @@ int policy1(int hour, int T) {
 								//printf("\nshop\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
@@ -1215,8 +1222,9 @@ int policy1(int hour, int T) {
 								//printf("\nshop\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
@@ -1314,8 +1322,9 @@ int policy2(int hour, int T) {
 								//printf("\nshop\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
@@ -1387,8 +1396,9 @@ int policy2(int hour, int T) {
 								//printf("\nshop\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
@@ -1424,7 +1434,7 @@ int policy2(int hour, int T) {
 }
 int policy3(int hour, int T) {
 	contagion_distance = 1;
-	double contagion_probability = 0.3; // FACEMASK 0.3 is the value used in paper
+	double contagion_probability = 0.2; // FACEMASK 0.3 is the value used in paper
 	int contactsPerDay = 0;
 
 	if (hour >= 0 && hour < 8) {
@@ -1486,8 +1496,9 @@ int policy3(int hour, int T) {
 								//printf("\nshop\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
@@ -1558,8 +1569,9 @@ int policy3(int hour, int T) {
 								//printf("\nshop\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
-								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 30);
+								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 30);
+								PPL[i].house.home_wealth = PPL[i].house.home_wealth - (PPL[i].personal_expenses / 30);
 
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
@@ -2003,7 +2015,7 @@ int main()
 
 	else if (press_button_data == 'n')
 
-	{
+  {
 	
 	//Spawn houses
 	for (int i = 0; i < no_houses; i++) {
@@ -2856,7 +2868,7 @@ int main()
 			{
 				for (int hour = 0; hour < 24; hour++)
 				{
-					contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
+					contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
 				}
 			}
 
@@ -2918,7 +2930,7 @@ int main()
 		// finances ppl - houses, hospital fee
 		for (int i = 0; i < N; i++)
 		{
-			for (int j = 0; j < no_houses; j++)
+			/*for (int j = 0; j < no_houses; j++)
 			{
 				if (PPL[i].x_home == HOU[j].x && PPL[i].y_home == HOU[j].y)
 				{
@@ -2929,7 +2941,7 @@ int main()
 					//printf("\npersonal money after home_interference = %d\n", PPL[i].personal_wealth);
 					//printf("\nhome money after home_interference = %d\n", HOU[j].home_wealth);
 				}
-			}
+			}*/
 			if (PPL[i].group == 4 || PPL[i].group == 5)
 			{
 				//printf("\npersonal money pro fee = %d\n", PPL[i].personal_wealth);
@@ -3136,7 +3148,7 @@ int main()
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
 		T++;
-		if (T == 91) {
+		if (T == 100) {
 			done = true;
 		}
 
