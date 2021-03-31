@@ -591,8 +591,8 @@ void actionHouseSupplyBusiness(House& house, Workplace& workplace)
 
 {
 
-	house.home_wealth = house.home_wealth - 1500;
-	workplace.workplace_wealth = workplace.workplace_wealth + 1500;
+	house.home_wealth = house.home_wealth - 500;
+	workplace.workplace_wealth = workplace.workplace_wealth + 500;
 }
 
 void GovermentFinanceHealthcare()
@@ -3034,10 +3034,10 @@ int main()
 				//printf("\ngov money after bills_h = %d\n", goverment_wealth_total);
 				std::uniform_int_distribution <int> distribution_supply(0, no_workplaces);
 
-			//	int z = distribution_supply(generator);
+			int z = distribution_supply(generator);
 				//printf("\nhome money before supply = %d\n", HOU[j].home_wealth);
 				//printf("\nwork money pro supply = %d\n", WRP[z].workplace_wealth);
-				//actionHouseSupplyBusiness(HOU[j], WRP[z]);
+				actionHouseSupplyBusiness(HOU[j], WRP[z]);
 				//printf("\nhome money after supply = %d\n", HOU[j].home_wealth);
 				//printf("\nwork money after supply = %d\n", WRP[z].workplace_wealth);
 
@@ -3059,7 +3059,7 @@ int main()
 
 					}
 				}
-				else if (PPL[i].unemployed == 1 || PPL[i].homeless == 1)
+				else if (PPL[i].unemployed == 1 /*|| PPL[i].homeless == 1*/)
 
 				{
 					//printf("\ngov money before aid = %d\n", goverment_wealth_total);
