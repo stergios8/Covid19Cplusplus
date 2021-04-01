@@ -7,6 +7,7 @@
 #include <chrono>
 #include <iomanip>
 #include <fstream>
+//using namespace std::geometric_distribution;
 
 
 
@@ -65,6 +66,9 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
+int SimulationTime = 30; // Simulation time in days.
+
+double Qtable[30][7]; // first bracked must be the same as simulation time. 
 
 //new 
 int quarantine = 0; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
@@ -164,6 +168,7 @@ public:
 	int personal_wealth;
 	int social_stratum;
 	int essential_worker = 0;
+	int shopped_today = 0;
 	House house;
 	Workplace work;
 	int quarantined = 0;
@@ -526,8 +531,11 @@ std::vector<Human> PPL;
 std::vector<House> HOU;
 std::vector<Workplace> WRP;
 Hospital HOS;
-//Create School
 School school;
+
+
+
+
 
 //printf("\nschool x_pos = %d\n", school.x);
 //printf("\nschool y_pos = %d\n", school.y);
@@ -569,9 +577,8 @@ void actionTransferSalaryToHome(Human& person, House& house)
 	//printf("\nshop\n");
 	//printf("\npersonal money after shopping = %d\n", person.personal_wealth);
 	//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-	
-}*/ //alternative shopping
 
+}*/ //alternative shopping
 bool actionShopping(Human& person, Workplace& workplace)
 {
 	if (person.x == workplace.x && person.y == workplace.y && person.x_work != workplace.x && person.y_work != workplace.y)
@@ -586,7 +593,6 @@ bool actionShopping(Human& person, Workplace& workplace)
 		return false;
 	}
 }
-
 void actionHouseSupplyBusiness(House& house, Workplace& workplace)
 
 {
@@ -594,7 +600,6 @@ void actionHouseSupplyBusiness(House& house, Workplace& workplace)
 	house.home_wealth = house.home_wealth - 500;
 	workplace.workplace_wealth = workplace.workplace_wealth + 500;
 }
-
 void GovermentFinanceHealthcare()
 
 {
@@ -858,6 +863,35 @@ void EtoItransition(int N, int T) {
 	}
 }
 
+float QReward() {
+	float R = 1;
+
+
+	return R;
+}
+
+void QUpdate(int policy, int T, float R) {
+	float newQ = 0;
+	float alpha = 0.9;
+	float gamma = 0.9;
+	double maxQ = std::max(Qtable[T][0], Qtable[T][1]);
+	maxQ = std::max(maxQ, Qtable[T][2]);
+	maxQ = std::max(maxQ, Qtable[T][3]);
+	maxQ = std::max(maxQ, Qtable[T][4]);
+	maxQ = std::max(maxQ, Qtable[T][5]);
+	maxQ = std::max(maxQ, Qtable[T][6]);
+	newQ = (1 - alpha) * Qtable[T][policy] + alpha * (R + gamma * maxQ);
+	Qtable[T][policy] = newQ;
+}
+
+int pickRandomPolicy() {
+	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+	std::uniform_int_distribution <int> distribution(0, 6);
+	int eps = distribution(generator);  // uniform distribution
+	return eps;
+}
+
 int policy0(int hour, int T) {
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
@@ -925,14 +959,14 @@ int policy0(int hour, int T) {
 					PPL[i].actionWalkFree();
 					for (int m = 0; m < no_workplaces; m++)
 					{
-						if (PPL[i].homeless == 0)
+						if (PPL[i].homeless == 0 && PPL[i].shopped_today == 0)
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
 								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								
+								PPL[i].shopped_today = 1;
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
 								for (int z = 0; z < no_houses; z++)
@@ -945,9 +979,9 @@ int policy0(int hour, int T) {
 									}
 								}
 								//printf("\nshop\n");
-							    //printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
+								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-								
+
 							}
 
 						}
@@ -973,6 +1007,9 @@ int policy0(int hour, int T) {
 					}
 				}
 			}
+		}
+		for (int j = 0; j < N; j++) {
+			PPL[j].shopped_today = 0;
 		}
 	}
 	if (hour > 14 && hour < 19) {
@@ -1022,14 +1059,14 @@ int policy0(int hour, int T) {
 					PPL[i].actionWalkFree();
 					for (int m = 0; m < no_workplaces; m++)
 					{
-						if (PPL[i].homeless == 0)
+						if (PPL[i].homeless == 0 && PPL[i].shopped_today == 0)
 						{
 							if (actionShopping(PPL[i], WRP[m]) == true) // works ok
 							{
 								//printf("\nshop1\n");
 								//printf("\npersonal money pro shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money pro shopping = %d\n", WRP[m].workplace_wealth);
-								
+								PPL[i].shopped_today = 1;
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
 								for (int z = 0; z < no_houses; z++)
@@ -1044,7 +1081,7 @@ int policy0(int hour, int T) {
 								//printf("\nshop\n");
 								//printf("\npersonal money after shopping = %d\n", PPL[i].personal_wealth);
 								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
-								
+
 							}
 
 						}
@@ -1070,6 +1107,9 @@ int policy0(int hour, int T) {
 					}
 				}
 			}
+		}
+		for (int j = 0; j < N; j++) {
+			PPL[j].shopped_today = 0;
 		}
 	}
 	return contactsPerDay;
@@ -1139,7 +1179,7 @@ int policy1(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionWalkFree();
-					
+
 					for (int m = 0; m < no_workplaces; m++)
 					{
 						if (PPL[i].homeless == 0)
@@ -1669,7 +1709,7 @@ int policy3(int hour, int T) {
 }
 int policy4(int hour, int T) {
 	contagion_distance = 1;
-	double contagion_probability = 0.4; // FACEMASK
+	double contagion_probability = 0.2; // FACEMASK
 	int contactsPerDay = 0;
 
 	// MAKE CONDITION FOR CONDITIONAL LOCKDOWN
@@ -1743,7 +1783,7 @@ int policy4(int hour, int T) {
 }
 int policy5(int hour, int T) {
 	contagion_distance = 1;
-	double contagion_probability = 0.4; // FACEMASK
+	double contagion_probability = 0.2; // FACEMASK
 	int contactsPerDay = 0;
 	for (int i = 0; i < N; i++) {
 		if (hour >= 0 && hour < 8) {
@@ -1805,7 +1845,7 @@ int policy5(int hour, int T) {
 }
 int policy6(int hour, int T) {
 	contagion_distance = 1;
-	double contagion_probability = 0.3; // FACEMASK
+	double contagion_probability = 0.2; // FACEMASK
 	int contactsPerDay = 0;
 	for (int timestamp = 0; timestamp < 200; timestamp++) {
 		for (int i = 0; i < N; i++) {
@@ -1835,6 +1875,7 @@ int main()
 	std::ofstream excel_file_WORKPLACES; // excel file for exporting WORKPLACES Objects
 	std::ofstream excel_file_SCHOOL; // excel file for exporting SCHOOL
 	std::ofstream excel_file_HOSPITAL; // excel file for exporting HOSPITAL
+	std::ofstream excel_qtab;
 
 	//Random generators
 
@@ -2074,646 +2115,645 @@ int main()
 		}
 
 	}
-
 	else if (press_button_data == 'n')
 
-  {
-	
-	//Spawn houses
-	for (int i = 0; i < no_houses; i++) {
-		House house;
-		house.x = distribution_x(generator);
-		house.y = distribution_y(generator);
-		house.dx = distribution_dx_house(generator);
-		house.dy = distribution_dy_house(generator);
-		house.social_stratum = distribution_social_stratum(generator);
-		house.no_residents = 0;
-		HOU.push_back(house);
-	}
+	{
 
-	//Spawn workplaces
-	for (int i = 0; i < no_workplaces; i++) {
-		Workplace workplace;
-		workplace.x = distribution_x(generator);
-		workplace.y = distribution_y(generator);
-		workplace.dx = distribution_dx_workplace(generator);
-		workplace.dy = distribution_dy_workplace(generator);
-		workplace.social_stratum = distribution_social_stratum(generator);
-		workplace.no_workers = 0;
-		WRP.push_back(workplace);
-	}
+		//Spawn houses
+		for (int i = 0; i < no_houses; i++) {
+			House house;
+			house.x = distribution_x(generator);
+			house.y = distribution_y(generator);
+			house.dx = distribution_dx_house(generator);
+			house.dy = distribution_dy_house(generator);
+			house.social_stratum = distribution_social_stratum(generator);
+			house.no_residents = 0;
+			HOU.push_back(house);
+		}
+
+		//Spawn workplaces
+		for (int i = 0; i < no_workplaces; i++) {
+			Workplace workplace;
+			workplace.x = distribution_x(generator);
+			workplace.y = distribution_y(generator);
+			workplace.dx = distribution_dx_workplace(generator);
+			workplace.dy = distribution_dy_workplace(generator);
+			workplace.social_stratum = distribution_social_stratum(generator);
+			workplace.no_workers = 0;
+			WRP.push_back(workplace);
+		}
 
 
 
-	//Spawn people
+		//Spawn people
 
-	Workplace emptyWork;
-	emptyWork.x = 0;
-	emptyWork.y = 0;
-	emptyWork.dx = 0;
-	emptyWork.dy = 0;
-	emptyWork.no_workers = 0;
+		Workplace emptyWork;
+		emptyWork.x = 0;
+		emptyWork.y = 0;
+		emptyWork.dx = 0;
+		emptyWork.dy = 0;
+		emptyWork.no_workers = 0;
 
-	House emptyHouse;
-	emptyHouse.x = 0;
-	emptyHouse.y = 0;
-	emptyHouse.dx = 0;
-	emptyHouse.dy = 0;
-	emptyHouse.no_residents = 0;
+		House emptyHouse;
+		emptyHouse.x = 0;
+		emptyHouse.y = 0;
+		emptyHouse.dx = 0;
+		emptyHouse.dy = 0;
+		emptyHouse.no_residents = 0;
 
-	/*
-	for (int i = 0; i < 1; i++){
-		Human person;
+		/*
+		for (int i = 0; i < 1; i++){
+			Human person;
 
-		person.x = 1;
-		person.y = 1;
-		person.dx = 1;
-		person.dy = 1;
-		person.group = 0;
-		person.action = 0;
-		person.homeless = 1;
-		person.unemployed = 1;
-		person.x_home = -1;
-		person.y_home = -1;
-		person.x_work = -1;
-		person.y_work = -1;
-		person.house = emptyHouse;
-		person.work = emptyWork;
-		PPL.push_back(person);
-	}
-	*/
-
-	// S GROUP
-
-	for (int i = 0; i < N - I_init; i++) {
-		Human person;
-
-		person.x = 1;
-		person.y = 1;
-		person.dx = 1;
-		person.dy = 1;
-		float l = distribution_immune(generator);
-		if (l <= (1 - initial_immune_rate)) // initial immunity
-		{
+			person.x = 1;
+			person.y = 1;
+			person.dx = 1;
+			person.dy = 1;
 			person.group = 0;
-		}
-		else
-		{
-			person.group = 3;
-
-		}
-
-		//person.action = 0;
-		person.age = (int)(distribution_age(generator) * 100);
-		float w = distribution_homeless(generator);
-		if (w <= (1 - homeless_rate)) {
-			person.homeless = 0;
-		}
-		else {
+			person.action = 0;
 			person.homeless = 1;
 			person.unemployed = 1;
+			person.x_home = -1;
+			person.y_home = -1;
+			person.x_work = -1;
+			person.y_work = -1;
+			person.house = emptyHouse;
+			person.work = emptyWork;
+			PPL.push_back(person);
 		}
-		if (person.age < 17 || person.age > 66) {
-			person.unemployed = 1;
-		}
-		else {
-			float z = distribution_employeed(generator);
-			if (z <= (1 - unemployment_rate)) {
-				person.unemployed = 0;
-				float z1 = essential_job(generator);
-				if (z1 < 0.2) {
-					person.essential_worker = 1;
-				}
+		*/
+
+		// S GROUP
+
+		for (int i = 0; i < N - I_init; i++) {
+			Human person;
+
+			person.x = 1;
+			person.y = 1;
+			person.dx = 1;
+			person.dy = 1;
+			float l = distribution_immune(generator);
+			if (l <= (1 - initial_immune_rate)) // initial immunity
+			{
+				person.group = 0;
+			}
+			else
+			{
+				person.group = 3;
+
 			}
 
+			//person.action = 0;
+			person.age = (int)(distribution_age(generator) * 100);
+			float w = distribution_homeless(generator);
+			if (w <= (1 - homeless_rate)) {
+				person.homeless = 0;
+			}
 			else {
+				person.homeless = 1;
 				person.unemployed = 1;
 			}
-		}
-		if (person.age < 17) {
-			person.student = 1;
-			school.no_students = school.no_students + 1;
-		}
-		if (person.age > 16) {
-			person.student = 0;
-		}
-
-		person.x_home = -1;
-		person.y_home = -1;
-		person.x_work = -1;
-		person.y_work = -1;
-		person.house = emptyHouse;
-		person.work = emptyWork;
-		PPL.push_back(person);
-	}
-
-	// I GROUP
-
-	for (int i = 0; i < I_init; i++) {
-		Human person;
-
-		person.x = 1;
-		person.y = 1;
-		person.dx = 1;
-		person.dy = 1;
-		person.group = 2;
-		//person.action = 0;
-		person.age = (int)(distribution_age(generator) * 100);
-		person.homeless = 0;
-
-		if (person.age < 17 || person.age > 66) {
-			person.unemployed = 1;
-		}
-		else {
-			float z = distribution_employeed(generator);
-			if (z <= (1 - unemployment_rate)) {
-				person.unemployed = 0;
-				float z1 = essential_job(generator);
-				if (z1 < 0.2) {
-					person.essential_worker = 1;
-				}
-			}
-
-			else {
+			if (person.age < 17 || person.age > 66) {
 				person.unemployed = 1;
 			}
-		}
-		if (person.age < 17) {
-			person.student = 1;
-			school.no_students = school.no_students + 1;
-		}
-		if (person.age > 16) {
-			person.student = 0;
-		}
-
-		person.x_home = -1;
-		person.y_home = -1;
-		person.x_work = -1;
-		person.y_work = -1;
-		person.house = emptyHouse;
-		person.work = emptyWork;
-		person.Iday = 0;
-		PPL.push_back(person);
-	}
-
-	shuffle(PPL.begin(), PPL.end(), std::default_random_engine(seed));
-
-	// assign people to houses
-
-	for (int i = 0; i < no_houses; i++) {
-		int ff = distribution_family(generator);
-		int temp = 0;
-		for (int j = 0; j < N; j++) {
-			if (PPL[j].homeless == 0) {
-				if (PPL[j].x_home == -1) {
-					PPL[j].house = HOU[i];
-					PPL[j].x_home = HOU[i].x;
-					PPL[j].y_home = HOU[i].y;
-					PPL[j].x = HOU[i].x;
-					PPL[j].y = HOU[i].y;
-					HOU[i].no_residents = HOU[i].no_residents + 1;
-					PPL[j].social_stratum = HOU[i].social_stratum;
-					temp = temp + 1;
-					if (temp == ff) {
-						break;
+			else {
+				float z = distribution_employeed(generator);
+				if (z <= (1 - unemployment_rate)) {
+					person.unemployed = 0;
+					float z1 = essential_job(generator);
+					if (z1 < 0.2) {
+						person.essential_worker = 1;
 					}
 				}
+
+				else {
+					person.unemployed = 1;
+				}
 			}
-			if (PPL[j].homeless == 1) {
-				PPL[j].social_stratum = 1;
+			if (person.age < 17) {
+				person.student = 1;
+				school.no_students = school.no_students + 1;
 			}
+			if (person.age > 16) {
+				person.student = 0;
+			}
+
+			person.x_home = -1;
+			person.y_home = -1;
+			person.x_work = -1;
+			person.y_work = -1;
+			person.house = emptyHouse;
+			person.work = emptyWork;
+			PPL.push_back(person);
 		}
-	}
 
-	// Check if everone has a home
+		// I GROUP
 
-	for (int i = 0; i < N; i++) {
-		if (PPL[i].homeless == 0 && PPL[i].x_home == -1 && PPL[i].y_home == -1) {
-			//printf("\nError to houses people assignment\n");
-			PPL[i].homeless = 1;
-			PPL[i].unemployed = 1;
-			PPL[i].social_stratum = 1;
+		for (int i = 0; i < I_init; i++) {
+			Human person;
+
+			person.x = 1;
+			person.y = 1;
+			person.dx = 1;
+			person.dy = 1;
+			person.group = 2;
+			//person.action = 0;
+			person.age = (int)(distribution_age(generator) * 100);
+			person.homeless = 0;
+
+			if (person.age < 17 || person.age > 66) {
+				person.unemployed = 1;
+			}
+			else {
+				float z = distribution_employeed(generator);
+				if (z <= (1 - unemployment_rate)) {
+					person.unemployed = 0;
+					float z1 = essential_job(generator);
+					if (z1 < 0.2) {
+						person.essential_worker = 1;
+					}
+				}
+
+				else {
+					person.unemployed = 1;
+				}
+			}
+			if (person.age < 17) {
+				person.student = 1;
+				school.no_students = school.no_students + 1;
+			}
+			if (person.age > 16) {
+				person.student = 0;
+			}
+
+			person.x_home = -1;
+			person.y_home = -1;
+			person.x_work = -1;
+			person.y_work = -1;
+			person.house = emptyHouse;
+			person.work = emptyWork;
+			person.Iday = 0;
+			PPL.push_back(person);
 		}
-	}
 
-	// assign people to workplaces
+		shuffle(PPL.begin(), PPL.end(), std::default_random_engine(seed));
 
-	for (int i = 0; i < no_workplaces; i++) {
-		int ff = distribution_employees(generator);
-		int temp = 0;
-		for (int j = 0; j < N; j++) {
-			if (PPL[j].unemployed == 0) {
-				if (PPL[j].social_stratum == WRP[i].social_stratum) {
-					if (PPL[j].x_work == -1) {
-						PPL[j].work = WRP[i];
-						PPL[j].x_work = WRP[i].x;
-						PPL[j].y_work = WRP[i].y;
-						WRP[i].no_workers = WRP[i].no_workers + 1;
+		// assign people to houses
+
+		for (int i = 0; i < no_houses; i++) {
+			int ff = distribution_family(generator);
+			int temp = 0;
+			for (int j = 0; j < N; j++) {
+				if (PPL[j].homeless == 0) {
+					if (PPL[j].x_home == -1) {
+						PPL[j].house = HOU[i];
+						PPL[j].x_home = HOU[i].x;
+						PPL[j].y_home = HOU[i].y;
+						PPL[j].x = HOU[i].x;
+						PPL[j].y = HOU[i].y;
+						HOU[i].no_residents = HOU[i].no_residents + 1;
+						PPL[j].social_stratum = HOU[i].social_stratum;
 						temp = temp + 1;
 						if (temp == ff) {
 							break;
 						}
 					}
 				}
+				if (PPL[j].homeless == 1) {
+					PPL[j].social_stratum = 1;
+				}
 			}
 		}
-	}
 
-	std::vector <int> housesx;
-	std::vector <int> housesy;
-	std::vector <int> worksx;
-	std::vector <int> worksy;
+		// Check if everone has a home
 
-	// How many ppl are in each group
-
-	for (int j = 0; j < N; j++) {
-
-		if (PPL[j].social_stratum == 1)
-		{
-			MostPoor_people = MostPoor_people + 1;
+		for (int i = 0; i < N; i++) {
+			if (PPL[i].homeless == 0 && PPL[i].x_home == -1 && PPL[i].y_home == -1) {
+				//printf("\nError to houses people assignment\n");
+				PPL[i].homeless = 1;
+				PPL[i].unemployed = 1;
+				PPL[i].social_stratum = 1;
+			}
 		}
 
-		else if (PPL[j].social_stratum == 2)
-		{
-			Poor_people = Poor_people + 1;
+		// assign people to workplaces
+
+		for (int i = 0; i < no_workplaces; i++) {
+			int ff = distribution_employees(generator);
+			int temp = 0;
+			for (int j = 0; j < N; j++) {
+				if (PPL[j].unemployed == 0) {
+					if (PPL[j].social_stratum == WRP[i].social_stratum) {
+						if (PPL[j].x_work == -1) {
+							PPL[j].work = WRP[i];
+							PPL[j].x_work = WRP[i].x;
+							PPL[j].y_work = WRP[i].y;
+							WRP[i].no_workers = WRP[i].no_workers + 1;
+							temp = temp + 1;
+							if (temp == ff) {
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
 
-		else if (PPL[j].social_stratum == 3)
-		{
-			WorkingClass_people = WorkingClass_people + 1;
-		}
+		std::vector <int> housesx;
+		std::vector <int> housesy;
+		std::vector <int> worksx;
+		std::vector <int> worksy;
 
-		else if (PPL[j].social_stratum == 4)
-		{
-			Rich_people = Rich_people + 1;
-		}
-		else if (PPL[j].social_stratum == 5)
-		{
-			MostRich_people = MostRich_people + 1;
-		}
-		else
-		{
+		// How many ppl are in each group
 
-			printf("\nERROR!! Social Stratum dont assigned for a person\n");
-			//printf("\nhas this guy home : %d\n", PPL[j].x_home);
-			//printf("\nhas this guy work : %d\n", PPL[j].x_work);
-		}
-	}
+		for (int j = 0; j < N; j++) {
 
-	//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_people, Poor_people, WorkingClass_people, Rich_people, MostRich_people);
+			if (PPL[j].social_stratum == 1)
+			{
+				MostPoor_people = MostPoor_people + 1;
+			}
 
-	// Share money, set income, expenses
+			else if (PPL[j].social_stratum == 2)
+			{
+				Poor_people = Poor_people + 1;
+			}
 
-	for (int i = 0; i < N; i++)
+			else if (PPL[j].social_stratum == 3)
+			{
+				WorkingClass_people = WorkingClass_people + 1;
+			}
 
-	{
-		if (PPL[i].unemployed == 1)
-		{
-
-			PPL[i].personal_income = 0;
-
-			if (PPL[i].social_stratum == 1)
+			else if (PPL[j].social_stratum == 4)
+			{
+				Rich_people = Rich_people + 1;
+			}
+			else if (PPL[j].social_stratum == 5)
+			{
+				MostRich_people = MostRich_people + 1;
+			}
+			else
 			{
 
-
-				PPL[i].personal_expenses = 600;
-				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0362) / MostPoor_people);
-				//printf("\nPersonal wealth of very poor person is : %d\n", PPL[i].personal_wealth);
-			}
-
-			else if (PPL[i].social_stratum == 2)
-			{
-
-
-				PPL[i].personal_expenses = 650;
-				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0788) / Poor_people);
-				//printf("\nPersonal wealth of poor person is : %d\n", PPL[i].personal_wealth);
-			}
-
-			else if (PPL[i].social_stratum == 3)
-			{
-
-
-				PPL[i].personal_expenses = 900;
-
-				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.1262) / WorkingClass_people);
-				//printf("\nPersonal wealth of working class person is : %d\n", PPL[i].personal_wealth);
-			}
-
-			else if (PPL[i].social_stratum == 4)
-			{
-
-
-				PPL[i].personal_expenses = 1200;
-
-				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.4388) / Rich_people);
-				//printf("\nPersonal wealth of rich person is : %d\n", PPL[i].personal_wealth);
-			}
-			else if (PPL[i].social_stratum == 5)
-			{
-
-
-				PPL[i].personal_expenses = 1700;
-				PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.5612) / MostRich_people);
-				//printf("\nPersonal wealth of very rich person is : %d\n", PPL[i].personal_wealth);
-			}
-
-		}
-
-		else if (PPL[i].unemployed == 0)
-
-		{
-
-			if (PPL[i].social_stratum == 1)
-			{
-
-				PPL[i].personal_income = 900;
-				PPL[i].personal_expenses = 600;
-				PPL[i].personal_wealth = ((personal_Wealth_total * 0.0362) / MostPoor_people);
-				//printf("\nPersonal wealth of very poor person is : %d\n", PPL[i].personal_wealth);
-			}
-
-			else if (PPL[i].social_stratum == 2)
-			{
-
-				PPL[i].personal_income = 950;
-				PPL[i].personal_expenses = 650;
-				PPL[i].personal_wealth = ((personal_Wealth_total * 0.0788) / Poor_people);
-				//printf("\nPersonal wealth of poor person is : %d\n", PPL[i].personal_wealth);
-			}
-
-			else if (PPL[i].social_stratum == 3)
-			{
-
-				PPL[i].personal_income = 1200;
-				PPL[i].personal_expenses = 900;
-
-				PPL[i].personal_wealth = ((personal_Wealth_total * 0.1262) / WorkingClass_people);
-				//printf("\nPersonal wealth of working class person is : %d\n", PPL[i].personal_wealth);
-			}
-
-			else if (PPL[i].social_stratum == 4)
-			{
-
-				PPL[i].personal_income = 1500;
-				PPL[i].personal_expenses = 1200;
-
-				PPL[i].personal_wealth = ((personal_Wealth_total * 0.4388) / Rich_people);
-				//printf("\nPersonal wealth of rich person is : %d\n", PPL[i].personal_wealth);
-			}
-			else if (PPL[i].social_stratum == 5)
-			{
-
-				PPL[i].personal_income = 2000;
-				PPL[i].personal_expenses = 1700;
-				PPL[i].personal_wealth = ((personal_Wealth_total * 0.5612) / MostRich_people);
-				//printf("\nPersonal wealth of very rich person is : %d\n", PPL[i].personal_wealth);
+				printf("\nERROR!! Social Stratum dont assigned for a person\n");
+				//printf("\nhas this guy home : %d\n", PPL[j].x_home);
+				//printf("\nhas this guy work : %d\n", PPL[j].x_work);
 			}
 		}
 
-	}
+		//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_people, Poor_people, WorkingClass_people, Rich_people, MostRich_people);
 
-	//wealth sharing workplaces
-
-	for (int j = 0; j < no_workplaces; j++)
-
-	{
-
-		if (WRP[j].social_stratum == 1)
-		{
-			MostPoor_workplaces = MostPoor_workplaces + 1;
-		}
-
-		else if (WRP[j].social_stratum == 2)
-		{
-			Poor_workplaces = Poor_workplaces + 1;
-		}
-
-		else if (WRP[j].social_stratum == 3)
-		{
-			WorkingClass_workplaces = WorkingClass_workplaces + 1;
-		}
-
-		else if (WRP[j].social_stratum == 4)
-		{
-			Rich_workplaces = Rich_workplaces + 1;
-		}
-		else if (WRP[j].social_stratum == 5)
-		{
-			MostRich_workplaces = MostRich_workplaces + 1;
-		}
-	}
-	//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_workplaces, Poor_workplaces, WorkingClass_workplaces, Rich_workplaces, MostRich_workplaces);
-
-	for (int i = 0; i < no_workplaces; i++)
-
-	{
-
-		if (WRP[i].social_stratum == 1)
-		{
-
-
-			WRP[i].workplace_wealth = ((business_Wealth_total * 0.0362) / MostPoor_workplaces);
-			//printf("\nWealth of very poor workplace is : %d\n", WRP[i].workplace_wealth);
-		}
-
-		else if (WRP[i].social_stratum == 2)
-		{
-
-
-			WRP[i].workplace_wealth = ((business_Wealth_total * 0.0788) / Poor_workplaces);
-			//printf("\nWealth of poor workplace is : %d\n", WRP[i].workplace_wealth);
-		}
-
-		else if (WRP[i].social_stratum == 3)
-		{
-
-			WRP[i].workplace_wealth = ((business_Wealth_total * 0.1262) / WorkingClass_workplaces);
-			//printf("\nWealth of working class workplace is : %d\n", WRP[i].workplace_wealth);
-		}
-
-		else if (WRP[i].social_stratum == 4)
-		{
-
-			WRP[i].workplace_wealth = ((business_Wealth_total * 0.4388) / Rich_workplaces);
-			//printf("\nWealth of rich workplace is : %d\n", WRP[i].workplace_wealth);
-		}
-		else if (WRP[i].social_stratum == 5)
-		{
-			WRP[i].workplace_wealth = ((business_Wealth_total * 0.5612) / MostRich_workplaces);
-			//printf("\nWealth of very rich workplace is : %d\n", WRP[i].workplace_wealth);
-		}
-	}
-
-	//wealth sharing houses
-
-	for (int j = 0; j < no_houses; j++)
-
-	{
-
-		if (HOU[j].social_stratum == 1)
-		{
-			MostPoor_houses = MostPoor_houses + 1;
-		}
-
-		else if (HOU[j].social_stratum == 2)
-		{
-			Poor_houses = Poor_houses + 1;
-		}
-
-		else if (HOU[j].social_stratum == 3)
-		{
-			WorkingClass_houses = WorkingClass_houses + 1;
-		}
-
-		else if (HOU[j].social_stratum == 4)
-		{
-			Rich_houses = Rich_houses + 1;
-		}
-		else if (HOU[j].social_stratum == 5)
-		{
-			MostRich_houses = MostRich_houses + 1;
-		}
-	}
-	//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_houses, Poor_houses, WorkingClass_houses, Rich_houses, MostRich_houses);
-
-	for (int i = 0; i < no_houses; i++)
-
-	{
-
-		if (HOU[i].social_stratum == 1)
-		{
-
-
-			HOU[i].home_wealth = ((public_Wealth_total * 0.0362) / MostPoor_houses);
-			//printf("\nWealth of very poor home is : %d\n", HOU[i].home_wealth);
-		}
-
-		else if (HOU[i].social_stratum == 2)
-		{
-
-
-			HOU[i].home_wealth = ((public_Wealth_total * 0.0788) / Poor_houses);
-			//printf("\nWealth of poor home is : %d\n", HOU[i].home_wealth);
-		}
-
-		else if (HOU[i].social_stratum == 3)
-		{
-
-			HOU[i].home_wealth = ((public_Wealth_total * 0.1262) / WorkingClass_houses);
-			//printf("\nWealth of working class home is : %d\n", HOU[i].home_wealth);
-		}
-
-		else if (HOU[i].social_stratum == 4)
-		{
-
-			HOU[i].home_wealth = ((public_Wealth_total * 0.4388) / Rich_houses);
-			//printf("\nWealth of rich home is : %d\n", HOU[i].home_wealth);
-		}
-		else if (HOU[i].social_stratum == 5)
-		{
-			HOU[i].home_wealth = ((public_Wealth_total * 0.5612) / MostRich_houses);
-			//printf("\nWealth of very rich home is : %d\n", HOU[i].home_wealth);
-		}
-
-		//printf("\nhome wealth = %d\n", HOU[i].home_wealth);
-	}
-
-
-	/*for (House house : HOU)
-	{
-		housesx.push_back(house.x);
-		housesy.push_back(house.y);
-
-		}
-
-	for (Workplace workplace : WRP)
-	{
-		worksx.push_back(workplace.x);
-		worksy.push_back(workplace.y);
-
-		}*/
-		//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
-		//plot(z, u);
-		/*for (House house : HOU)
-
-		{
-			//printf("\n position_house_x = %d\n", house.x);
-			printf("\n house residents = %d\n", house.no_residents);
-
-		}*/
-		/*for (Workplace workplace : WRP)
-
-		{
-			//printf("\n position_work_x = %d\n", workplace.x);
-			printf("\n employees = %d\n", workplace.no_workers);
-		}
-		*/
-		/*for (Human person1 : PPL)
-		{
-
-			//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
-			printf("\n position_x = %d\n", person1.x_work);
-
-		}*/
-
-
-		// ################### EXCEL FILE
-	char press_button_save;
-	printf("\n Do you want the initiallisation data to be saved? Press y if yes or any other button if not...\n");
-	std::cin >> press_button_save;
-	if (press_button_save == 'y')
-	{
-		excel_file_HOUSES.open("HOUSES_OBJECTS.csv");
-		excel_file_HUMANS.open("HUMAN_OBJECTS.csv");
-		excel_file_WORKPLACES.open("WORKPLACES_OBJECTS.csv");
-		excel_file_SCHOOL.open("SCHOOL_OBJECT.csv");
-		excel_file_HOSPITAL.open("HOSPITAL_OBJECT.csv");
-
-		// DATA SAVE
+		// Share money, set income, expenses
 
 		for (int i = 0; i < N; i++)
 
 		{
-			excel_file_HUMANS << PPL[i].x << "," << PPL[i].y << "," << PPL[i].dx << "," << PPL[i].dy << "," << PPL[i].group << "," << PPL[i].age << "," << PPL[i].homeless << "," << PPL[i].unemployed << "," << PPL[i].x_home << "," << PPL[i].y_home << "," << PPL[i].x_work << "," << PPL[i].y_work << "," << PPL[i].student << "," << PPL[i].social_stratum << "," << PPL[i].personal_income << "," << PPL[i].personal_expenses << "," << PPL[i].personal_wealth << "," << PPL[i].essential_worker << std::endl;
+			if (PPL[i].unemployed == 1)
+			{
+
+				PPL[i].personal_income = 0;
+
+				if (PPL[i].social_stratum == 1)
+				{
+
+
+					PPL[i].personal_expenses = 600;
+					PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0362) / MostPoor_people);
+					//printf("\nPersonal wealth of very poor person is : %d\n", PPL[i].personal_wealth);
+				}
+
+				else if (PPL[i].social_stratum == 2)
+				{
+
+
+					PPL[i].personal_expenses = 650;
+					PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.0788) / Poor_people);
+					//printf("\nPersonal wealth of poor person is : %d\n", PPL[i].personal_wealth);
+				}
+
+				else if (PPL[i].social_stratum == 3)
+				{
+
+
+					PPL[i].personal_expenses = 900;
+
+					PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.1262) / WorkingClass_people);
+					//printf("\nPersonal wealth of working class person is : %d\n", PPL[i].personal_wealth);
+				}
+
+				else if (PPL[i].social_stratum == 4)
+				{
+
+
+					PPL[i].personal_expenses = 1200;
+
+					PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.4388) / Rich_people);
+					//printf("\nPersonal wealth of rich person is : %d\n", PPL[i].personal_wealth);
+				}
+				else if (PPL[i].social_stratum == 5)
+				{
+
+
+					PPL[i].personal_expenses = 1700;
+					PPL[i].personal_wealth = (int)((personal_Wealth_total * 0.5612) / MostRich_people);
+					//printf("\nPersonal wealth of very rich person is : %d\n", PPL[i].personal_wealth);
+				}
+
+			}
+
+			else if (PPL[i].unemployed == 0)
+
+			{
+
+				if (PPL[i].social_stratum == 1)
+				{
+
+					PPL[i].personal_income = 900;
+					PPL[i].personal_expenses = 600;
+					PPL[i].personal_wealth = ((personal_Wealth_total * 0.0362) / MostPoor_people);
+					//printf("\nPersonal wealth of very poor person is : %d\n", PPL[i].personal_wealth);
+				}
+
+				else if (PPL[i].social_stratum == 2)
+				{
+
+					PPL[i].personal_income = 950;
+					PPL[i].personal_expenses = 650;
+					PPL[i].personal_wealth = ((personal_Wealth_total * 0.0788) / Poor_people);
+					//printf("\nPersonal wealth of poor person is : %d\n", PPL[i].personal_wealth);
+				}
+
+				else if (PPL[i].social_stratum == 3)
+				{
+
+					PPL[i].personal_income = 1200;
+					PPL[i].personal_expenses = 900;
+
+					PPL[i].personal_wealth = ((personal_Wealth_total * 0.1262) / WorkingClass_people);
+					//printf("\nPersonal wealth of working class person is : %d\n", PPL[i].personal_wealth);
+				}
+
+				else if (PPL[i].social_stratum == 4)
+				{
+
+					PPL[i].personal_income = 1500;
+					PPL[i].personal_expenses = 1200;
+
+					PPL[i].personal_wealth = ((personal_Wealth_total * 0.4388) / Rich_people);
+					//printf("\nPersonal wealth of rich person is : %d\n", PPL[i].personal_wealth);
+				}
+				else if (PPL[i].social_stratum == 5)
+				{
+
+					PPL[i].personal_income = 2000;
+					PPL[i].personal_expenses = 1700;
+					PPL[i].personal_wealth = ((personal_Wealth_total * 0.5612) / MostRich_people);
+					//printf("\nPersonal wealth of very rich person is : %d\n", PPL[i].personal_wealth);
+				}
+			}
 
 		}
 
-		for (int i = 0; i < no_houses; i++)
+		//wealth sharing workplaces
+
+		for (int j = 0; j < no_workplaces; j++)
 
 		{
-			excel_file_HOUSES << HOU[i].x << "," << HOU[i].y << "," << HOU[i].dx << "," << HOU[i].dy << "," << HOU[i].no_residents << "," << HOU[i].social_stratum << "," << HOU[i].home_wealth << std::endl;
 
+			if (WRP[j].social_stratum == 1)
+			{
+				MostPoor_workplaces = MostPoor_workplaces + 1;
+			}
+
+			else if (WRP[j].social_stratum == 2)
+			{
+				Poor_workplaces = Poor_workplaces + 1;
+			}
+
+			else if (WRP[j].social_stratum == 3)
+			{
+				WorkingClass_workplaces = WorkingClass_workplaces + 1;
+			}
+
+			else if (WRP[j].social_stratum == 4)
+			{
+				Rich_workplaces = Rich_workplaces + 1;
+			}
+			else if (WRP[j].social_stratum == 5)
+			{
+				MostRich_workplaces = MostRich_workplaces + 1;
+			}
 		}
+		//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_workplaces, Poor_workplaces, WorkingClass_workplaces, Rich_workplaces, MostRich_workplaces);
 
 		for (int i = 0; i < no_workplaces; i++)
 
 		{
-			excel_file_WORKPLACES << WRP[i].x << "," << WRP[i].y << "," << WRP[i].dx << "," << WRP[i].dy << "," << WRP[i].no_workers << "," << WRP[i].social_stratum << "," << WRP[i].workplace_wealth << std::endl;
 
+			if (WRP[i].social_stratum == 1)
+			{
+
+
+				WRP[i].workplace_wealth = ((business_Wealth_total * 0.0362) / MostPoor_workplaces);
+				//printf("\nWealth of very poor workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+
+			else if (WRP[i].social_stratum == 2)
+			{
+
+
+				WRP[i].workplace_wealth = ((business_Wealth_total * 0.0788) / Poor_workplaces);
+				//printf("\nWealth of poor workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+
+			else if (WRP[i].social_stratum == 3)
+			{
+
+				WRP[i].workplace_wealth = ((business_Wealth_total * 0.1262) / WorkingClass_workplaces);
+				//printf("\nWealth of working class workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+
+			else if (WRP[i].social_stratum == 4)
+			{
+
+				WRP[i].workplace_wealth = ((business_Wealth_total * 0.4388) / Rich_workplaces);
+				//printf("\nWealth of rich workplace is : %d\n", WRP[i].workplace_wealth);
+			}
+			else if (WRP[i].social_stratum == 5)
+			{
+				WRP[i].workplace_wealth = ((business_Wealth_total * 0.5612) / MostRich_workplaces);
+				//printf("\nWealth of very rich workplace is : %d\n", WRP[i].workplace_wealth);
+			}
 		}
 
-		for (int i = 0; i < 1; i++)
+		//wealth sharing houses
+
+		for (int j = 0; j < no_houses; j++)
 
 		{
-			excel_file_SCHOOL << school.x << "," << school.y << "," << school.dx << "," << school.dy << "," << school.no_students << std::endl;
 
+			if (HOU[j].social_stratum == 1)
+			{
+				MostPoor_houses = MostPoor_houses + 1;
+			}
+
+			else if (HOU[j].social_stratum == 2)
+			{
+				Poor_houses = Poor_houses + 1;
+			}
+
+			else if (HOU[j].social_stratum == 3)
+			{
+				WorkingClass_houses = WorkingClass_houses + 1;
+			}
+
+			else if (HOU[j].social_stratum == 4)
+			{
+				Rich_houses = Rich_houses + 1;
+			}
+			else if (HOU[j].social_stratum == 5)
+			{
+				MostRich_houses = MostRich_houses + 1;
+			}
 		}
+		//printf("\nMP = %d, P = %d, wc = %d, r = %d, mr = %d \n", MostPoor_houses, Poor_houses, WorkingClass_houses, Rich_houses, MostRich_houses);
 
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < no_houses; i++)
 
 		{
-			excel_file_HOSPITAL << HOS.x << "," << HOS.y << "," << HOS.infected_hospitalized << "," << HOS.intected_severe << std::endl;
 
+			if (HOU[i].social_stratum == 1)
+			{
+
+
+				HOU[i].home_wealth = ((public_Wealth_total * 0.0362) / MostPoor_houses);
+				//printf("\nWealth of very poor home is : %d\n", HOU[i].home_wealth);
+			}
+
+			else if (HOU[i].social_stratum == 2)
+			{
+
+
+				HOU[i].home_wealth = ((public_Wealth_total * 0.0788) / Poor_houses);
+				//printf("\nWealth of poor home is : %d\n", HOU[i].home_wealth);
+			}
+
+			else if (HOU[i].social_stratum == 3)
+			{
+
+				HOU[i].home_wealth = ((public_Wealth_total * 0.1262) / WorkingClass_houses);
+				//printf("\nWealth of working class home is : %d\n", HOU[i].home_wealth);
+			}
+
+			else if (HOU[i].social_stratum == 4)
+			{
+
+				HOU[i].home_wealth = ((public_Wealth_total * 0.4388) / Rich_houses);
+				//printf("\nWealth of rich home is : %d\n", HOU[i].home_wealth);
+			}
+			else if (HOU[i].social_stratum == 5)
+			{
+				HOU[i].home_wealth = ((public_Wealth_total * 0.5612) / MostRich_houses);
+				//printf("\nWealth of very rich home is : %d\n", HOU[i].home_wealth);
+			}
+
+			//printf("\nhome wealth = %d\n", HOU[i].home_wealth);
 		}
 
-		excel_file_HOUSES.close();
-		excel_file_HUMANS.close();
-		excel_file_WORKPLACES.close();
-		excel_file_SCHOOL.close();
-		excel_file_HOSPITAL.close();
 
-	}
+		/*for (House house : HOU)
+		{
+			housesx.push_back(house.x);
+			housesy.push_back(house.y);
+
+			}
+
+		for (Workplace workplace : WRP)
+		{
+			worksx.push_back(workplace.x);
+			worksy.push_back(workplace.y);
+
+			}*/
+			//Plotdata z(-3.0, 3.0), u = sin(z) - 0.5 * z;
+			//plot(z, u);
+			/*for (House house : HOU)
+
+			{
+				//printf("\n position_house_x = %d\n", house.x);
+				printf("\n house residents = %d\n", house.no_residents);
+
+			}*/
+			/*for (Workplace workplace : WRP)
+
+			{
+				//printf("\n position_work_x = %d\n", workplace.x);
+				printf("\n employees = %d\n", workplace.no_workers);
+			}
+			*/
+			/*for (Human person1 : PPL)
+			{
+
+				//if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
+				printf("\n position_x = %d\n", person1.x_work);
+
+			}*/
+
+
+			// ################### EXCEL FILE
+		char press_button_save;
+		printf("\n Do you want the initiallisation data to be saved? Press y if yes or any other button if not...\n");
+		std::cin >> press_button_save;
+		if (press_button_save == 'y')
+		{
+			excel_file_HOUSES.open("HOUSES_OBJECTS.csv");
+			excel_file_HUMANS.open("HUMAN_OBJECTS.csv");
+			excel_file_WORKPLACES.open("WORKPLACES_OBJECTS.csv");
+			excel_file_SCHOOL.open("SCHOOL_OBJECT.csv");
+			excel_file_HOSPITAL.open("HOSPITAL_OBJECT.csv");
+
+			// DATA SAVE
+
+			for (int i = 0; i < N; i++)
+
+			{
+				excel_file_HUMANS << PPL[i].x << "," << PPL[i].y << "," << PPL[i].dx << "," << PPL[i].dy << "," << PPL[i].group << "," << PPL[i].age << "," << PPL[i].homeless << "," << PPL[i].unemployed << "," << PPL[i].x_home << "," << PPL[i].y_home << "," << PPL[i].x_work << "," << PPL[i].y_work << "," << PPL[i].student << "," << PPL[i].social_stratum << "," << PPL[i].personal_income << "," << PPL[i].personal_expenses << "," << PPL[i].personal_wealth << "," << PPL[i].essential_worker << std::endl;
+
+			}
+
+			for (int i = 0; i < no_houses; i++)
+
+			{
+				excel_file_HOUSES << HOU[i].x << "," << HOU[i].y << "," << HOU[i].dx << "," << HOU[i].dy << "," << HOU[i].no_residents << "," << HOU[i].social_stratum << "," << HOU[i].home_wealth << std::endl;
+
+			}
+
+			for (int i = 0; i < no_workplaces; i++)
+
+			{
+				excel_file_WORKPLACES << WRP[i].x << "," << WRP[i].y << "," << WRP[i].dx << "," << WRP[i].dy << "," << WRP[i].no_workers << "," << WRP[i].social_stratum << "," << WRP[i].workplace_wealth << std::endl;
+
+			}
+
+			for (int i = 0; i < 1; i++)
+
+			{
+				excel_file_SCHOOL << school.x << "," << school.y << "," << school.dx << "," << school.dy << "," << school.no_students << std::endl;
+
+			}
+
+			for (int i = 0; i < 1; i++)
+
+			{
+				excel_file_HOSPITAL << HOS.x << "," << HOS.y << "," << HOS.infected_hospitalized << "," << HOS.intected_severe << std::endl;
+
+			}
+
+			excel_file_HOUSES.close();
+			excel_file_HUMANS.close();
+			excel_file_WORKPLACES.close();
+			excel_file_SCHOOL.close();
+			excel_file_HOSPITAL.close();
+
+		}
 
 
 	}
@@ -2725,13 +2765,10 @@ int main()
 		return 0;
 
 	}*/
-
-
-
 	//printf("\ntotal houses are = %d\n", no_houses);
 	//printf("\ntottal workplaces are = %d\n", no_workplaces);
 
-	
+
 	excel_file_initialization.open("initiallisation_houses_works.csv");  //excel_file.open("initiallisation_houses_works.csv", std::ios::app);  this way if we dont want to erase old data
 
 	for (int i = 0; i < N; i++)
@@ -2757,13 +2794,13 @@ int main()
 
 	}
 
-	
+
 	// debbuging
 
 		//printf("\nxhome = %d, yhome = %d \n", PPL[55].x_home, PPL[55].y_home);
 		//printf("\nxwork = %d, ywork = %d \n", PPL[55].x_work, PPL[55].y_work);
 
-	
+
 
 	std::vector<float> Sarray;
 	std::vector<float> Earray;
@@ -2886,9 +2923,51 @@ int main()
 
 	int policyx;
 	bool choice = false;
-	printf("\nChoose the policy you want to simulate...\n");
-	printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
-	std::cin >> policyx;
+	//printf("\nChoose starting policy...\n");
+	//printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
+	//std::cin >> policyx;
+
+	char inputData;
+	printf("\nRead Qtable? y - yes, other - no\n");
+	std::cin >> inputData;
+	if (inputData == 'y') {
+		std::string fileName;
+		printf("\ninput file name: \n");
+		std::cin >> fileName;
+
+		std::ifstream read_excel_qtab(fileName);
+
+		for (int i = 0; i < SimulationTime; i++) {
+			std::string qForPol0;
+			std::string qForPol1;
+			std::string qForPol2;
+			std::string qForPol3;
+			std::string qForPol4;
+			std::string qForPol5;
+			std::string qForPol6;
+
+
+			std::getline(read_excel_qtab, qForPol0, ',');
+			Qtable[i][0] = std::stod(qForPol0);
+			std::getline(read_excel_qtab, qForPol1, ',');
+			Qtable[i][1] = std::stod(qForPol1);
+			std::getline(read_excel_qtab, qForPol2, ',');
+			Qtable[i][2] = std::stod(qForPol2);
+			std::getline(read_excel_qtab, qForPol3, ',');
+			Qtable[i][3] = std::stod(qForPol3);
+			std::getline(read_excel_qtab, qForPol4, ',');
+			Qtable[i][4] = std::stod(qForPol4);
+			std::getline(read_excel_qtab, qForPol5, ',');
+			Qtable[i][5] = std::stod(qForPol5);
+			std::getline(read_excel_qtab, qForPol6);
+			Qtable[i][6] = std::stod(qForPol6);
+
+
+			//printf("\nx = %d, y = %d, ih = %d, is = %d\n", HOS.x, HOS.y, HOS.infected_hospitalized, HOS.intected_severe);
+		}
+	}
+
+
 
 	// MAIN LOOP
 
@@ -2905,9 +2984,14 @@ int main()
 
 		contactsPerDay1 = 0;
 
-	
+		policyx = pickRandomPolicy();
+
+
+
 
 		EtoItransition(N, T);
+
+
 
 		// ###################   24 H LOOP 
 
@@ -2925,68 +3009,65 @@ int main()
 		}
 		// END OF CODE FOR POLICY 4
 
-	
+
 		if (policyx == 0)
+		{
+			for (int hour = 0; hour < 24; hour++)
 			{
-				for (int hour = 0; hour < 24; hour++)
-				{
-					contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
-				}
+				contactsPerDay1 = contactsPerDay1 + policy0(hour, T);
 			}
+		}
+		else if (policyx == 1)
+		{
+			for (int hour = 0; hour < 24; hour++)
+			{
+				contactsPerDay1 = contactsPerDay1 + policy1(hour, T);
+			}
+		}
+		else if (policyx == 2)
+		{
+			for (int hour = 0; hour < 24; hour++)
+			{
+				contactsPerDay1 = contactsPerDay1 + policy2(hour, T);
+			}
+		}
+		else if (policyx == 3)
+		{
+			for (int hour = 0; hour < 24; hour++)
+			{
+				contactsPerDay1 = contactsPerDay1 + policy3(hour, T);
+			}
+		}
+		else if (policyx == 4)
+		{
+			for (int hour = 0; hour < 24; hour++)
+			{
+				contactsPerDay1 = contactsPerDay1 + policy4(hour, T);
+			}
+		}
+		else if (policyx == 5)
+		{
+			for (int hour = 0; hour < 24; hour++)
+			{
+				contactsPerDay1 = contactsPerDay1 + policy5(hour, T);
+			}
+		}
+		else if (policyx == 6)
+		{
+			for (int hour = 0; hour < 24; hour++)
+			{
+				contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
+			}
+		}
+		else
+		{
 
-			else if (policyx == 1)
-			{
-				for (int hour = 0; hour < 24; hour++)
-				{
-					contactsPerDay1 = contactsPerDay1 + policy1(hour, T);
-				}
-			}
+			printf("\nWrong choice, the program will exit...Try again...\n");
 
-			else if (policyx == 2)
-			{
-				for (int hour = 0; hour < 24; hour++)
-				{
-					contactsPerDay1 = contactsPerDay1 + policy2(hour, T);
-				}
-			}
+			getchar();
+			return 0;
+		}
 
-			else if (policyx == 3)
-			{
-				for (int hour = 0; hour < 24; hour++)
-				{
-					contactsPerDay1 = contactsPerDay1 + policy3(hour, T);
-				}
-			}
-			else if (policyx == 4)
-			{
-				for (int hour = 0; hour < 24; hour++)
-				{
-					contactsPerDay1 = contactsPerDay1 + policy4(hour, T);
-				}
-			}
-			else if (policyx == 5)
-			{
-				for (int hour = 0; hour < 24; hour++)
-				{
-					contactsPerDay1 = contactsPerDay1 + policy5(hour, T);
-				}
-			}
-			else if (policyx == 6)
-			{
-				for (int hour = 0; hour < 24; hour++)
-				{
-					contactsPerDay1 = contactsPerDay1 + policy6(hour, T);
-				}
-			}
-			else
-			{
-
-				printf("\nWrong choice, the program will exit...Try again...\n");
-
-				getchar();
-				return 0;
-			}
-		
 		// ### END OF 24 H LOOP
 
 		// finances ppl - houses, hospital fee
@@ -3034,7 +3115,7 @@ int main()
 				//printf("\ngov money after bills_h = %d\n", goverment_wealth_total);
 				std::uniform_int_distribution <int> distribution_supply(0, no_workplaces);
 
-			int z = distribution_supply(generator);
+				int z = distribution_supply(generator);
 				//printf("\nhome money before supply = %d\n", HOU[j].home_wealth);
 				//printf("\nwork money pro supply = %d\n", WRP[z].workplace_wealth);
 				actionHouseSupplyBusiness(HOU[j], WRP[z]);
@@ -3209,13 +3290,17 @@ int main()
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
+		QUpdate(policyx, T, QReward());
+
+
+
 		T++;
-		if (T == 100) {
+		if (T == SimulationTime) {
 			done = true;
 		}
 
 	}
-	
+
 
 
 	excel_file_SEIR_results.open("SEIR_Results.csv");
@@ -3238,17 +3323,32 @@ int main()
 
 	printf("\nFinancial results excel file done!\n");
 
-	float financial_difference_people = (((Personal_Wealth_Array[90] - Personal_Wealth_Array[0]) / Personal_Wealth_Array[0])*100);
+	float financial_difference_people = (((Personal_Wealth_Array[90] - Personal_Wealth_Array[0]) / Personal_Wealth_Array[0]) * 100);
 	printf("\nbusiness wealth T - 1 = %d\n", Business_Wealth_Array[90]);
 	printf("\nbusiness wealth 0 = %d\n", Business_Wealth_Array[0]);
-	float financial_difference_houses = (((House_Wealth_Array[90] - House_Wealth_Array[0]) / House_Wealth_Array[0])*100);
-	float financial_difference_business = (((Business_Wealth_Array[90] - Business_Wealth_Array[0]) / Business_Wealth_Array[0])* 100);
-	float financial_difference_gov = (((Goverment_Wealth_Array[90] - Goverment_Wealth_Array[0]) / Goverment_Wealth_Array[0])* 100);
+	float financial_difference_houses = (((House_Wealth_Array[90] - House_Wealth_Array[0]) / House_Wealth_Array[0]) * 100);
+	float financial_difference_business = (((Business_Wealth_Array[90] - Business_Wealth_Array[0]) / Business_Wealth_Array[0]) * 100);
+	float financial_difference_gov = (((Goverment_Wealth_Array[90] - Goverment_Wealth_Array[0]) / Goverment_Wealth_Array[0]) * 100);
 
 	printf("\nFinancial difference in people is %f\n", financial_difference_people);
 	printf("\nFinancial difference in houses is %f\n", financial_difference_houses);
 	printf("\nFinancial difference in businesses is %f\n", financial_difference_business);
 	printf("\nFinancial difference in goverment is %f\n", financial_difference_gov);
+
+	char press_button_data1;
+	printf("\nDo you want to save Q table? y - yes, other - no\n");
+	std::cin >> press_button_data1;
+	if (press_button_data1 == 'y') {
+		printf("\nInput file name: \n");
+		std::string QtableFileName;
+		std::cin >> QtableFileName;
+		excel_qtab.open(QtableFileName);
+		//excel_qtab.open("po.csv");
+		for (int i = 0; i < SimulationTime; i++) {
+			excel_qtab << Qtable[i][0] << "," << Qtable[i][1] << "," << Qtable[i][2] << "," << Qtable[i][3] << "," << Qtable[i][4] << "," << Qtable[i][5] << "," << Qtable[i][6] << std::endl;
+		}
+		excel_qtab.close();
+	}
 
 	printf("\nSimulation completed!\n");
 
