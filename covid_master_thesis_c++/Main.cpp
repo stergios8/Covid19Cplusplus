@@ -133,7 +133,7 @@ public:
 	int workplace_wealth;
 	int workplace_income;
 	int workplace_expense;
-
+	float profit;
 	void actionPayBills() {
 		workplace_wealth = workplace_wealth - workplace_tax;
 		goverment_wealth_total = goverment_wealth_total + workplace_tax;
@@ -612,6 +612,11 @@ void GovermentAid(Human& person)
 
 	goverment_wealth_total = goverment_wealth_total - goverment_aid;
 	person.personal_wealth = person.personal_wealth + goverment_aid;
+
+}
+void BusinessProfit(Workplace& workplace)
+{
+	workplace.workplace_wealth = (workplace.workplace_wealth + (workplace.profit * workplace.workplace_wealth));
 
 }
 
@@ -1947,6 +1952,7 @@ int main()
 			std::string dx;
 			std::string dy;
 			std::string ss;
+			std::string profit;
 			std::string nw;
 			std::string ww;
 			Workplace workplace;
@@ -1964,10 +1970,12 @@ int main()
 			workplace.no_workers = std::stoi(nw);
 			std::getline(read_excel_WORKPLACES, ss, ',');
 			workplace.social_stratum = std::stoi(ss);
+			std::getline(read_excel_WORKPLACES, profit, ',');
+			workplace.profit = std::stoi(profit);
 			std::getline(read_excel_WORKPLACES, ww);
 			workplace.workplace_wealth = std::stoi(ww);
 			WRP.push_back(workplace);
-			//	printf("\nx = %d, y = %d, dx = %d, dy = %d, nw = %d, ss = %d, ww = %d\n", WRP[i].x, WRP[i].y, WRP[i].dx, WRP[i].dy, WRP[i].no_workers, WRP[i].social_stratum, WRP[i].workplace_wealth);
+			//	printf("\nx = %d, y = %d, dx = %d, dy = %d, nw = %d, ss = %d,profit = %f, ww = %d\n", WRP[i].x, WRP[i].y, WRP[i].dx, WRP[i].dy, WRP[i].no_workers, WRP[i].social_stratum, WRP[i].profit, WRP[i].workplace_wealth);
 
 		}
 		//spawn people
@@ -2139,6 +2147,23 @@ int main()
 			workplace.dx = distribution_dx_workplace(generator);
 			workplace.dy = distribution_dy_workplace(generator);
 			workplace.social_stratum = distribution_social_stratum(generator);
+			if (workplace.social_stratum == 1 || workplace.social_stratum == 2)
+			{
+				workplace.profit = 0.0005;
+
+			}
+			else if (workplace.social_stratum == 3)
+			{
+
+				workplace.profit = 0.001;
+			}
+
+			else if (workplace.social_stratum == 4 || workplace.social_stratum == 5)
+
+			{
+				workplace.profit = 0.002;
+
+			}
 			workplace.no_workers = 0;
 			WRP.push_back(workplace);
 		}
@@ -2729,7 +2754,7 @@ int main()
 			for (int i = 0; i < no_workplaces; i++)
 
 			{
-				excel_file_WORKPLACES << WRP[i].x << "," << WRP[i].y << "," << WRP[i].dx << "," << WRP[i].dy << "," << WRP[i].no_workers << "," << WRP[i].social_stratum << "," << WRP[i].workplace_wealth << std::endl;
+				excel_file_WORKPLACES << WRP[i].x << "," << WRP[i].y << "," << WRP[i].dx << "," << WRP[i].dy << "," << WRP[i].no_workers << "," << WRP[i].social_stratum << "," << WRP[i].profit << "," << WRP[i].workplace_wealth << std::endl;
 
 			}
 
@@ -2923,11 +2948,11 @@ int main()
 
 	int policyx;
 	bool choice = false;
-	//printf("\nChoose starting policy...\n");
-	//printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
-	//std::cin >> policyx;
+	printf("\nChoose starting policy...\n");
+	printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
+	std::cin >> policyx;
 
-	char inputData;
+	/*char inputData;
 	printf("\nRead Qtable? y - yes, other - no\n");
 	std::cin >> inputData;
 	if (inputData == 'y') {
@@ -2966,7 +2991,7 @@ int main()
 			//printf("\nx = %d, y = %d, ih = %d, is = %d\n", HOS.x, HOS.y, HOS.infected_hospitalized, HOS.intected_severe);
 		}
 	}
-
+	*/
 
 
 	// MAIN LOOP
@@ -2984,7 +3009,7 @@ int main()
 
 		contactsPerDay1 = 0;
 
-		policyx = pickRandomPolicy();
+		//policyx = pickRandomPolicy();
 
 
 
@@ -3102,6 +3127,10 @@ int main()
 				//printf("\nwork money pro bills = %d\n", WRP[i].workplace_wealth);
 				//printf("\ngov money pro bills_w = %d\n", goverment_wealth_total);
 				WRP[i].actionPayBills(); // works
+				if (policyx == 0 || policyx == 1)
+				{
+					BusinessProfit(WRP[i]);
+				}
 				//printf("\nwork money after bills = %d\n", WRP[i].workplace_wealth);
 				//printf("\ngov money after_w bills = %d\n", goverment_wealth_total);
 
