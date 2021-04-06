@@ -66,7 +66,7 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
-int SimulationTime = 30; // Simulation time in days.
+int SimulationTime = 92; // Simulation time in days.
 
 double Qtable[30][7]; // first bracked must be the same as simulation time. 
 
@@ -103,7 +103,7 @@ int I_icu_max = N * 0.01; // 4
 int workplace_tax = 1000;
 int house_tax = 500;
 
-
+int clients = 0;
 
 class House {
 public:
@@ -616,8 +616,9 @@ void GovermentAid(Human& person)
 }
 void BusinessProfit(Workplace& workplace)
 {
-	workplace.workplace_wealth = (workplace.workplace_wealth + (workplace.profit * workplace.workplace_wealth));
-
+	//workplace.workplace_wealth = (workplace.workplace_wealth + (workplace.profit * workplace.workplace_wealth));
+	workplace.workplace_wealth = (workplace.workplace_wealth + ((workplace.profit * workplace.workplace_wealth)/30));
+	//printf("\npercentage is equal to %f\n", (workplace.profit * workplace.workplace_wealth) / 30);
 }
 
 
@@ -974,6 +975,10 @@ int policy0(int hour, int T) {
 								PPL[i].shopped_today = 1;
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								//printf("\nwork money pro profit = %d\n", WRP[m].workplace_wealth);
+								//clients = clients + 1;
+								//WRP[m].workplace_wealth = WRP[m].workplace_wealth + ((PPL[i].personal_expenses/60) * (WRP[m].profit));
+								//printf("\nwork money after shopping = %d\n", WRP[m].workplace_wealth);
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1074,6 +1079,8 @@ int policy0(int hour, int T) {
 								PPL[i].shopped_today = 1;
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								//WRP[m].workplace_wealth = WRP[m].workplace_wealth + ((PPL[i].personal_expenses / 60) * (WRP[m].profit));
+								//clients = clients + 1;
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1113,6 +1120,17 @@ int policy0(int hour, int T) {
 				}
 			}
 		}
+		/*for (int i = 0; i < no_workplaces; i++)
+		{
+
+			printf("\nworks's clients are %d\n", clients);
+			printf("\namount are %f\n", (((PPL[i].personal_expenses)*clients)* WRP[i].profit));
+			printf("\nwork money pro profit= %d\n", WRP[i].workplace_wealth);
+			WRP[i].workplace_wealth = WRP[i].workplace_wealth + (((PPL[i].personal_expenses)*clients)* WRP[i].profit);
+			printf("\nwork money after profit = %d\n", WRP[i].workplace_wealth);
+			clients = 0;
+		}*/
+
 		for (int j = 0; j < N; j++) {
 			PPL[j].shopped_today = 0;
 		}
@@ -1197,6 +1215,7 @@ int policy1(int hour, int T) {
 
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1292,6 +1311,7 @@ int policy1(int hour, int T) {
 
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1400,6 +1420,7 @@ int policy2(int hour, int T) {
 
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+						
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1482,6 +1503,7 @@ int policy2(int hour, int T) {
 
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+								
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1590,6 +1612,7 @@ int policy3(int hour, int T) {
 
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+						
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1671,6 +1694,7 @@ int policy3(int hour, int T) {
 
 								PPL[i].personal_wealth = PPL[i].personal_wealth - (PPL[i].personal_expenses / 60);
 								WRP[m].workplace_wealth = WRP[m].workplace_wealth + (PPL[i].personal_expenses / 60);
+						
 								for (int z = 0; z < no_houses; z++)
 								{
 									if (HOU[z].x == PPL[i].x_home && HOU[z].y == PPL[i].y_home)
@@ -1971,11 +1995,11 @@ int main()
 			std::getline(read_excel_WORKPLACES, ss, ',');
 			workplace.social_stratum = std::stoi(ss);
 			std::getline(read_excel_WORKPLACES, profit, ',');
-			workplace.profit = std::stoi(profit);
+			workplace.profit = std::stof(profit);
 			std::getline(read_excel_WORKPLACES, ww);
 			workplace.workplace_wealth = std::stoi(ww);
 			WRP.push_back(workplace);
-			//	printf("\nx = %d, y = %d, dx = %d, dy = %d, nw = %d, ss = %d,profit = %f, ww = %d\n", WRP[i].x, WRP[i].y, WRP[i].dx, WRP[i].dy, WRP[i].no_workers, WRP[i].social_stratum, WRP[i].profit, WRP[i].workplace_wealth);
+				//printf("\nx = %d, y = %d, dx = %d, dy = %d, nw = %d, ss = %d,profit = %f, ww = %d\n", WRP[i].x, WRP[i].y, WRP[i].dx, WRP[i].dy, WRP[i].no_workers, WRP[i].social_stratum, WRP[i].profit, WRP[i].workplace_wealth);
 
 		}
 		//spawn people
@@ -2149,22 +2173,23 @@ int main()
 			workplace.social_stratum = distribution_social_stratum(generator);
 			if (workplace.social_stratum == 1 || workplace.social_stratum == 2)
 			{
-				workplace.profit = 0.0005;
+				workplace.profit = 0.001;
 
 			}
 			else if (workplace.social_stratum == 3)
 			{
 
-				workplace.profit = 0.001;
+				workplace.profit = 0.005;
 			}
 
 			else if (workplace.social_stratum == 4 || workplace.social_stratum == 5)
 
 			{
-				workplace.profit = 0.002;
+				workplace.profit = 0.01;
 
 			}
 			workplace.no_workers = 0;
+		
 			WRP.push_back(workplace);
 		}
 
@@ -3117,7 +3142,17 @@ int main()
 				//printf("\npersonal money after fee = %d\n", PPL[i].personal_wealth);
 			}
 		}
+	for (int i = 0; i < no_workplaces; i++)
+		{
 
+			if ((policyx == 0 || policyx == 1) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+			{
+				//printf("\nwork money pro profit = %d\n", WRP[i].workplace_wealth);
+				BusinessProfit(WRP[i]);
+				//printf("\nwork money after profit = %d\n", WRP[i].workplace_wealth);
+			}
+		}
+		
 		// salaries, taxes at the end of the month
 		if (T == 30 || T == 60 || T == 90 || T == 120 || T == 150 || T == 180)
 			//if (T == 2)
@@ -3127,10 +3162,12 @@ int main()
 				//printf("\nwork money pro bills = %d\n", WRP[i].workplace_wealth);
 				//printf("\ngov money pro bills_w = %d\n", goverment_wealth_total);
 				WRP[i].actionPayBills(); // works
-				if (policyx == 0 || policyx == 1)
+				/*if(policyx == 0 || policyx == 1)
 				{
+					//printf("\nwork money pro profit = %d\n", WRP[i].workplace_wealth);
 					BusinessProfit(WRP[i]);
-				}
+					//printf("\nwork money after profit = %d\n", WRP[i].workplace_wealth);
+				}*/
 				//printf("\nwork money after bills = %d\n", WRP[i].workplace_wealth);
 				//printf("\ngov money after_w bills = %d\n", goverment_wealth_total);
 
@@ -3319,7 +3356,7 @@ int main()
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
-		QUpdate(policyx, T, QReward());
+		//QUpdate(policyx, T, QReward());
 
 
 
@@ -3364,7 +3401,7 @@ int main()
 	printf("\nFinancial difference in businesses is %f\n", financial_difference_business);
 	printf("\nFinancial difference in goverment is %f\n", financial_difference_gov);
 
-	char press_button_data1;
+	/*char press_button_data1;
 	printf("\nDo you want to save Q table? y - yes, other - no\n");
 	std::cin >> press_button_data1;
 	if (press_button_data1 == 'y') {
@@ -3377,7 +3414,7 @@ int main()
 			excel_qtab << Qtable[i][0] << "," << Qtable[i][1] << "," << Qtable[i][2] << "," << Qtable[i][3] << "," << Qtable[i][4] << "," << Qtable[i][5] << "," << Qtable[i][6] << std::endl;
 		}
 		excel_qtab.close();
-	}
+	}*/
 
 	printf("\nSimulation completed!\n");
 
