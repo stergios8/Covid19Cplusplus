@@ -34,6 +34,8 @@ int goverment_aid = 400;
 int delta_business_wealth_total;
 int delta_houses_wealth_total;
 int delta_people_wealth_total;
+float financial_reward_rate;
+float reward_f;
 
 
 int N = 400; // Population
@@ -70,7 +72,7 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
-int SimulationTime = 92; // Simulation time in days.
+int SimulationTime = 10; // Simulation time in days.
 
 double Qtable[30][7]; // first bracked must be the same as simulation time. 
 
@@ -2994,18 +2996,18 @@ int main()
 	}
 	//printf("\nTotal house wealth = %d\n", public_Wealth_total);
 
-	Personal_Wealth_Array.push_back(personal_Wealth_total);
+	/*Personal_Wealth_Array.push_back(personal_Wealth_total);
 	House_Wealth_Array.push_back(public_Wealth_total);
 	Business_Wealth_Array.push_back(business_Wealth_total);
-	Goverment_Wealth_Array.push_back(goverment_wealth_total);
+	Goverment_Wealth_Array.push_back(goverment_wealth_total);*/
 
 
 
 	int policyx;
 	bool choice = false;
-	printf("\nChoose starting policy...\n");
-	printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
-	std::cin >> policyx;
+	//printf("\nChoose starting policy...\n");
+	//printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
+	//std::cin >> policyx;
 
 	/*char inputData;
 	printf("\nRead Qtable? y - yes, other - no\n");
@@ -3065,7 +3067,7 @@ int main()
 
 		contactsPerDay1 = 0;
 
-		//policyx = pickRandomPolicy();
+		policyx = pickRandomPolicy();
 
 
 
@@ -3297,20 +3299,23 @@ int main()
 			personal_Wealth_total = personal_Wealth_total + PPL[i].personal_wealth;
 
 		}
-
+		printf("\n policy is %d\n", policyx);
 		Personal_Wealth_Array.push_back(personal_Wealth_total);
 		House_Wealth_Array.push_back(public_Wealth_total);
 		Business_Wealth_Array.push_back(business_Wealth_total);
 		Goverment_Wealth_Array.push_back(goverment_wealth_total);
-		/*if (T > 0)
-		{
-			delta_business_wealth_total = Business_Wealth_Array[T] - Business_Wealth_Array[T - 1];
-			printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
-			delta_houses_wealth_total = House_Wealth_Array[T] - House_Wealth_Array[T - 1];
-			printf("\nDifference in house wealth is %d\n", delta_houses_wealth_total);
-			delta_people_wealth_total = Personal_Wealth_Array[T] - Personal_Wealth_Array[T - 1];
-			printf("\nDifference in personal wealth is %d\n", delta_people_wealth_total);
-		}*/
+		
+		
+			delta_business_wealth_total = (Business_Wealth_Array[T+1] - Business_Wealth_Array[T]);
+			financial_reward_rate = 1;
+			reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 100);
+			//printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
+			//printf("\nreward is %f\n", reward_f);
+			//delta_houses_wealth_total = House_Wealth_Array[T + 1] - House_Wealth_Array[T];
+			//printf("\nDifference in house wealth is %d\n", delta_houses_wealth_total);
+			//delta_people_wealth_total = Personal_Wealth_Array[T + 1] - Personal_Wealth_Array[T];
+			//printf("\nDifference in personal wealth is %d\n", delta_people_wealth_total);
+		
 
 		/*
 		int S1 = S;
@@ -3434,7 +3439,7 @@ int main()
 
 	printf("\nFinancial results excel file done!\n");
 
-	float financial_difference_people = (((Personal_Wealth_Array[90] - Personal_Wealth_Array[0]) / Personal_Wealth_Array[0]) * 100);
+	/*float financial_difference_people = (((Personal_Wealth_Array[90] - Personal_Wealth_Array[0]) / Personal_Wealth_Array[0]) * 100);
 	printf("\nbusiness wealth T - 1 = %d\n", Business_Wealth_Array[90]);
 	printf("\nbusiness wealth 0 = %d\n", Business_Wealth_Array[0]);
 	float financial_difference_houses = (((House_Wealth_Array[90] - House_Wealth_Array[0]) / House_Wealth_Array[0]) * 100);
@@ -3444,7 +3449,7 @@ int main()
 	printf("\nFinancial difference in people is %f\n", financial_difference_people);
 	printf("\nFinancial difference in houses is %f\n", financial_difference_houses);
 	printf("\nFinancial difference in businesses is %f\n", financial_difference_business);
-	printf("\nFinancial difference in goverment is %f\n", financial_difference_gov);
+	printf("\nFinancial difference in goverment is %f\n", financial_difference_gov);*/
 
 	/*char press_button_data1;
 	printf("\nDo you want to save Q table? y - yes, other - no\n");
