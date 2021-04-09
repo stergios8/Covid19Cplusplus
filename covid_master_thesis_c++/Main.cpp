@@ -72,7 +72,7 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
-int SimulationTime = 10; // Simulation time in days.
+int SimulationTime = 92; // Simulation time in days.
 
 double Qtable[30][7]; // first bracked must be the same as simulation time. 
 
@@ -1931,6 +1931,7 @@ int main()
 	std::ofstream excel_file_initialization; // excel file for exporting initial distribution of houses, workplaces etc.
 	std::ofstream excel_file_SEIR_results; // excel file for exporting final results of SEIR model
 	std::ofstream excel_file_Financial_results; // excel file for exporting final results of Economical conditions
+	std::ofstream excel_file_Financial_Reward; // excel file for exporting financial reward
 	std::ofstream excel_file_HOUSES; // excel file for exporting HOUSES Objects
 	std::ofstream excel_file_HUMANS; // excel file for exporting HUMANS Objects
 	std::ofstream excel_file_WORKPLACES; // excel file for exporting WORKPLACES Objects
@@ -2895,6 +2896,8 @@ int main()
 	std::vector<int> House_Wealth_Array;
 	std::vector<int> Business_Wealth_Array;
 	std::vector<int> Goverment_Wealth_Array;
+	std::vector<float> Financial_Reward_Array;
+	std::vector<int> Policy_Array;
 
 	// INITIAL CONDITIONS
 
@@ -3299,22 +3302,14 @@ int main()
 			personal_Wealth_total = personal_Wealth_total + PPL[i].personal_wealth;
 
 		}
-		printf("\n policy is %d\n", policyx);
+		//printf("\n policy is %d\n", policyx);
 		Personal_Wealth_Array.push_back(personal_Wealth_total);
 		House_Wealth_Array.push_back(public_Wealth_total);
 		Business_Wealth_Array.push_back(business_Wealth_total);
 		Goverment_Wealth_Array.push_back(goverment_wealth_total);
-		
-		
-			delta_business_wealth_total = (Business_Wealth_Array[T+1] - Business_Wealth_Array[T]);
-			financial_reward_rate = 1;
-			reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 100);
-			//printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
-			//printf("\nreward is %f\n", reward_f);
-			//delta_houses_wealth_total = House_Wealth_Array[T + 1] - House_Wealth_Array[T];
-			//printf("\nDifference in house wealth is %d\n", delta_houses_wealth_total);
-			//delta_people_wealth_total = Personal_Wealth_Array[T + 1] - Personal_Wealth_Array[T];
-			//printf("\nDifference in personal wealth is %d\n", delta_people_wealth_total);
+	
+		delta_business_wealth_total = (Business_Wealth_Array[T+1] - Business_Wealth_Array[T]);
+			
 		
 
 		/*
@@ -3403,6 +3398,35 @@ int main()
 		Iharray.push_back(Ih);
 		Isarray.push_back(Is);
 
+		if ((I < 200 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+
+		{
+			financial_reward_rate = 1;
+		}
+
+		else if ((I > 200 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+		{
+
+			financial_reward_rate = 0.5;
+		}
+
+		else if ((Ih > 8 || Is > 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+		{
+			financial_reward_rate = 0;
+
+		}
+		
+		reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 100);
+		Financial_Reward_Array.push_back(reward_f);
+		Policy_Array.push_back(policyx);
+		//printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
+		//printf("\nreward rate is %f\n", financial_reward_rate);
+		//printf("\nreward is %f\n", reward_f);
+		//delta_houses_wealth_total = House_Wealth_Array[T + 1] - House_Wealth_Array[T];
+		//printf("\nDifference in house wealth is %d\n", delta_houses_wealth_total);
+		//delta_people_wealth_total = Personal_Wealth_Array[T + 1] - Personal_Wealth_Array[T];
+		//printf("\nDifference in personal wealth is %d\n", delta_people_wealth_total);
+
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
@@ -3433,6 +3457,13 @@ int main()
 		excel_file_Financial_results << Personal_Wealth_Array[i] << "," << House_Wealth_Array[i] << "," << Business_Wealth_Array[i] << "," << Goverment_Wealth_Array[i] << "," << timepassed[i] << std::endl;
 	}
 	excel_file_Financial_results.close();
+
+	excel_file_Financial_Reward.open("Financial_Reward.csv");
+	printf("\nPreparing Financial Reward excel file...\n");
+	for (int i = 0; i < T; i++) {
+		excel_file_Financial_Reward << Policy_Array[i] << "," << Iarray[i] << "," << Iharray[i] << "," << Isarray[i] << "," << Financial_Reward_Array[i] << std::endl;
+	}
+	excel_file_Financial_Reward.close();
 
 
 	printf("\nSEIR results excel file done!\n");
