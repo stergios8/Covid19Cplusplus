@@ -70,12 +70,12 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
-int SimulationTime = 10; // Simulation time in days.
+int SimulationTime = 92; // Simulation time in days.
 
 double Qtable[30][7]; // first bracked must be the same as simulation time. 
 
 //new 
-int quarantine = 1; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
+int quarantine = 0; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
 int EcanSpread = 0;
 
 //Pandemics Parameters
@@ -3047,26 +3047,18 @@ int main()
 		}
 	}
 	*/
-
+	Personal_Wealth_Array.push_back(personal_Wealth_total);
+	House_Wealth_Array.push_back(public_Wealth_total);
+	Business_Wealth_Array.push_back(business_Wealth_total);
+	Goverment_Wealth_Array.push_back(goverment_wealth_total);
 
 	// MAIN LOOP
 
 	bool done = false;
 	while (done == false)
 	{
-		Personal_Wealth_Array.push_back(personal_Wealth_total);
-		House_Wealth_Array.push_back(public_Wealth_total);
-		Business_Wealth_Array.push_back(business_Wealth_total);
-		Goverment_Wealth_Array.push_back(goverment_wealth_total);
-		if (T > 0)
-		{
-			delta_business_wealth_total = Business_Wealth_Array[T] - Business_Wealth_Array[T - 1];
-			printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
-			delta_houses_wealth_total = House_Wealth_Array[T] - House_Wealth_Array[T - 1];
-			printf("\nDifference in house wealth is %d\n", delta_houses_wealth_total);
-			delta_people_wealth_total = Personal_Wealth_Array[T] - Personal_Wealth_Array[T - 1];
-			printf("\nDifference in personal wealth is %d\n", delta_people_wealth_total);
-		}
+		
+		
 		personal_Wealth_total = 0;
 		business_Wealth_total = 0;
 		public_Wealth_total = 0;
@@ -3305,6 +3297,20 @@ int main()
 			personal_Wealth_total = personal_Wealth_total + PPL[i].personal_wealth;
 
 		}
+
+		Personal_Wealth_Array.push_back(personal_Wealth_total);
+		House_Wealth_Array.push_back(public_Wealth_total);
+		Business_Wealth_Array.push_back(business_Wealth_total);
+		Goverment_Wealth_Array.push_back(goverment_wealth_total);
+		/*if (T > 0)
+		{
+			delta_business_wealth_total = Business_Wealth_Array[T] - Business_Wealth_Array[T - 1];
+			printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
+			delta_houses_wealth_total = House_Wealth_Array[T] - House_Wealth_Array[T - 1];
+			printf("\nDifference in house wealth is %d\n", delta_houses_wealth_total);
+			delta_people_wealth_total = Personal_Wealth_Array[T] - Personal_Wealth_Array[T - 1];
+			printf("\nDifference in personal wealth is %d\n", delta_people_wealth_total);
+		}*/
 
 		/*
 		int S1 = S;
