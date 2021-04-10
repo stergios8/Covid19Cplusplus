@@ -109,7 +109,7 @@ int I_icu_max = N * 0.01; // 4
 int workplace_tax = 1000;
 int house_tax = 500;
 
-int clients = 0;
+float reward = 0;
 
 class House {
 public:
@@ -875,10 +875,15 @@ void EtoItransition(int N, int T) {
 	}
 }
 
-float QReward() {
-	float R = 1;
+float QReward(int delI, int hospI, int sevI) {
+	float delIreward = 0.1 * delI; // should be probably bigger
+	
+	float economyReward = financial_reward_rate * (float)(delta_business_wealth_total / 100);
+	float hospReward = -0.8 * hospI * hospI;
+	float sevReward = -2.2 * sevI * sevI;
 
 
+	float R = delIreward + economyReward + hospReward + sevReward;
 	return R;
 }
 
@@ -3012,7 +3017,7 @@ int main()
 	//printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
 	//std::cin >> policyx;
 
-	/*char inputData;
+	char inputData;
 	printf("\nRead Qtable? y - yes, other - no\n");
 	std::cin >> inputData;
 	if (inputData == 'y') {
@@ -3051,7 +3056,7 @@ int main()
 			//printf("\nx = %d, y = %d, ih = %d, is = %d\n", HOS.x, HOS.y, HOS.infected_hospitalized, HOS.intected_severe);
 		}
 	}
-	*/
+	
 	Personal_Wealth_Array.push_back(personal_Wealth_total);
 	House_Wealth_Array.push_back(public_Wealth_total);
 	Business_Wealth_Array.push_back(business_Wealth_total);
@@ -3398,13 +3403,13 @@ int main()
 		Iharray.push_back(Ih);
 		Isarray.push_back(Is);
 
-		if ((I < 200 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+		if ((I < 300 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
 
 		{
 			financial_reward_rate = 1;
 		}
 
-		else if ((I > 200 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+		else if ((I > 300 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
 		{
 
 			financial_reward_rate = 0.5;
@@ -3428,10 +3433,12 @@ int main()
 		//printf("\nDifference in personal wealth is %d\n", delta_people_wealth_total);
 
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
-		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
-
-		//QUpdate(policyx, T, QReward());
-
+		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
+		
+		reward = QReward(deltaI, Ih, Is);
+		
+		QUpdate(policyx, T, reward);
+		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined, reward);
 
 
 		T++;
@@ -3482,7 +3489,7 @@ int main()
 	printf("\nFinancial difference in businesses is %f\n", financial_difference_business);
 	printf("\nFinancial difference in goverment is %f\n", financial_difference_gov);*/
 
-	/*char press_button_data1;
+	char press_button_data1;
 	printf("\nDo you want to save Q table? y - yes, other - no\n");
 	std::cin >> press_button_data1;
 	if (press_button_data1 == 'y') {
@@ -3495,7 +3502,7 @@ int main()
 			excel_qtab << Qtable[i][0] << "," << Qtable[i][1] << "," << Qtable[i][2] << "," << Qtable[i][3] << "," << Qtable[i][4] << "," << Qtable[i][5] << "," << Qtable[i][6] << std::endl;
 		}
 		excel_qtab.close();
-	}*/
+	}
 
 	printf("\nSimulation completed!\n");
 
