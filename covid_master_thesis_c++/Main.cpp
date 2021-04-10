@@ -72,7 +72,7 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
-int SimulationTime = 92; // Simulation time in days.
+int SimulationTime = 30; // Simulation time in days.
 
 double Qtable[30][7]; // first bracked must be the same as simulation time. 
 
@@ -623,7 +623,7 @@ void GovermentAid(Human& person)
 void BusinessProfit(Workplace& workplace)
 {
 	//workplace.workplace_wealth = (workplace.workplace_wealth + (workplace.profit * workplace.workplace_wealth));
-	workplace.workplace_wealth = (workplace.workplace_wealth + ((workplace.profit * workplace.workplace_wealth)/30));
+	workplace.workplace_wealth = (workplace.workplace_wealth + ((workplace.profit * workplace.workplace_wealth) / 30));
 	//printf("\npercentage is equal to %f\n", (workplace.profit * workplace.workplace_wealth) / 30);
 }
 
@@ -877,12 +877,12 @@ void EtoItransition(int N, int T) {
 
 float QReward(int delI, int hospI, int sevI) {
 	float delIreward = 0.1 * delI; // should be probably bigger
-	
-	float economyReward = financial_reward_rate * (float)(delta_business_wealth_total / 100);
+
+	float economyReward = financial_reward_rate * (float)(delta_business_wealth_total / 300);
 	float hospReward = -0.8 * hospI * hospI;
 	float sevReward = -2.2 * sevI * sevI;
 
-
+	printf("\n\n delIreward: %f, economyReward: %f, hospReward: %f, sevReward: %f ", delIreward, economyReward, hospReward, sevReward);
 	float R = delIreward + economyReward + hospReward + sevReward;
 	return R;
 }
@@ -2037,7 +2037,7 @@ int main()
 			std::getline(read_excel_WORKPLACES, ww);
 			workplace.workplace_wealth = std::stoi(ww);
 			WRP.push_back(workplace);
-				//printf("\nx = %d, y = %d, dx = %d, dy = %d, nw = %d, ss = %d,profit = %f, ww = %d\n", WRP[i].x, WRP[i].y, WRP[i].dx, WRP[i].dy, WRP[i].no_workers, WRP[i].social_stratum, WRP[i].profit, WRP[i].workplace_wealth);
+			//printf("\nx = %d, y = %d, dx = %d, dy = %d, nw = %d, ss = %d,profit = %f, ww = %d\n", WRP[i].x, WRP[i].y, WRP[i].dx, WRP[i].dy, WRP[i].no_workers, WRP[i].social_stratum, WRP[i].profit, WRP[i].workplace_wealth);
 
 		}
 		//spawn people
@@ -2227,7 +2227,7 @@ int main()
 
 			}
 			workplace.no_workers = 0;
-		
+
 			WRP.push_back(workplace);
 		}
 
@@ -3056,7 +3056,7 @@ int main()
 			//printf("\nx = %d, y = %d, ih = %d, is = %d\n", HOS.x, HOS.y, HOS.infected_hospitalized, HOS.intected_severe);
 		}
 	}
-	
+
 	Personal_Wealth_Array.push_back(personal_Wealth_total);
 	House_Wealth_Array.push_back(public_Wealth_total);
 	Business_Wealth_Array.push_back(business_Wealth_total);
@@ -3067,8 +3067,8 @@ int main()
 	bool done = false;
 	while (done == false)
 	{
-		
-		
+
+
 		personal_Wealth_total = 0;
 		business_Wealth_total = 0;
 		public_Wealth_total = 0;
@@ -3183,7 +3183,7 @@ int main()
 				//printf("\npersonal money after fee = %d\n", PPL[i].personal_wealth);
 			}
 		}
-	for (int i = 0; i < no_workplaces; i++)
+		/*for (int i = 0; i < no_workplaces; i++)
 		{
 
 			if ((policyx == 0 || policyx == 1) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
@@ -3192,8 +3192,8 @@ int main()
 				BusinessProfit(WRP[i]);
 				//printf("\nwork money after profit = %d\n", WRP[i].workplace_wealth);
 			}
-		}
-		
+		}*/
+
 		// salaries, taxes at the end of the month
 		if (T == 30 || T == 60 || T == 90 || T == 120 || T == 150 || T == 180)
 			//if (T == 2)
@@ -3312,10 +3312,10 @@ int main()
 		House_Wealth_Array.push_back(public_Wealth_total);
 		Business_Wealth_Array.push_back(business_Wealth_total);
 		Goverment_Wealth_Array.push_back(goverment_wealth_total);
-	
-		delta_business_wealth_total = (Business_Wealth_Array[T+1] - Business_Wealth_Array[T]);
-			
-		
+
+		delta_business_wealth_total = (Business_Wealth_Array[T + 1] - Business_Wealth_Array[T]);
+
+
 
 		/*
 		int S1 = S;
@@ -3403,25 +3403,29 @@ int main()
 		Iharray.push_back(Ih);
 		Isarray.push_back(Is);
 
-		if ((I < 300 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+		if (I < 300 && Ih < 8 && Is < 4)
 
 		{
 			financial_reward_rate = 1;
 		}
 
-		else if ((I > 300 && Ih < 8 && Is < 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+		else if (I > 300 && Ih < 8 && Is < 4)
 		{
 
 			financial_reward_rate = 0.5;
 		}
 
-		else if ((Ih > 8 || Is > 4) && (T != 30 && T != 60 && T != 90 && T != 120 && T != 150 && T != 180))
+		else if (Ih > 8 || Is > 4)
 		{
 			financial_reward_rate = 0;
 
 		}
-		
-		reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 100);
+		if (T == 30 || T == 60 || T == 90 || T == 120 || T == 150 || T == 180)
+		{
+			financial_reward_rate = 0;
+		}
+
+		reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 300);
 		Financial_Reward_Array.push_back(reward_f);
 		Policy_Array.push_back(policyx);
 		//printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
@@ -3434,11 +3438,11 @@ int main()
 
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
-		
+
 		reward = QReward(deltaI, Ih, Is);
-		
+
 		QUpdate(policyx, T, reward);
-		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined, reward);
+		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f, Policy: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined, reward, policyx);
 
 
 		T++;
