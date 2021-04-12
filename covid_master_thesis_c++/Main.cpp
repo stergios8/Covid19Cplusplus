@@ -72,9 +72,9 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
-int SimulationTime = 30; // Simulation time in days.
+int SimulationTime = 62; // Simulation time in days.
 
-double Qtable[30][7]; // first bracked must be the same as simulation time. 
+double Qtable[62][7]; // first bracked must be the same as simulation time. 
 
 //new 
 int quarantine = 0; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
@@ -1967,9 +1967,9 @@ int main()
 	std::uniform_real_distribution <float> essential_job(0, 1);
 
 
-	char press_button_data;
+	char press_button_data = 'n';
 	printf("\nDo you want to generate new initiallization data and objects or use the saved ones? Press n if you want new or s if you want saved...\n");
-	std::cin >> press_button_data;
+	//std::cin >> press_button_data;
 	if (press_button_data == 's')
 	{
 		std::ifstream read_excel_HUMANS("HUMAN_OBJECTS.csv");
@@ -2185,6 +2185,7 @@ int main()
 		}
 
 	}
+
 	else if (press_button_data == 'n')
 
 	{
@@ -2787,9 +2788,9 @@ int main()
 
 
 			// ################### EXCEL FILE
-		char press_button_save;
+		char press_button_save = 'f';
 		printf("\n Do you want the initiallisation data to be saved? Press y if yes or any other button if not...\n");
-		std::cin >> press_button_save;
+		//std::cin >> press_button_save;
 		if (press_button_save == 'y')
 		{
 			excel_file_HOUSES.open("HOUSES_OBJECTS.csv");
@@ -3017,13 +3018,14 @@ int main()
 	//printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
 	//std::cin >> policyx;
 
-	char inputData;
+
+	char inputData = 'y';
 	printf("\nRead Qtable? y - yes, other - no\n");
-	std::cin >> inputData;
+	//std::cin >> inputData;
 	if (inputData == 'y') {
-		std::string fileName;
+		std::string fileName = "newq2.csv";
 		printf("\ninput file name: \n");
-		std::cin >> fileName;
+		//std::cin >> fileName;
 
 		std::ifstream read_excel_qtab(fileName);
 
@@ -3056,11 +3058,81 @@ int main()
 			//printf("\nx = %d, y = %d, ih = %d, is = %d\n", HOS.x, HOS.y, HOS.infected_hospitalized, HOS.intected_severe);
 		}
 	}
-
 	Personal_Wealth_Array.push_back(personal_Wealth_total);
 	House_Wealth_Array.push_back(public_Wealth_total);
 	Business_Wealth_Array.push_back(business_Wealth_total);
 	Goverment_Wealth_Array.push_back(goverment_wealth_total);
+
+
+	std::ifstream read_excel_OptPolicy ("C:\\Users\\SterPol\\Desktop\\AAU\\4\\Master_Thesis\\RL_SIMULATION\\Optimal_Policies.csv");
+	
+	//import optimal policies
+	for (int i = 0; i < (SimulationTime); i++) {
+		std::string policy_optimal_value;
+		int policy_value;
+
+		std::getline(read_excel_OptPolicy, policy_optimal_value);
+		
+		if (i == 0)
+		{
+
+			policy_optimal_value.erase(policy_optimal_value.begin() , policy_optimal_value.end() - 8);
+		}
+
+		//printf("\n policy is %s\n",policy_optimal_value);
+		if (policy_optimal_value == "POLICY 0")
+		{
+			policy_value = 0;
+		}
+		else if (policy_optimal_value == "POLICY 1")
+		{
+
+			policy_value = 1;
+		}
+		else if (policy_optimal_value == "POLICY 2")
+		{
+
+			policy_value = 2;
+		}
+		else if (policy_optimal_value == "POLICY 3")
+		{
+
+			policy_value = 3;
+		}
+		else if (policy_optimal_value == "POLICY 4")
+		{
+
+			policy_value = 4;
+		}
+		else if (policy_optimal_value == "POLICY 5")
+		{
+
+			policy_value = 5;
+		}
+
+		else if (policy_optimal_value == "POLICY 6")
+		{
+
+			policy_value = 6;
+		}
+		else
+		{
+
+			policy_value = -1;
+		}
+
+		Policy_Array.push_back(policy_value);
+		
+
+	}
+
+	//policy array check
+	/*for (int i = 0; i < (SimulationTime); i++) {
+
+		printf("\n policy day %d is %d\n", i, Policy_Array[i]);
+	}*/
+
+
 
 	// MAIN LOOP
 
@@ -3075,9 +3147,20 @@ int main()
 
 		contactsPerDay1 = 0;
 
-		policyx = pickRandomPolicy();
+		policyx = Policy_Array[T];
 
+		if (policyx == -1)
+		{
 
+			printf("\nError in policy import, simulation stops...\n");
+
+			getchar();
+			
+			return 0;
+		}
+		//policyx = pickRandomPolicy();
+
+	//	printf("\n policy is %d\n",policyx);
 
 
 		EtoItransition(N, T);
@@ -3427,7 +3510,7 @@ int main()
 
 		reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 300);
 		Financial_Reward_Array.push_back(reward_f);
-		Policy_Array.push_back(policyx);
+		//Policy_Array.push_back(policyx);
 		//printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
 		//printf("\nreward rate is %f\n", financial_reward_rate);
 		//printf("\nreward is %f\n", reward_f);
@@ -3450,6 +3533,22 @@ int main()
 			done = true;
 		}
 
+	}
+
+
+	char press_button_data1 = 'y';
+	printf("\nDo you want to save Q table? y - yes, other - no\n");
+	//std::cin >> press_button_data1;
+	if (press_button_data1 == 'y') {
+		printf("\nInput file name: \n");
+		std::string QtableFileName = "newq.csv";
+		//std::cin >> QtableFileName;
+		excel_qtab.open(QtableFileName);
+		//excel_qtab.open("po.csv");
+		for (int i = 0; i < SimulationTime; i++) {
+			excel_qtab << Qtable[i][0] << "," << Qtable[i][1] << "," << Qtable[i][2] << "," << Qtable[i][3] << "," << Qtable[i][4] << "," << Qtable[i][5] << "," << Qtable[i][6] << std::endl;
+		}
+		excel_qtab.close();
 	}
 
 
@@ -3493,24 +3592,11 @@ int main()
 	printf("\nFinancial difference in businesses is %f\n", financial_difference_business);
 	printf("\nFinancial difference in goverment is %f\n", financial_difference_gov);*/
 
-	char press_button_data1;
-	printf("\nDo you want to save Q table? y - yes, other - no\n");
-	std::cin >> press_button_data1;
-	if (press_button_data1 == 'y') {
-		printf("\nInput file name: \n");
-		std::string QtableFileName;
-		std::cin >> QtableFileName;
-		excel_qtab.open(QtableFileName);
-		//excel_qtab.open("po.csv");
-		for (int i = 0; i < SimulationTime; i++) {
-			excel_qtab << Qtable[i][0] << "," << Qtable[i][1] << "," << Qtable[i][2] << "," << Qtable[i][3] << "," << Qtable[i][4] << "," << Qtable[i][5] << "," << Qtable[i][6] << std::endl;
-		}
-		excel_qtab.close();
-	}
+
 
 	printf("\nSimulation completed!\n");
 
 	printf("\nPress a button to finish...\n");
 
-	getchar();
+	//getchar();
 };
