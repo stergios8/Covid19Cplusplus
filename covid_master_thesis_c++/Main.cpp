@@ -1967,9 +1967,9 @@ int main()
 	std::uniform_real_distribution <float> essential_job(0, 1);
 
 
-	char press_button_data = 'n';
+	char press_button_data;
 	printf("\nDo you want to generate new initiallization data and objects or use the saved ones? Press n if you want new or s if you want saved...\n");
-	//std::cin >> press_button_data;
+	std::cin >> press_button_data;
 	if (press_button_data == 's')
 	{
 		std::ifstream read_excel_HUMANS("HUMAN_OBJECTS.csv");
@@ -2788,9 +2788,9 @@ int main()
 
 
 			// ################### EXCEL FILE
-		char press_button_save = 'f';
+		char press_button_save;
 		printf("\n Do you want the initiallisation data to be saved? Press y if yes or any other button if not...\n");
-		//std::cin >> press_button_save;
+		std::cin >> press_button_save;
 		if (press_button_save == 'y')
 		{
 			excel_file_HOUSES.open("HOUSES_OBJECTS.csv");
