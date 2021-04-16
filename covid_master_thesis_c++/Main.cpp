@@ -864,9 +864,10 @@ void EtoItransition(int N, int T) {
 			if (PPL[i].group == 2 && T - PPL[i].Iday == 1 && PPL[i].inHospital == 0) {
 				PPL[i].quarantined = 1;
 			}
-			if (PPL[i].group == 3 && PPL[i].quarantined == 1) {
-				PPL[i].quarantined = 0;
+			
 			}
+		if (PPL[i].group == 3 && PPL[i].quarantined == 1) {
+			PPL[i].quarantined = 0;
 		}
 		if ((PPL[i].group == 2 || PPL[i].group == 4 || PPL[i].group == 5) && T - PPL[i].Iday == 20) {
 			HOS.releaseFromHospital(PPL[i]);
@@ -910,6 +911,7 @@ int pickRandomPolicy() {
 }
 
 int policy0(int hour, int T) {
+	quarantine = 0;
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
@@ -1149,6 +1151,7 @@ int policy0(int hour, int T) {
 	return contactsPerDay;
 }
 int policy1(int hour, int T) {
+	quarantine = 0;
 	contagion_distance = 1;
 	double contagion_probability = 0.8;
 	int contactsPerDay = 0;
@@ -1376,6 +1379,7 @@ int policy1(int hour, int T) {
 	return contactsPerDay;
 }
 int policy2(int hour, int T) {
+	quarantine = 1;
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
@@ -1575,6 +1579,7 @@ int policy2(int hour, int T) {
 	return contactsPerDay;
 }
 int policy3(int hour, int T) {
+	quarantine = 1;
 	contagion_distance = 1;
 	double contagion_probability = 0.3; // FACEMASK 0.3 is the value used in paper
 	int contactsPerDay = 0;
@@ -1774,6 +1779,7 @@ int policy3(int hour, int T) {
 	return contactsPerDay;
 }
 int policy4(int hour, int T) {
+	quarantine = 1;
 	contagion_distance = 1;
 	double contagion_probability = 0.2; // FACEMASK
 	int contactsPerDay = 0;
@@ -1848,6 +1854,7 @@ int policy4(int hour, int T) {
 	return contactsPerDay;
 }
 int policy5(int hour, int T) {
+	quarantine = 1;
 	contagion_distance = 1;
 	double contagion_probability = 0.2; // FACEMASK
 	int contactsPerDay = 0;
@@ -1910,6 +1917,7 @@ int policy5(int hour, int T) {
 	return contactsPerDay;
 }
 int policy6(int hour, int T) {
+	quarantine = 1;
 	contagion_distance = 1;
 	double contagion_probability = 0.2; // FACEMASK
 	int contactsPerDay = 0;
