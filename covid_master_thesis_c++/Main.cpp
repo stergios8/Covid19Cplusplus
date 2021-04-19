@@ -97,6 +97,7 @@ float e = 0.1;  // incubation rate is the rate of latent individuals becoming in
 
 int deltaI = 0;
 int deltaR = 0;
+int deltaE = 0;
 int lockdownDurationForPolicy4 = 0;
 int lockdownForPolicy4 = 0;
 
@@ -186,6 +187,8 @@ public:
 	int IICUday;
 	int Rday;
 
+	int incubation_time;
+	int recovery_time;
 
 	void actionGoHome()
 
@@ -693,7 +696,7 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 
 void EtoItransition(int N, int T) {
 	for (int i = 0; i < N; i++) {
-		if (PPL[i].group == 1 && T - PPL[i].Eday == 5) {
+		if (PPL[i].group == 1 && T - PPL[i].Eday == PPL[i].incubation_time) {
 			PPL[i].group = 2;
 			PPL[i].Iday = T;
 			//printf("\nGroup: %d, Iday: %d", PPL[i].group, PPL[i].Iday);
@@ -864,27 +867,42 @@ void EtoItransition(int N, int T) {
 			if (PPL[i].group == 2 && T - PPL[i].Iday == 1 && PPL[i].inHospital == 0) {
 				PPL[i].quarantined = 1;
 			}
-			
+
+
+			if (PPL[i].group == 3 && PPL[i].quarantined == 1) {
+				PPL[i].quarantined = 0;
 			}
-		if (PPL[i].group == 3 && PPL[i].quarantined == 1) {
-			PPL[i].quarantined = 0;
 		}
-		if ((PPL[i].group == 2 || PPL[i].group == 4 || PPL[i].group == 5) && T - PPL[i].Iday == 20) {
+		if (PPL[i].group == 2 && T - PPL[i].Iday == PPL[i].recovery_time) {
+			PPL[i].group = 3;
+		}
+		if ((PPL[i].group == 4 || PPL[i].group == 5) && T - PPL[i].Iday == PPL[i].recovery_time) {
 			HOS.releaseFromHospital(PPL[i]);
 			PPL[i].group = 3;
 		}
 	}
 }
 
-float QReward(int delI, int hospI, int sevI) {
-	float delIreward = 0.1 * delI; // should be probably bigger
-
+float QReward(int delI, int hospI, int sevI, int delE) {
+	float delIreward = 2 * delI; // should be probably bigger
+	float delEreward = 2 * delE;
+	if (delEreward > 0)
+	{
+		delEreward = 0;
+	}
 	float economyReward = financial_reward_rate * (float)(delta_business_wealth_total / 300);
 	float hospReward = -0.8 * hospI * hospI;
 	float sevReward = -2.2 * sevI * sevI;
 
-	printf("\n\n delIreward: %f, economyReward: %f, hospReward: %f, sevReward: %f ", delIreward, economyReward, hospReward, sevReward);
-	float R = delIreward + economyReward + hospReward + sevReward;
+	if (hospI > 8) {
+		hospReward = -200;
+	}
+	if (sevI > 4) {
+		sevReward = -300;
+	}
+
+	printf("\n\n delIreward: %f, economyReward: %f, hospReward: %f, sevReward: %f, delEreward: %f ", delIreward, economyReward, hospReward, sevReward, delEreward);
+	float R = delIreward + economyReward + hospReward + sevReward + delEreward;
 	return R;
 }
 
@@ -2341,6 +2359,26 @@ int main()
 			person.y_work = -1;
 			person.house = emptyHouse;
 			person.work = emptyWork;
+
+			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::default_random_engine generator(seed);
+			std::normal_distribution<double> distribution66(7, 3);
+
+			person.incubation_time = (int)distribution66(generator);
+			if (person.incubation_time < 3) {
+				person.incubation_time = 3;
+			}
+
+			if (person.age < 40) {
+				person.recovery_time = 14;
+			}
+			if (person.age >= 40 && person.age < 60) {
+				person.recovery_time = 17;
+			}
+			if (person.age >= 60) {
+				person.recovery_time = 20;
+			}
+
 			PPL.push_back(person);
 		}
 
@@ -2390,6 +2428,25 @@ int main()
 			person.house = emptyHouse;
 			person.work = emptyWork;
 			person.Iday = 0;
+
+			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::default_random_engine generator(seed);
+			std::normal_distribution<double> distribution66(7, 3);
+
+			person.incubation_time = (int)distribution66(generator);
+			if (person.incubation_time < 3) {
+				person.incubation_time = 3;
+			}
+
+			if (person.age < 40) {
+				person.recovery_time = 14;
+			}
+			if (person.age >= 40 && person.age < 60) {
+				person.recovery_time = 17;
+			}
+			if (person.age >= 60) {
+				person.recovery_time = 20;
+
 			PPL.push_back(person);
 		}
 
@@ -2925,6 +2982,7 @@ int main()
 	int T = 0;
 	int Iold = I;
 	int Rold = R;
+	int Eold = E;
 	//timepassed.push_back(T);
 	int contactsPerDay1 = 0;
 	int essential_workers = 0;
@@ -3450,6 +3508,7 @@ int main()
 
 		Rold = R;
 		Iold = I;
+		Eold = E;
 
 		S = 0;
 		E = 0;
@@ -3486,6 +3545,7 @@ int main()
 		deltaR = R - Rold;
 		deltaI = Iold - I;
 		deltaI = deltaI - deltaR;
+		deltaE = Eold - E;
 		timepassed.push_back(T);
 		Sarray.push_back(S);
 		Earray.push_back(E);
@@ -3530,7 +3590,7 @@ int main()
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
-		reward = QReward(deltaI, Ih, Is);
+		reward = QReward(deltaI, Ih, Is, deltaE);
 
 		QUpdate(policyx, T, reward);
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f, Policy: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined, reward, policyx);
