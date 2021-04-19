@@ -2446,7 +2446,7 @@ int main()
 			}
 			if (person.age >= 60) {
 				person.recovery_time = 20;
-
+			}
 			PPL.push_back(person);
 		}
 
