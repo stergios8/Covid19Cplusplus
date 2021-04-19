@@ -38,7 +38,7 @@ float financial_reward_rate;
 float reward_f;
 
 
-int N = 400; // Population
+int N = 2000; // Population
 int I_init = N * initial_infected_rate;  //Infected
 int S_init = N - (N * initial_infected_rate);
 
@@ -929,7 +929,7 @@ int pickRandomPolicy() {
 }
 
 int policy0(int hour, int T) {
-	quarantine = 0;
+	quarantine = 1;
 	contagion_distance = 1;
 	double contagion_probability = 0.9;
 	int contactsPerDay = 0;
@@ -1169,7 +1169,7 @@ int policy0(int hour, int T) {
 	return contactsPerDay;
 }
 int policy1(int hour, int T) {
-	quarantine = 0;
+	quarantine = 1;
 	contagion_distance = 1;
 	double contagion_probability = 0.8;
 	int contactsPerDay = 0;
