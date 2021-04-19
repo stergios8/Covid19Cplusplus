@@ -3593,7 +3593,7 @@ int main()
 		reward = QReward(deltaI, Ih, Is, deltaE);
 
 		QUpdate(policyx, T, reward);
-		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f, Policy: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined, reward, policyx);
+		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f, Policy: %d", S, E, I, R, Ih, Is, contactsPerDay1, /*HOS.infected_hospitalized*/ Ih, /*HOS.intected_severe*/Is, deltaI, selfQuarantined, reward, policyx);
 
 
 		T++;
