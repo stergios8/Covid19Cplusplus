@@ -36,9 +36,10 @@ int delta_houses_wealth_total;
 int delta_people_wealth_total;
 float financial_reward_rate;
 float reward_f;
+int biggest_age;
+int oldest_guy;
 
-
-int N = 2000; // Population
+int N = 400; // Population
 int I_init = N * initial_infected_rate;  //Infected
 int S_init = N - (N * initial_infected_rate);
 
@@ -79,6 +80,7 @@ double Qtable[62][7]; // first bracked must be the same as simulation time.
 //new 
 int quarantine = 0; // Set this to 1 if people after 1 day of being "I" should do self quarantine at their house. Works for every policy.
 int EcanSpread = 0;
+int vaccination = 0; //		Set to 1 if we want vaccination program to run
 
 //Pandemics Parameters
 
@@ -176,6 +178,8 @@ public:
 	int social_stratum;
 	int essential_worker = 0;
 	int shopped_today = 0;
+	int vaccined = 0;
+
 	House house;
 	Workplace work;
 	int quarantined = 0;
@@ -881,6 +885,14 @@ void EtoItransition(int N, int T) {
 			PPL[i].group = 3;
 		}
 	}
+}
+
+void vaccine(Human& person)
+{
+	
+		person.vaccined = 1;
+		person.group = 3;
+	
 }
 
 float QReward(int delI, int hospI, int sevI, int delE) {
@@ -2955,7 +2967,18 @@ int main()
 		//printf("\nxwork = %d, ywork = %d \n", PPL[55].x_work, PPL[55].y_work);
 
 
+	char want_vaccination;
+	printf("\nDo you want to activate vaccination program? Press y if you want or other if you dont...\n");
+	std::cin >> want_vaccination;
 
+	if (want_vaccination == 'y')
+	{
+		vaccination = 1;
+	}
+	else
+	{
+        vaccination = 0;
+	}
 	std::vector<float> Sarray;
 	std::vector<float> Earray;
 	std::vector<float> Iarray;
@@ -3201,7 +3224,7 @@ int main()
 
 
 	// MAIN LOOP
-
+	
 	bool done = false;
 	while (done == false)
 	{
@@ -3309,7 +3332,31 @@ int main()
 		}
 
 		// ### END OF 24 H LOOP
+		if (vaccination == 1)
+		{
+			if (S > 0)
+			{
+				biggest_age = 0;
+				oldest_guy = 0;
 
+				for (int i = 0; i < N; i++)
+				{
+					if (PPL[i].age > biggest_age)
+					{
+						if (PPL[i].vaccined == 0 && PPL[i].group == 0)
+						{
+							biggest_age = PPL[i].age;
+							oldest_guy = i;
+						}
+
+					}
+
+				}
+
+				printf("\nAge of vaccined guy is %d\n", PPL[oldest_guy].age);
+				vaccine(PPL[oldest_guy]);
+			}
+		}
 		// finances ppl - houses, hospital fee
 		for (int i = 0; i < N; i++)
 		{
@@ -3590,9 +3637,9 @@ int main()
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI);
 		//printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d", S, E, I, R, Ih, Is, contactsPerDay1, HOS.infected_hospitalized, HOS.intected_severe, deltaI, selfQuarantined);
 
-		reward = QReward(deltaI, Ih, Is, deltaE);
+		//reward = QReward(deltaI, Ih, Is, deltaE);
 
-		QUpdate(policyx, T, reward);
+		//QUpdate(policyx, T, reward);
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f, Policy: %d", S, E, I, R, Ih, Is, contactsPerDay1, /*HOS.infected_hospitalized*/ Ih, /*HOS.intected_severe*/Is, deltaI, selfQuarantined, reward, policyx);
 
 
@@ -3604,7 +3651,7 @@ int main()
 	}
 
 
-	char press_button_data1 = 'y';
+	char press_button_data1 = 'n';
 	printf("\nDo you want to save Q table? y - yes, other - no\n");
 	//std::cin >> press_button_data1;
 	if (press_button_data1 == 'y') {
