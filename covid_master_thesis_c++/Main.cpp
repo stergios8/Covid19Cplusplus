@@ -124,6 +124,7 @@ public:
 	int home_wealth;
 	int home_income;
 	int home_expense;
+	int old_house = 0;
 
 	void actionPayBills() {
 		home_wealth = home_wealth - house_tax;
@@ -1995,7 +1996,7 @@ int main()
 	std::uniform_int_distribution <int> distribution_dx_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_dy_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_family(2, 4);
-	std::uniform_int_distribution <int> distribution_employees(20, 60);
+	std::uniform_int_distribution <int> distribution_employees(5, 10);
 	std::uniform_real_distribution <float> distribution_homeless(0, 1);
 	std::uniform_real_distribution <float> distribution_employeed(0, 1);
 	std::_Beta_distribution <float> distribution_age(2, 5);
@@ -2472,14 +2473,30 @@ int main()
 			for (int j = 0; j < N; j++) {
 				if (PPL[j].homeless == 0) {
 					if (PPL[j].x_home == -1) {
-						PPL[j].house = HOU[i];
-						PPL[j].x_home = HOU[i].x;
-						PPL[j].y_home = HOU[i].y;
-						PPL[j].x = HOU[i].x;
-						PPL[j].y = HOU[i].y;
-						HOU[i].no_residents = HOU[i].no_residents + 1;
-						PPL[j].social_stratum = HOU[i].social_stratum;
-						temp = temp + 1;
+						if(PPL[j].age > 45 && HOU[i].no_residents == 0){
+							HOU[i].old_house = 1;
+							ff = 2;
+						}
+						if (HOU[i].old_house == 1 && PPL[j].age > 45) {
+							PPL[j].house = HOU[i];
+							PPL[j].x_home = HOU[i].x;
+							PPL[j].y_home = HOU[i].y;
+							PPL[j].x = HOU[i].x;
+							PPL[j].y = HOU[i].y;
+							HOU[i].no_residents = HOU[i].no_residents + 1;
+							PPL[j].social_stratum = HOU[i].social_stratum;
+							temp = temp + 1;
+						}
+						 if (HOU[i].old_house == 0 && PPL[j].age < 46) {
+							PPL[j].house = HOU[i];
+							PPL[j].x_home = HOU[i].x;
+							PPL[j].y_home = HOU[i].y;
+							PPL[j].x = HOU[i].x;
+							PPL[j].y = HOU[i].y;
+							HOU[i].no_residents = HOU[i].no_residents + 1;
+							PPL[j].social_stratum = HOU[i].social_stratum;
+							temp = temp + 1;
+						}
 						if (temp == ff) {
 							break;
 						}
@@ -2943,7 +2960,7 @@ int main()
 		if (i < (no_houses - 1))
 
 		{
-			excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << "," << HOU[i].x << "," << HOU[i].y << std::endl;
+			excel_file_initialization << PPL[i].x_home << "," << PPL[i].y_home << "," << WRP[i].x << "," << WRP[i].y << "," << HOU[i].x << "," << HOU[i].y << "," << PPL[i].age << std::endl;
 
 
 		}
@@ -3332,6 +3349,8 @@ int main()
 		}
 
 		// ### END OF 24 H LOOP
+
+		//vaccination
 		if (vaccination == 1)
 		{
 			if (S > 0)
@@ -3357,6 +3376,8 @@ int main()
 				vaccine(PPL[oldest_guy]);
 			}
 		}
+
+
 		// finances ppl - houses, hospital fee
 		for (int i = 0; i < N; i++)
 		{
