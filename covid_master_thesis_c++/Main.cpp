@@ -375,6 +375,76 @@ public:
 
 		}
 	}
+	void actionStayAtWork2()
+	{
+		//If person at work, stay at px or move with probability inside work
+		if ((x >= work.x - work.dx) && (x <= work.x + work.dx) && (y >= work.y - work.dy) && (y <= work.y + work.dy))
+		{
+			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::default_random_engine generator(seed);
+			std::uniform_real_distribution <float> distribution(0, 1);
+			float eps2 = distribution(generator);  // uniform distribution	
+
+
+			if (eps2 > 0.95) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+				std::default_random_engine generator(seed);
+				std::uniform_real_distribution <float> distribution(0, 1);
+				float eps = distribution(generator);  // uniform distribution	
+
+				if (eps > 0 and eps < 0.2)
+				{
+					x = x + dx;
+					y = y + dy;
+				}
+				if (eps > 0.2 and eps < 0.4)
+				{
+					x = x - dx;
+					y = y - dy;
+				}
+				if (eps > 0.4 and eps < 0.6)
+				{
+					x = x - dx;
+				}
+				if (eps > 0.6 and eps < 0.8)
+				{
+					x = x + dx;
+				}
+				if (eps > 0.8 and eps < 0.9)
+				{
+					y = y - dy;
+				}
+				if (eps > 0.9)
+				{
+					y = y + dy;
+				}
+				if (x > work.x + work.dx)
+				{
+					x = work.x + work.dx - 1;
+				}
+
+				if (x > work.x - work.dx)
+				{
+					x = work.x - work.dx + 1;
+				}
+
+				if (y > work.y + work.dy)
+				{
+					y = work.y + work.dy - 1;
+				}
+
+				if (y > work.y - work.dy)
+				{
+					y = work.y - work.dy + 1;
+				}
+
+			}
+
+
+
+
+		}
+	}
 	void actionWalkFree()
 	{
 		unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -1637,7 +1707,7 @@ int policy3(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
-					PPL[i].actionStayAtWork();
+					PPL[i].actionStayAtWork2();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1723,7 +1793,7 @@ int policy3(int hour, int T) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
-					PPL[i].actionStayAtWork();
+					PPL[i].actionStayAtWork2();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1841,7 +1911,7 @@ int policy4(int hour, int T) {
 				for (int timestamp = 0; timestamp < 200; timestamp++) {
 					if (PPL[i].unemployed == 0 && PPL[i].essential_worker == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && PPL[i].age < 60 && PPL[i].age > 16) {
 						PPL[i].actionGoWork();
-						PPL[i].actionStayAtWork();
+						PPL[i].actionStayAtWork2();
 						for (int j = 0; j < N; j++) {
 							if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 								if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1909,7 +1979,7 @@ int policy5(int hour, int T) {
 			for (int timestamp = 0; timestamp < 200; timestamp++) {
 				if (PPL[i].unemployed == 0 && PPL[i].essential_worker == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && PPL[i].age < 60 && PPL[i].age > 16) {
 					PPL[i].actionGoWork();
-					PPL[i].actionStayAtWork();
+					PPL[i].actionStayAtWork2();
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
@@ -1996,7 +2066,7 @@ int main()
 	std::uniform_int_distribution <int> distribution_dx_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_dy_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_family(2, 4);
-	std::uniform_int_distribution <int> distribution_employees(5, 10);
+	std::uniform_int_distribution <int> distribution_employees(3, 9);
 	std::uniform_real_distribution <float> distribution_homeless(0, 1);
 	std::uniform_real_distribution <float> distribution_employeed(0, 1);
 	std::_Beta_distribution <float> distribution_age(2, 5);
@@ -3355,28 +3425,30 @@ int main()
 		{
 			if (S > 0)
 			{
-				biggest_age = 0;
-				oldest_guy = 0;
-
-				for (int i = 0; i < N; i++)
+				for (int j = 0; j < 2; j++)
 				{
-					if (PPL[i].age > biggest_age)
+					biggest_age = 0;
+					oldest_guy = 0;
+
+					for (int i = 0; i < N; i++)
 					{
-						if (PPL[i].vaccined == 0 && PPL[i].group == 0)
+						if (PPL[i].age > biggest_age)
 						{
-							biggest_age = PPL[i].age;
-							oldest_guy = i;
+							if (PPL[i].vaccined == 0 && PPL[i].group == 0)
+							{
+								biggest_age = PPL[i].age;
+								oldest_guy = i;
+							}
+
 						}
 
 					}
 
+					printf("\nAge of vaccined guy is %d\n", PPL[oldest_guy].age);
+					vaccine(PPL[oldest_guy]);
 				}
-
-				printf("\nAge of vaccined guy is %d\n", PPL[oldest_guy].age);
-				vaccine(PPL[oldest_guy]);
 			}
 		}
-
 
 		// finances ppl - houses, hospital fee
 		for (int i = 0; i < N; i++)
