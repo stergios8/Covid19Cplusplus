@@ -9,7 +9,7 @@
 #include <fstream>
 //using namespace std::geometric_distribution;
 
-
+//Stergios
 
 float homeless_rate = 0.0005;
 float initial_infected_rate = 0.01;
@@ -117,6 +117,13 @@ float reward = 0;
 int counter1 = 0;
 int randompolicy1 = 0;
 
+int raz = 0; // for recover transferring
+int dwa = 0;
+int tszy = 0;
+int cztery = 0;
+int piec = 0;
+int szesc = 0;
+
 
 class House {
 public:
@@ -184,6 +191,7 @@ public:
 	int essential_worker = 0;
 	int shopped_today = 0;
 	int vaccined = 0;
+	int carry_virus = 0;
 
 	House house;
 	Workplace work;
@@ -739,63 +747,173 @@ void BusinessProfit(Workplace& workplace)
 
 bool contact(Human& person1, Human& person2, int day, double contagion_probability1)
 {
-
-	if ((person1.x == person2.x) && (person1.y == person2.y))
-	{
-		if ((person1.group != 3 && person2.group != 3) && (((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)) || (EcanSpread == 1 && ((person1.group == 1 && person2.group == 0) || (person1.group == 0 && person2.group == 1)))))
-		{
-
-			if ((person1.x < person1.house.x + person1.house.dx) && (person1.x > person1.house.x - person1.house.dx) && (person1.y < person1.house.y + person1.house.dy) && (person1.y > person1.house.y - person1.house.dy))
+	if ((person1.x == person2.x) && (person1.y == person2.y)) {
+		if (person1.x_home == person2.x_home && person1.y_home == person2.y_home) {
+			if ((person1.group != 3 && person2.group != 3) && (((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)) || (EcanSpread == 1 && ((person1.group == 1 && person2.group == 0) || (person1.group == 0 && person2.group == 1)))))
 			{
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+				std::default_random_engine generator(seed);
+				std::uniform_real_distribution <float> distribution(0, 1);
+				float eps = distribution(generator);  // uniform distribution
+				if (eps <= contagion_probability1)
+				{
+					//printf("\nprob %f, eps %f\n", contagion_probability1, eps);
+					if (person1.group == 2)
+					{
+						person2.group = 1;
+						person2.Eday = day;
+					}
+
+					if (person2.group == 2)
+					{
+						person1.group = 1;
+						person1.Eday = day;
+					}
+
+					if (EcanSpread == 1 && person1.group == 1)
+					{
+						person2.group = 1;
+						person2.Eday = day;
+					}
+
+					if (EcanSpread == 1 && person2.group == 1)
+					{
+						person1.group = 1;
+						person1.Eday = day;
+					}
+					raz++;
+					return true;
+				}
+			}
+			if ((person1.group == 3 && person2.group == 2) || (person1.group == 2 && person2.group == 3)) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+				std::default_random_engine generator(seed);
+				std::uniform_real_distribution <float> distribution(0, 1);
+				float eps = distribution(generator);  // uniform distribution
+				if (eps <= contagion_probability1) {
+					if (person1.group == 2)
+					{
+						person2.carry_virus = 1;
+					}
+
+					if (person2.group == 2)
+					{
+						person1.carry_virus = 1;
+					}
+
+				}
+				dwa++;
+				return true;
+			}
+			if ((person1.group == 3 && person2.group == 3 && person1.carry_virus == 1) || (person1.group == 2 && person2.group == 3 && person2.carry_virus == 1)) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+				std::default_random_engine generator(seed);
+				std::uniform_real_distribution <float> distribution(0, 1);
+				float eps = distribution(generator);  // uniform distribution
+				if (eps <= contagion_probability1) {
+					if (person1.carry_virus == 0)
+					{
+						person1.carry_virus = 1;
+					}
+
+					if (person2.carry_virus == 0)
+					{
+						person2.carry_virus = 1;
+					}
+				}
+				tszy++;
+				return true;
+			}
+		}
+		else {
+			if ((person1.x < person1.house.x + person1.house.dx) && (person1.x > person1.house.x - person1.house.dx) && (person1.y < person1.house.y + person1.house.dy) && (person1.y > person1.house.y - person1.house.dy)) {
 				return false;
 			}
-			else
-			{
-				if ((person2.x < person2.house.x + person2.house.dx) && (person2.x > person2.house.x - person2.house.dx) && (person2.y < person2.house.y + person2.house.dy) && (person2.y > person2.house.y - person2.house.dy))
-				{
+			else {
+				if ((person2.x < person2.house.x + person2.house.dx) && (person2.x > person2.house.x - person2.house.dx) && (person2.y < person2.house.y + person2.house.dy) && (person2.y > person2.house.y - person2.house.dy)) {
 					return false;
 				}
 				else {
-					unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
-					std::default_random_engine generator(seed);
-					std::uniform_real_distribution <float> distribution(0, 1);
-					float eps = distribution(generator);  // uniform distribution
-					if (eps <= contagion_probability1)
+					if ((person1.group != 3 && person2.group != 3) && (((person1.group == 2 && person2.group == 0) || (person1.group == 0 && person2.group == 2)) || (EcanSpread == 1 && ((person1.group == 1 && person2.group == 0) || (person1.group == 0 && person2.group == 1)))))
 					{
-						//printf("\nprob %f, eps %f\n", contagion_probability1, eps);
-						if (person1.group == 2)
+						unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps <= contagion_probability1)
 						{
-							person2.group = 1;
-							person2.Eday = day;
-						}
+							//printf("\nprob %f, eps %f\n", contagion_probability1, eps);
+							if (person1.group == 2)
+							{
+								person2.group = 1;
+								person2.Eday = day;
+							}
 
-						if (person2.group == 2)
-						{
-							person1.group = 1;
-							person1.Eday = day;
-						}
+							if (person2.group == 2)
+							{
+								person1.group = 1;
+								person1.Eday = day;
+							}
 
-						if (EcanSpread == 1 && person1.group == 1)
-						{
-							person2.group = 1;
-							person2.Eday = day;
-						}
+							if (EcanSpread == 1 && person1.group == 1)
+							{
+								person2.group = 1;
+								person2.Eday = day;
+							}
 
-						if (EcanSpread == 1 && person2.group == 1)
-						{
-							person1.group = 1;
-							person1.Eday = day;
-						}
+							if (EcanSpread == 1 && person2.group == 1)
+							{
+								person1.group = 1;
+								person1.Eday = day;
+							}
 
+						}
+						cztery++;
 						return true;
+					}
+					if ((person1.group == 3 && person2.group == 2) || (person1.group == 2 && person2.group == 3)) {
+						unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps <= contagion_probability1) {
+							if (person1.group == 2)
+							{
+								person2.carry_virus = 1;
+							}
 
+							if (person2.group == 2)
+							{
+								person1.carry_virus = 1;
+							}
+
+						}
+						piec++;
+						return true;
+					}
+					if ((person1.group == 3 && person2.group == 3 && person1.carry_virus == 1) || (person1.group == 2 && person2.group == 3 && person2.carry_virus == 1)) {
+						unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+						std::default_random_engine generator(seed);
+						std::uniform_real_distribution <float> distribution(0, 1);
+						float eps = distribution(generator);  // uniform distribution
+						if (eps <= contagion_probability1) {
+							if (person1.carry_virus == 0)
+							{
+								person1.carry_virus = 1;
+							}
+
+							if (person2.carry_virus == 0)
+							{
+								person2.carry_virus = 1;
+							}
+
+						}
+						szesc++;
+						return true;
 					}
 				}
 			}
-
-
 		}
-		return false;
 	}
 	return false;
 }
@@ -3339,6 +3457,7 @@ int main()
 		printf("\n policy day %d is %d\n", i, Policy_Array[i]);
 	}*/
 
+	
 
 
 	// MAIN LOOP
@@ -3346,6 +3465,13 @@ int main()
 	bool done = false;
 	while (done == false)
 	{
+		int Rwithvirus = 0;
+		raz = dwa = tszy = cztery = piec = szesc = 0;
+
+		for (int i = 0; i < N; i++) {
+			PPL[i].carry_virus = 0;
+		}
+
 
 
 		personal_Wealth_total = 0;
@@ -3711,6 +3837,9 @@ int main()
 			if (PPL[i].quarantined == 1) {
 				selfQuarantined++;
 			}
+			if (PPL[i].carry_virus == 1) {
+				Rwithvirus++;
+			}
 		}
 
 		deltaR = R - Rold;
@@ -3765,7 +3894,8 @@ int main()
 
 		//QUpdate(policyx, T, reward);
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f, Policy: %d", S, E, I, R, Ih, Is, contactsPerDay1, /*HOS.infected_hospitalized*/ Ih, /*HOS.intected_severe*/Is, deltaI, selfQuarantined, reward, policyx);
-
+		printf("  SAME HOME: I-S %d, R-S %d, R-R %d ######## DIFF HOME: I-S %d, R-S %d, R-R %d    ", raz, dwa, tszy, cztery, piec, szesc);
+		printf("R with virus: %d", Rwithvirus);
 
 		T++;
 		if (T == SimulationTime) {
