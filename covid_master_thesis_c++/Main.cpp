@@ -114,6 +114,10 @@ int house_tax = 500;
 
 float reward = 0;
 
+int counter1 = 0;
+int randompolicy1 = 0;
+
+
 class House {
 public:
 
@@ -236,26 +240,35 @@ public:
 			std::default_random_engine generator(seed);
 			std::uniform_real_distribution <float> distribution(0, 1);
 			float eps = distribution(generator);  // uniform distribution
-			if (eps > 0.6 && eps < 0.7)
+			if (eps > 0.6 and eps < 0.65)
 			{
 				x = x + dx;
 				y = y + dy;
 			}
-
-			if (eps > 0.7 && eps < 0.8)
+			if (eps > 0.65 and eps < 0.7)
+			{
+				x = x + dx;
+				y = y - dy;
+			}
+			if (eps > 0.7 and eps < 0.75)
 			{
 				x = x - dx;
 				y = y - dy;
 			}
-			if (eps > 0.8 && eps < 0.85)
+			if (eps > 0.75 and eps < 0.8)
+			{
+				x = x - dx;
+				y = y + dy;
+			}
+			if (eps > 0.8 and eps < 0.85)
 			{
 				x = x - dx;
 			}
-			if (eps > 0.85 && eps < 0.9)
+			if (eps > 0.85 and eps < 0.9)
 			{
 				x = x + dx;
 			}
-			if (eps > 0.9 && eps < 0.95)
+			if (eps > 0.9 and eps < 0.95)
 			{
 				y = y - dy;
 			}
@@ -315,67 +328,6 @@ public:
 		}
 	}
 	void actionStayAtWork()
-
-	{
-		//If person at work, stay at px or move with probability inside work
-		if ((x >= work.x - work.dx) && (x <= work.x + work.dx) && (y >= work.y - work.dy) && (y <= work.y + work.dy))
-		{
-			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
-			std::default_random_engine generator(seed);
-			std::uniform_real_distribution <float> distribution(0, 1);
-			float eps = distribution(generator);  // uniform distribution	
-
-
-			if (eps > 0.6 and eps < 0.7)
-			{
-				x = x + dx;
-				y = y + dy;
-			}
-			if (eps > 0.7 and eps < 0.8)
-			{
-				x = x - dx;
-				y = y - dy;
-			}
-			if (eps > 0.8 and eps < 0.85)
-			{
-				x = x - dx;
-			}
-			if (eps > 0.85 and eps < 0.9)
-			{
-				x = x + dx;
-			}
-			if (eps > 0.9 and eps < 0.95)
-			{
-				y = y - dy;
-			}
-			if (eps > 0.95)
-			{
-				y = y + dy;
-			}
-			if (x > work.x + work.dx)
-			{
-				x = work.x + work.dx - 1;
-			}
-
-			if (x > work.x - work.dx)
-			{
-				x = work.x - work.dx + 1;
-			}
-
-			if (y > work.y + work.dy)
-			{
-				y = work.y + work.dy - 1;
-			}
-
-			if (y > work.y - work.dy)
-			{
-				y = work.y - work.dy + 1;
-			}
-
-
-		}
-	}
-	void actionStayAtWork2()
 	{
 		//If person at work, stay at px or move with probability inside work
 		if ((x >= work.x - work.dx) && (x <= work.x + work.dx) && (y >= work.y - work.dy) && (y <= work.y + work.dy))
@@ -385,36 +337,45 @@ public:
 			std::uniform_real_distribution <float> distribution(0, 1);
 			float eps2 = distribution(generator);  // uniform distribution	
 
-
-			if (eps2 > 0.95) {
+			if (eps2 > 0.6) {
 				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
 				float eps = distribution(generator);  // uniform distribution	
 
-				if (eps > 0 and eps < 0.2)
+				if (eps < 0.125)
 				{
 					x = x + dx;
 					y = y + dy;
 				}
-				if (eps > 0.2 and eps < 0.4)
+				if (eps >= 0.125 and eps < 0.25)
+				{
+					x = x + dx;
+					y = y - dy;
+				}
+				if (eps >= 0.25 and eps < 0.375)
 				{
 					x = x - dx;
 					y = y - dy;
 				}
-				if (eps > 0.4 and eps < 0.6)
+				if (eps >= 0.375 and eps < 0.5)
+				{
+					x = x - dx;
+					y = y + dy;
+				}
+				if (eps >= 0.5 and eps < 0.625)
 				{
 					x = x - dx;
 				}
-				if (eps > 0.6 and eps < 0.8)
+				if (eps >= 0.625 and eps < 0.75)
 				{
 					x = x + dx;
 				}
-				if (eps > 0.8 and eps < 0.9)
+				if (eps >= 0.75 and eps < 0.875)
 				{
 					y = y - dy;
 				}
-				if (eps > 0.9)
+				if (eps >= 0.875)
 				{
 					y = y + dy;
 				}
@@ -437,12 +398,82 @@ public:
 				{
 					y = work.y - work.dy + 1;
 				}
-
 			}
+		}
+	}
+	void actionStayAtWork2()
+	{
+		//If person at work, stay at px or move with probability inside work
+		if ((x >= work.x - work.dx) && (x <= work.x + work.dx) && (y >= work.y - work.dy) && (y <= work.y + work.dy))
+		{
+			unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::default_random_engine generator(seed);
+			std::uniform_real_distribution <float> distribution(0, 1);
+			float eps2 = distribution(generator);  // uniform distribution	
 
 
+			if (eps2 > 0.95) {
+				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+				std::default_random_engine generator(seed);
+				std::uniform_real_distribution <float> distribution(0, 1);
+				float eps = distribution(generator);  // uniform distribution	
 
+				if (eps < 0.125)
+				{
+					x = x + dx;
+					y = y + dy;
+				}
+				if (eps >= 0.125 and eps < 0.25)
+				{
+					x = x + dx;
+					y = y - dy;
+				}
+				if (eps >= 0.25 and eps < 0.375)
+				{
+					x = x - dx;
+					y = y - dy;
+				}
+				if (eps >= 0.375 and eps < 0.5)
+				{
+					x = x - dx;
+					y = y + dy;
+				}
+				if (eps >= 0.5 and eps < 0.625)
+				{
+					x = x - dx;
+				}
+				if (eps >= 0.625 and eps < 0.75)
+				{
+					x = x + dx;
+				}
+				if (eps >= 0.75 and eps < 0.875)
+				{
+					y = y - dy;
+				}
+				if (eps >= 0.875)
+				{
+					y = y + dy;
+				}
+				if (x > work.x + work.dx)
+				{
+					x = work.x + work.dx - 1;
+				}
 
+				if (x > work.x - work.dx)
+				{
+					x = work.x - work.dx + 1;
+				}
+
+				if (y > work.y + work.dy)
+				{
+					y = work.y + work.dy - 1;
+				}
+
+				if (y > work.y - work.dy)
+				{
+					y = work.y - work.dy + 1;
+				}
+			}
 		}
 	}
 	void actionWalkFree()
