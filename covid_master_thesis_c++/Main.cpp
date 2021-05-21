@@ -73,7 +73,7 @@ int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_i
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
 int Width = 300;
-int SimulationTime = 62; // Simulation time in days.
+int SimulationTime = 92; // Simulation time in days.
 
 double Qtable[62][7]; // first bracked must be the same as simulation time. 
 
@@ -3495,12 +3495,12 @@ int main()
 	bool done = false;
 	while (done == false)
 	{
-		int Rwithvirus = 0;
-		raz = dwa = tszy = cztery = piec = szesc = 0;
+		//int Rwithvirus = 0;
+		//raz = dwa = tszy = cztery = piec = szesc = 0;
 
-		for (int i = 0; i < N; i++) {
-			PPL[i].carry_virus = 0;
-		}
+		//for (int i = 0; i < N; i++) {
+			//PPL[i].carry_virus = 0;
+		//}
 
 
 
@@ -3867,9 +3867,9 @@ int main()
 			if (PPL[i].quarantined == 1) {
 				selfQuarantined++;
 			}
-			if (PPL[i].carry_virus == 1) {
+			/*if (PPL[i].carry_virus == 1) {
 				Rwithvirus++;
-			}
+			}*/
 		}
 
 		deltaR = R - Rold;
@@ -3924,8 +3924,8 @@ int main()
 
 		//QUpdate(policyx, T, reward);
 		printf("\nS: %d, E: %d, I: %d, R: %d, Ih: %d, Is: %d, Contacts last day: %d, PPL in Hospital: %d, PPL in IC: %d, Delta I: %d, Self Quarantined: %d, Reward: %f, Policy: %d", S, E, I, R, Ih, Is, contactsPerDay1, /*HOS.infected_hospitalized*/ Ih, /*HOS.intected_severe*/Is, deltaI, selfQuarantined, reward, policyx);
-		printf("  SAME HOME: I-S %d, R-S %d, R-R %d ######## DIFF HOME: I-S %d, R-S %d, R-R %d    ", raz, dwa, tszy, cztery, piec, szesc);
-		printf("R with virus: %d", Rwithvirus);
+		//printf("  SAME HOME: I-S %d, R-S %d, R-R %d ######## DIFF HOME: I-S %d, R-S %d, R-R %d    ", raz, dwa, tszy, cztery, piec, szesc);
+		//printf("R with virus: %d", Rwithvirus);
 
 		T++;
 		if (T == SimulationTime) {
