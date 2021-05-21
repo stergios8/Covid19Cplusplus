@@ -2218,7 +2218,8 @@ int main()
 	std::uniform_int_distribution <int> distribution_employees(3, 9);
 	std::uniform_real_distribution <float> distribution_homeless(0, 1);
 	std::uniform_real_distribution <float> distribution_employeed(0, 1);
-	std::_Beta_distribution <float> distribution_age(2, 5);
+	std::normal_distribution <float> distribution_age(42.0, 28.0);
+	std::uniform_int_distribution <int> distribution_age_below_one(1, 17);
 	std::uniform_int_distribution <int> distribution_social_stratum(1, 5);
 	std::uniform_int_distribution <int> distribution_unemployeed_social_stratum(1, 2);
 	std::uniform_real_distribution <float> distribution_immune(0, 1);
@@ -2551,7 +2552,13 @@ int main()
 			}
 
 			//person.action = 0;
-			person.age = (int)(distribution_age(generator) * 100);
+			//person.age = (int)(distribution_age(generator) * 100);
+			person.age = (int)(distribution_age(generator));
+			if (person.age < 1)
+			{
+
+				person.age = distribution_age_below_one(generator);
+			}
 			float w = distribution_homeless(generator);
 			if (w <= (1 - homeless_rate)) {
 				person.homeless = 0;
@@ -2625,7 +2632,12 @@ int main()
 			person.dy = 1;
 			person.group = 2;
 			//person.action = 0;
-			person.age = (int)(distribution_age(generator) * 100);
+			//person.age = (int)(distribution_age(generator) * 100);
+			person.age = (int)(distribution_age(generator));
+			if (person.age < 1)
+			{
+				person.age = distribution_age_below_one(generator);
+			}
 			person.homeless = 0;
 
 			if (person.age < 17 || person.age > 66) {
@@ -3340,8 +3352,8 @@ int main()
 	int policyx;
 	bool choice = false;
 	//printf("\nChoose starting policy...\n");
-	//printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
-	//std::cin >> policyx;
+	printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
+	std::cin >> policyx;
 
 
 	char inputData = 'y';
@@ -3480,7 +3492,7 @@ int main()
 
 		contactsPerDay1 = 0;
 
-		policyx = Policy_Array[T];
+		//policyx = Policy_Array[T];
 
 		if (policyx == -1)
 		{
