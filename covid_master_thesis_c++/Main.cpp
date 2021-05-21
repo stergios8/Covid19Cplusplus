@@ -14,7 +14,7 @@
 float homeless_rate = 0.0005;
 float initial_infected_rate = 0.01;
 float initial_immune_rate = 0.01;
-float unemployment_rate = 0.045;
+float unemployment_rate = 0.045; //danish
 float business_proportion = 0.01875;
 float business_proportion_informal = 0.4;
 int total_Wealth = 1000000000;
@@ -68,7 +68,7 @@ int hospital_fee = 100;
 int family_size_average = 3;
 int no_houses = (int)(N / family_size_average);
 int no_workplaces = (int)((N * business_proportion) + (N * business_proportion_informal));
-
+//int no_workplaces = 21; //danish
 //Environment
 
 int Length = 300;  //each pixel corresponds to area 5x5 meters.
@@ -110,7 +110,7 @@ int I_icu_max = N * 0.01; // 4
 
 //Bills
 int workplace_tax = 1000;
-int house_tax = 500;
+int house_tax = 600;
 
 float reward = 0;
 
@@ -785,7 +785,7 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 					return true;
 				}
 			}
-			if ((person1.group == 3 && person2.group == 2) || (person1.group == 2 && person2.group == 3)) {
+			/*if ((person1.group == 3 && person2.group == 2) || (person1.group == 2 && person2.group == 3)) {
 				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
@@ -804,8 +804,8 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 				}
 				dwa++;
 				return true;
-			}
-			if ((person1.group == 3 && person2.group == 3 && person1.carry_virus == 1) || (person1.group == 2 && person2.group == 3 && person2.carry_virus == 1)) {
+			}*/
+			/*if ((person1.group == 3 && person2.group == 3 && person1.carry_virus == 1) || (person1.group == 2 && person2.group == 3 && person2.carry_virus == 1)) {
 				unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 				std::default_random_engine generator(seed);
 				std::uniform_real_distribution <float> distribution(0, 1);
@@ -823,7 +823,7 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 				}
 				tszy++;
 				return true;
-			}
+			}*/
 		}
 		else {
 			if ((person1.x < person1.house.x + person1.house.dx) && (person1.x > person1.house.x - person1.house.dx) && (person1.y < person1.house.y + person1.house.dy) && (person1.y > person1.house.y - person1.house.dy)) {
@@ -871,7 +871,7 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 						cztery++;
 						return true;
 					}
-					if ((person1.group == 3 && person2.group == 2) || (person1.group == 2 && person2.group == 3)) {
+					/*if ((person1.group == 3 && person2.group == 2) || (person1.group == 2 && person2.group == 3)) {
 						unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 						std::default_random_engine generator(seed);
 						std::uniform_real_distribution <float> distribution(0, 1);
@@ -890,8 +890,8 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 						}
 						piec++;
 						return true;
-					}
-					if ((person1.group == 3 && person2.group == 3 && person1.carry_virus == 1) || (person1.group == 2 && person2.group == 3 && person2.carry_virus == 1)) {
+					}*/
+					/*if ((person1.group == 3 && person2.group == 3 && person1.carry_virus == 1) || (person1.group == 2 && person2.group == 3 && person2.carry_virus == 1)) {
 						unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 						std::default_random_engine generator(seed);
 						std::uniform_real_distribution <float> distribution(0, 1);
@@ -910,7 +910,7 @@ bool contact(Human& person1, Human& person2, int day, double contagion_probabili
 						}
 						szesc++;
 						return true;
-					}
+					}*/
 				}
 			}
 		}
@@ -2215,11 +2215,12 @@ int main()
 	std::uniform_int_distribution <int> distribution_dx_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_dy_workplace(1, 7);
 	std::uniform_int_distribution <int> distribution_family(2, 4);
-	std::uniform_int_distribution <int> distribution_employees(3, 9);
+	std::uniform_int_distribution <int> distribution_employees(4, 6);
 	std::uniform_real_distribution <float> distribution_homeless(0, 1);
 	std::uniform_real_distribution <float> distribution_employeed(0, 1);
 	std::normal_distribution <float> distribution_age(42.0, 28.0);
 	std::uniform_int_distribution <int> distribution_age_below_one(1, 17);
+	std::uniform_int_distribution <int> distribution_age_over_hundred(80, 100);
 	std::uniform_int_distribution <int> distribution_social_stratum(1, 5);
 	std::uniform_int_distribution <int> distribution_unemployeed_social_stratum(1, 2);
 	std::uniform_real_distribution <float> distribution_immune(0, 1);
@@ -2319,6 +2320,8 @@ int main()
 			std::string pw;
 			std::string ss;
 			std::string ee;
+			std::string it;
+			std::string rt;
 
 			Human person;
 
@@ -2356,8 +2359,12 @@ int main()
 			person.personal_expenses = std::stoi(pe);
 			std::getline(read_excel_HUMANS, pw, ',');
 			person.personal_wealth = std::stoi(pw);
-			std::getline(read_excel_HUMANS, ee);
+			std::getline(read_excel_HUMANS, ee, ',');
 			person.essential_worker = std::stoi(ee);
+			std::getline(read_excel_HUMANS, it, ',');
+			person.incubation_time = std::stoi(it);
+			std::getline(read_excel_HUMANS, rt);
+			person.recovery_time = std::stoi(rt);
 
 			PPL.push_back(person);
 			//printf("\nx = %d, y = %d, dx = %d, dy = %d, group = %d, age = %d, hl = %d, ue = %d, xh = %d, yh = %d, xw = %d, yw = %d, stu = %d, ss = %d, pi = %d, pe = %d,  pw = %d, ee = %d\n", PPL[i].x, PPL[i].y, PPL[i].dx, PPL[i].dy, PPL[i].group, PPL[i].age, PPL[i].homeless, PPL[i].unemployed, PPL[i].x_home, PPL[i].y_home, PPL[i].x_work, PPL[i].y_work, PPL[i].student, PPL[i].social_stratum, PPL[i].personal_income, PPL[i].personal_expenses, PPL[i].personal_wealth, PPL[i].essential_worker);
@@ -2559,6 +2566,12 @@ int main()
 
 				person.age = distribution_age_below_one(generator);
 			}
+
+			if (person.age > 110)
+			{
+
+				person.age = distribution_age_over_hundred(generator);
+			}
 			float w = distribution_homeless(generator);
 			if (w <= (1 - homeless_rate)) {
 				person.homeless = 0;
@@ -2637,6 +2650,11 @@ int main()
 			if (person.age < 1)
 			{
 				person.age = distribution_age_below_one(generator);
+			}
+			if (person.age > 110)
+			{
+
+				person.age = distribution_age_over_hundred(generator);
 			}
 			person.homeless = 0;
 
@@ -3129,7 +3147,7 @@ int main()
 			for (int i = 0; i < N; i++)
 
 			{
-				excel_file_HUMANS << PPL[i].x << "," << PPL[i].y << "," << PPL[i].dx << "," << PPL[i].dy << "," << PPL[i].group << "," << PPL[i].age << "," << PPL[i].homeless << "," << PPL[i].unemployed << "," << PPL[i].x_home << "," << PPL[i].y_home << "," << PPL[i].x_work << "," << PPL[i].y_work << "," << PPL[i].student << "," << PPL[i].social_stratum << "," << PPL[i].personal_income << "," << PPL[i].personal_expenses << "," << PPL[i].personal_wealth << "," << PPL[i].essential_worker << std::endl;
+				excel_file_HUMANS << PPL[i].x << "," << PPL[i].y << "," << PPL[i].dx << "," << PPL[i].dy << "," << PPL[i].group << "," << PPL[i].age << "," << PPL[i].homeless << "," << PPL[i].unemployed << "," << PPL[i].x_home << "," << PPL[i].y_home << "," << PPL[i].x_work << "," << PPL[i].y_work << "," << PPL[i].student << "," << PPL[i].social_stratum << "," << PPL[i].personal_income << "," << PPL[i].personal_expenses << "," << PPL[i].personal_wealth << "," << PPL[i].essential_worker << "," << PPL[i].incubation_time << "," << PPL[i].recovery_time << std::endl;
 
 			}
 
@@ -3211,8 +3229,8 @@ int main()
 
 	// debbuging
 
-		//printf("\nxhome = %d, yhome = %d \n", PPL[55].x_home, PPL[55].y_home);
-		//printf("\nxwork = %d, ywork = %d \n", PPL[55].x_work, PPL[55].y_work);
+		//printf("\nxhome = %d, yhome = %d \n", PPL[62].x_home, PPL[62].y_home);
+		//printf("\nxwork = %d, ywork = %d \n", PPL[62].x_work, PPL[62].y_work);
 
 
 	char want_vaccination;
@@ -3355,8 +3373,8 @@ int main()
 	printf("\nPress 0 if you want to run policy0, 1 to run policy1, 2 to run policy2, 3 to run policy3, , 4 to run policy4, 5 to run policy5 or 6 to run policy6\n");
 	std::cin >> policyx;
 
-
-	char inputData = 'y';
+	//Qtable
+	/*char inputData = 'y';
 	printf("\nRead Qtable? y - yes, other - no\n");
 	//std::cin >> inputData;
 	if (inputData == 'y') {
@@ -3394,7 +3412,7 @@ int main()
 
 			//printf("\nx = %d, y = %d, ih = %d, is = %d\n", HOS.x, HOS.y, HOS.infected_hospitalized, HOS.intected_severe);
 		}
-	}
+	}*/
 	Personal_Wealth_Array.push_back(personal_Wealth_total);
 	House_Wealth_Array.push_back(public_Wealth_total);
 	Business_Wealth_Array.push_back(business_Wealth_total);
@@ -3866,7 +3884,7 @@ int main()
 		Iharray.push_back(Ih);
 		Isarray.push_back(Is);
 
-		if (I < 300 && Ih < 8 && Is < 4)
+	/*	if (I < 300 && Ih < 8 && Is < 4) //should be on
 
 		{
 			financial_reward_rate = 1;
@@ -3887,9 +3905,9 @@ int main()
 		{
 			financial_reward_rate = 0;
 		}
-
-		reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 300);
-		Financial_Reward_Array.push_back(reward_f);
+		*/
+		//reward_f = financial_reward_rate * (float)(delta_business_wealth_total / 300); //should be on
+		//Financial_Reward_Array.push_back(reward_f);//should be on
 		//Policy_Array.push_back(policyx);
 		//printf("\nDifference in business wealth is %d\n", delta_business_wealth_total);
 		//printf("\nreward rate is %f\n", financial_reward_rate);
@@ -3918,19 +3936,19 @@ int main()
 
 
 	char press_button_data1 = 'n';
-	printf("\nDo you want to save Q table? y - yes, other - no\n");
+	//printf("\nDo you want to save Q table? y - yes, other - no\n");//should be on
 	//std::cin >> press_button_data1;
-	if (press_button_data1 == 'y') {
-		printf("\nInput file name: \n");
-		std::string QtableFileName = "newq.csv";
+	//if (press_button_data1 == 'y') {//should be on
+	//	printf("\nInput file name: \n");//should be on
+		//std::string QtableFileName = "newq.csv";//should be on
 		//std::cin >> QtableFileName;
-		excel_qtab.open(QtableFileName);
+		//excel_qtab.open(QtableFileName);//should be on
 		//excel_qtab.open("po.csv");
-		for (int i = 0; i < SimulationTime; i++) {
+		/*for (int i = 0; i < SimulationTime; i++) {
 			excel_qtab << Qtable[i][0] << "," << Qtable[i][1] << "," << Qtable[i][2] << "," << Qtable[i][3] << "," << Qtable[i][4] << "," << Qtable[i][5] << "," << Qtable[i][6] << std::endl;
 		}
 		excel_qtab.close();
-	}
+	}*/ //should be on the loop
 
 
 
@@ -3949,12 +3967,12 @@ int main()
 	}
 	excel_file_Financial_results.close();
 
-	excel_file_Financial_Reward.open("Financial_Reward.csv");
+/*	excel_file_Financial_Reward.open("Financial_Reward.csv");
 	printf("\nPreparing Financial Reward excel file...\n");
 	for (int i = 0; i < T; i++) {
 		excel_file_Financial_Reward << Policy_Array[i] << "," << Iarray[i] << "," << Iharray[i] << "," << Isarray[i] << "," << Financial_Reward_Array[i] << std::endl;
 	}
-	excel_file_Financial_Reward.close();
+	excel_file_Financial_Reward.close();*/
 
 
 	printf("\nSEIR results excel file done!\n");
