@@ -1174,6 +1174,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1191,6 +1192,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1202,6 +1204,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1213,6 +1216,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1263,6 +1267,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1274,6 +1279,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1295,6 +1301,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1306,6 +1313,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1317,6 +1325,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1365,6 +1374,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -1376,6 +1386,7 @@ int policy0(int hour, int T) {
 					for (int j = 0; j < N; j++) {
 						if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 							if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+								//printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 								contactsPerDay = contactsPerDay + 1;
 							}
 						}
@@ -2178,6 +2189,7 @@ int policy6(int hour, int T) {
 			for (int j = 0; j < N; j++) {
 				if ((i != j) && PPL[i].x == PPL[j].x && PPL[i].y == PPL[j].y) {
 					if ((contact(PPL[i], PPL[j], T, contagion_probability) == true)) {
+						printf("\ngroup 1 is = %d and group 2 is = %d\n", PPL[i].group, PPL[j].group);
 						contactsPerDay = contactsPerDay + 1;
 					}
 				}
