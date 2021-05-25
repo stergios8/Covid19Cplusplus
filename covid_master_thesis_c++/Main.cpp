@@ -675,7 +675,7 @@ void financialInterferenceHome(Human& person, House& house)
 }
 void actionWorkplacePays(Human& person, Workplace& workplace)
 {
-	workplace.workplace_wealth = workplace.workplace_wealth - person.personal_income;
+	workplace.workplace_wealth = workplace.workplace_wealth - (person.personal_income);
 
 }
 void actionTransferSalaryToHome(Human& person, House& house)
@@ -2490,19 +2490,19 @@ int main()
 			workplace.social_stratum = distribution_social_stratum(generator);
 			if (workplace.social_stratum == 1 || workplace.social_stratum == 2)
 			{
-				workplace.profit = 0.001;
+				workplace.profit = 0.01;
 
 			}
 			else if (workplace.social_stratum == 3)
 			{
 
-				workplace.profit = 0.005;
+				workplace.profit = 0.025;
 			}
 
 			else if (workplace.social_stratum == 4 || workplace.social_stratum == 5)
 
 			{
-				workplace.profit = 0.01;
+				workplace.profit = 0.05;
 
 			}
 			workplace.no_workers = 0;
@@ -3691,12 +3691,12 @@ int main()
 				//printf("\nwork money pro bills = %d\n", WRP[i].workplace_wealth);
 				//printf("\ngov money pro bills_w = %d\n", goverment_wealth_total);
 				WRP[i].actionPayBills(); // works
-				/*if(policyx == 0 || policyx == 1)
-				{
+				//if(policyx == 0 || policyx == 2)
+				//{
 					//printf("\nwork money pro profit = %d\n", WRP[i].workplace_wealth);
 					BusinessProfit(WRP[i]);
 					//printf("\nwork money after profit = %d\n", WRP[i].workplace_wealth);
-				}*/
+				//}
 				//printf("\nwork money after bills = %d\n", WRP[i].workplace_wealth);
 				//printf("\ngov money after_w bills = %d\n", goverment_wealth_total);
 
