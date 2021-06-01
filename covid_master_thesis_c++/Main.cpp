@@ -1846,7 +1846,7 @@ int policy3(int hour, int T) {
 	int contactsPerDay = 0;
 
 	if (hour >= 0 && hour < 8) {
-		for (int timestamp = 0; timestamp < 200; timestamp++) {
+		for (int timestamp = 0; timestamp < 100; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].homeless == 0 && PPL[i].inHospital == 0) {
 					PPL[i].actionGoHome();
@@ -1863,7 +1863,7 @@ int policy3(int hour, int T) {
 		}
 	}
 	if (hour > 7 && hour < 12) {
-		for (int timestamp = 0; timestamp < 200; timestamp++) {
+		for (int timestamp = 0; timestamp < 100; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
@@ -1891,7 +1891,7 @@ int policy3(int hour, int T) {
 		}
 	}
 	if (hour > 11 && hour < 13) {
-		for (int timestamp = 0; timestamp < 200; timestamp++) {
+		for (int timestamp = 0; timestamp < 100; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
@@ -1949,7 +1949,7 @@ int policy3(int hour, int T) {
 		}
 	}
 	if (hour > 14 && hour < 19) {
-		for (int timestamp = 0; timestamp < 200; timestamp++) {
+		for (int timestamp = 0; timestamp < 100; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].unemployed == 0 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionGoWork();
@@ -1977,7 +1977,7 @@ int policy3(int hour, int T) {
 		}
 	}
 	if (hour > 18 && hour < 24) {
-		for (int timestamp = 0; timestamp < 200; timestamp++) {
+		for (int timestamp = 0; timestamp < 100; timestamp++) {
 			for (int i = 0; i < N; i++) {
 				if (PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && (PPL[i].age < 60 && PPL[i].age > 16)) {
 					PPL[i].actionWalkFree();
@@ -2053,7 +2053,7 @@ int policy4(int hour, int T) {
 
 		if (lockdownForPolicy4 == 1) {
 			if (hour >= 0 && hour < 8) {
-				for (int timestamp = 0; timestamp < 200; timestamp++) {
+				for (int timestamp = 0; timestamp < 100; timestamp++) {
 					if (PPL[i].homeless == 0) {
 						PPL[i].actionGoHome();
 						PPL[i].actionStayHome();
@@ -2068,7 +2068,7 @@ int policy4(int hour, int T) {
 				}
 			}
 			if (hour > 7 && hour < 17) {
-				for (int timestamp = 0; timestamp < 200; timestamp++) {
+				for (int timestamp = 0; timestamp < 100; timestamp++) {
 					if (PPL[i].unemployed == 0 && PPL[i].essential_worker == 1 && PPL[i].quarantined == 0 && PPL[i].inHospital == 0 && PPL[i].age < 60 && PPL[i].age > 16) {
 						PPL[i].actionGoWork();
 						PPL[i].actionStayAtWork2();
@@ -2094,7 +2094,7 @@ int policy4(int hour, int T) {
 				}
 			}
 			if (hour > 16 && hour < 24) {
-				for (int timestamp = 0; timestamp < 200; timestamp++) {
+				for (int timestamp = 0; timestamp < 100; timestamp++) {
 					PPL[i].actionGoHome();
 					PPL[i].actionStayHome();
 					for (int j = 0; j < N; j++) {
